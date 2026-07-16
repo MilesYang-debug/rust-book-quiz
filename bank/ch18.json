@@ -1,0 +1,257 @@
+{
+  "chapter": 18,
+  "title": "Object-Oriented Programming Features of Rust",
+  "link": "https://doc.rust-lang.org/book/ch18-00-oop.html",
+  "questions": [
+    {
+      "id": "ch18-q01",
+      "section": "18.1 Characteristics of Object-Oriented Languages",
+      "tag": "Concept",
+      "difficulty": 1,
+      "prompt": "The book cites the Gang of Four definition: an object packages both data and the procedures that operate on that data. By this definition, why does Rust qualify as object-oriented?",
+      "options": {
+        "A": "Rust has a `class` keyword that bundles fields and methods together",
+        "B": "Structs and enums hold data, and `impl` blocks provide methods on them, packaging data and behavior together",
+        "C": "Rust requires every type to inherit from a common base object",
+        "D": "Rust automatically generates getters and setters for every struct field"
+      },
+      "answer": "B",
+      "explanation": "Rust has no `class` keyword and no base object. Structs and enums carry the data, and `impl` blocks define the methods that operate on that data, which satisfies the Gang of Four definition even though the book doesn't call them \"objects\"."
+    },
+    {
+      "id": "ch18-q02",
+      "section": "18.1 Characteristics of Object-Oriented Languages",
+      "tag": "Spot the Bug",
+      "difficulty": 2,
+      "prompt": "This code uses the book's `AveragedCollection`. Why does it fail to compile?",
+      "code": "mod stats {\n    pub struct AveragedCollection {\n        list: Vec<i32>,\n        average: f64,\n    }\n\n    impl AveragedCollection {\n        pub fn new() -> Self {\n            AveragedCollection { list: vec![], average: 0.0 }\n        }\n        pub fn add(&mut self, value: i32) {\n            self.list.push(value);\n            self.update_average();\n        }\n        pub fn average(&self) -> f64 {\n            self.average\n        }\n        fn update_average(&mut self) {\n            let total: i32 = self.list.iter().sum();\n            self.average = total as f64 / self.list.len() as f64;\n        }\n    }\n}\n\nfn main() {\n    let mut c = stats::AveragedCollection::new();\n    c.add(10);\n    c.list.push(20);\n    println!(\"{}\", c.average());\n}",
+      "options": {
+        "A": "`update_average` cannot be called from `add` because it takes `&mut self`",
+        "B": "`AveragedCollection::new` must be marked `const` to be usable in `main`",
+        "C": "`c.list.push(20)` accesses the private field `list` from outside its module; fields are private by default even when the struct is `pub`",
+        "D": "`average` and the field `self.average` conflict, so the method shadows the field"
+      },
+      "answer": "C",
+      "explanation": "Marking the struct `pub` does not expose its fields; each field stays private unless individually marked `pub`. This is Rust's encapsulation: outside code must go through `add`/`remove`/`average`, so the cached `average` can never get out of sync with `list`. `c.list.push(20)` fails with E0616 (field is private). A method and a field may share a name, so D is not an error."
+    },
+    {
+      "id": "ch18-q03",
+      "section": "18.1 Characteristics of Object-Oriented Languages",
+      "tag": "Misconception",
+      "difficulty": 1,
+      "prompt": "A developer coming from Java asks how to make a `struct` inherit fields and methods from a parent `struct`. What does the book say?",
+      "options": {
+        "A": "Use the `#[derive(Inherit)]` attribute to copy the parent's fields and methods",
+        "B": "Rust has no inheritance; for code reuse it offers default trait method implementations, and for polymorphism it offers generics and trait objects",
+        "C": "Embed the parent struct as the first field and Rust will automatically delegate all method calls to it",
+        "D": "Implement `Deref` to the parent type, which the book presents as Rust's official inheritance mechanism"
+      },
+      "answer": "B",
+      "explanation": "There is no way to define a struct that inherits another struct's fields and method implementations (without macros). The book's alternatives are default method implementations in traits (reuse of behavior) and generics with trait bounds or trait objects (polymorphism). Embedding a field does not auto-delegate, and using `Deref` to fake inheritance is an anti-pattern, not a book recommendation."
+    },
+    {
+      "id": "ch18-q04",
+      "section": "18.1 Characteristics of Object-Oriented Languages",
+      "tag": "Concept",
+      "difficulty": 2,
+      "prompt": "Select ALL statements that correctly describe how Rust relates to classic object-oriented characteristics.",
+      "options": {
+        "A": "Structs and enums with `impl` blocks package data and behavior, satisfying the Gang of Four definition of objects",
+        "B": "Struct fields are private by default, and the `pub` keyword opts specific items into the public API, which provides encapsulation",
+        "C": "A struct can inherit the fields of another struct by listing it after a colon, as in `struct Child: Parent`",
+        "D": "Default trait method implementations give a limited form of code sharing similar to a subclass inheriting a method it can also override",
+        "E": "The only form of polymorphism Rust supports is dynamic dispatch through trait objects"
+      },
+      "answer": ["A", "B", "D"],
+      "explanation": "A, B, and D are exactly the book's points. C is not Rust syntax; there is no struct inheritance. E is wrong because Rust also has compile-time polymorphism: generics with trait bounds, which the book calls bounded parametric polymorphism."
+    },
+    {
+      "id": "ch18-q05",
+      "section": "18.2 Using Trait Objects That Allow for Values of Different Types",
+      "tag": "Concept",
+      "difficulty": 1,
+      "prompt": "In the type `Box<dyn Draw>`, what does the `dyn Draw` part denote?",
+      "options": {
+        "A": "A trait object: a value of any type that implements `Draw`, used behind a pointer, with the concrete method found at runtime",
+        "B": "A generic type parameter that the compiler replaces with one concrete type at compile time",
+        "C": "A special struct named `Draw` that the compiler generates automatically",
+        "D": "A dynamically sized array of values that implement `Draw`"
+      },
+      "answer": "A",
+      "explanation": "A trait object points to an instance of some type implementing the trait plus a table used to look up that type's trait methods at runtime. Trait objects must live behind a pointer such as `Box<dyn Draw>` or `&dyn Draw`. Unlike a generic parameter (B), the concrete type is not fixed at compile time."
+    },
+    {
+      "id": "ch18-q06",
+      "section": "18.2 Using Trait Objects That Allow for Values of Different Types",
+      "tag": "Concept",
+      "difficulty": 2,
+      "prompt": "The book defines `Screen` with `components: Vec<Box<dyn Draw>>` instead of a generic `Screen<T: Draw>` with `components: Vec<T>`. What is the key capability the trait-object version gains?",
+      "options": {
+        "A": "It compiles faster because the compiler skips type checking of the components",
+        "B": "One `Screen` can hold a mix of different concrete types (e.g., `Button` and `SelectBox`) in the same vector, whereas the generic version is substituted with a single concrete type, so its vector is homogeneous",
+        "C": "It allows the components to be modified without `&mut`, since trait objects have interior mutability",
+        "D": "It makes every `draw` call faster because the vtable caches results"
+      },
+      "answer": "B",
+      "explanation": "A generic parameter is monomorphized to exactly one concrete type per instantiation, so `Screen<Button>` could only ever hold `Button`s. `Vec<Box<dyn Draw>>` is a heterogeneous collection: each element can be a different concrete type as long as it implements `Draw`. The trade-off is runtime dispatch, not faster compilation or faster calls."
+    },
+    {
+      "id": "ch18-q07",
+      "section": "18.2 Using Trait Objects That Allow for Values of Different Types",
+      "tag": "Code Output",
+      "difficulty": 2,
+      "prompt": "What does this program print?",
+      "code": "trait Draw {\n    fn draw(&self);\n}\n\nstruct Button;\nstruct Slider;\n\nimpl Draw for Button {\n    fn draw(&self) {\n        print!(\"B\");\n    }\n}\n\nimpl Draw for Slider {\n    fn draw(&self) {\n        print!(\"S\");\n    }\n}\n\nfn main() {\n    let components: Vec<Box<dyn Draw>> = vec![\n        Box::new(Slider),\n        Box::new(Button),\n        Box::new(Slider),\n    ];\n    for c in components.iter() {\n        c.draw();\n    }\n}",
+      "options": {
+        "A": "`BSS`",
+        "B": "`SBS`",
+        "C": "It does not compile: a `Vec` cannot contain two different concrete types",
+        "D": "It does not compile: `draw` must be called as `Draw::draw(c)` on trait objects"
+      },
+      "answer": "B",
+      "explanation": "Each `Box<dyn Draw>` erases the concrete type, so the vector legally mixes `Slider` and `Button`. At runtime, dynamic dispatch selects each element's own `draw` implementation in iteration order: `Slider`, `Button`, `Slider`, printing `SBS`. Method-call syntax works fine on trait objects."
+    },
+    {
+      "id": "ch18-q08",
+      "section": "18.2 Using Trait Objects That Allow for Values of Different Types",
+      "tag": "Spot the Bug",
+      "difficulty": 2,
+      "prompt": "Using the book's `Screen`, why does this code fail to compile?",
+      "code": "pub trait Draw {\n    fn draw(&self);\n}\n\npub struct Screen {\n    pub components: Vec<Box<dyn Draw>>,\n}\n\nfn main() {\n    let screen = Screen {\n        components: vec![Box::new(String::from(\"Hi\"))],\n    };\n}",
+      "options": {
+        "A": "`String` does not implement `Draw`, so `Box<String>` cannot be coerced to `Box<dyn Draw>` (error E0277)",
+        "B": "`String` is dynamically sized, so it can never be placed in a `Box`",
+        "C": "The `vec!` macro cannot construct a vector of boxed values",
+        "D": "`components` is `pub`, so it can only be initialized from another module"
+      },
+      "answer": "A",
+      "explanation": "Trait objects accept any concrete type, but only types that actually implement the trait. `String` has no `Draw` impl, so the compiler rejects the coercion with \"the trait bound `String: Draw` is not satisfied\" (E0277). This check happens at compile time, so you never get a runtime \"method not found\" error. Boxing a `String` is otherwise perfectly legal."
+    },
+    {
+      "id": "ch18-q09",
+      "section": "18.2 Using Trait Objects That Allow for Values of Different Types",
+      "tag": "Behavior",
+      "difficulty": 2,
+      "prompt": "Compare `fn show<T: Draw>(item: &T)` with `fn show(item: &dyn Draw)`. Which statement correctly describes how each call is dispatched?",
+      "options": {
+        "A": "Both use dynamic dispatch, because `Draw` is a trait in both signatures",
+        "B": "The generic version is monomorphized: the compiler emits specialized code per concrete type and uses static dispatch; the `&dyn Draw` version looks up the method at runtime (dynamic dispatch), which has a runtime cost and prevents inlining",
+        "C": "The generic version decides the method at runtime, while `&dyn Draw` is resolved at compile time",
+        "D": "There is no difference: the compiler always optimizes both into direct calls"
+      },
+      "answer": "B",
+      "explanation": "Generics undergo monomorphization: nongeneric copies are generated for each concrete type used, so the exact method is known at compile time (static dispatch) and can be inlined. With `dyn Draw` the compiler cannot know the concrete type, so it emits a runtime lookup through the trait object's method table, which costs a lookup and blocks inlining and related optimizations."
+    },
+    {
+      "id": "ch18-q10",
+      "section": "18.2 Using Trait Objects That Allow for Values of Different Types",
+      "tag": "Spot the Bug",
+      "difficulty": 3,
+      "prompt": "This code fails to compile at the function signature. Why?",
+      "code": "trait Widget {\n    fn duplicate(&self) -> Self;\n    fn name(&self) -> String;\n}\n\nfn store(widgets: Vec<Box<dyn Widget>>) {\n    for w in widgets.iter() {\n        println!(\"{}\", w.name());\n    }\n}",
+      "options": {
+        "A": "`name` returns an owned `String`, which trait objects cannot do",
+        "B": "A trait used as a trait object may not have more than one method",
+        "C": "`duplicate` returns `Self`, so `Widget` is not dyn compatible (not object safe): once the concrete type is erased, the compiler cannot know what `Self` is",
+        "D": "`Vec` cannot store `Box` values; `Rc<dyn Widget>` is required"
+      },
+      "answer": "C",
+      "explanation": "To be usable as `dyn Widget`, a trait must be dyn compatible: at the book's level, its methods must not return `Self` and must not have generic type parameters. Behind `dyn Widget` the concrete type is erased, so a return type of `Self` is unknowable. `name` returning `String` is fine, traits may have many methods, and `Vec<Box<...>>` is a normal type."
+    },
+    {
+      "id": "ch18-q11",
+      "section": "18.2 Using Trait Objects That Allow for Values of Different Types",
+      "tag": "Behavior",
+      "difficulty": 3,
+      "prompt": "Select ALL statements that are true about trait objects and generics in Rust.",
+      "options": {
+        "A": "A `Vec<Box<dyn Draw>>` can hold values of several different concrete types at the same time",
+        "B": "A generic `Vec<T>` where `T: Draw` can mix `Button` and `SelectBox` values in one vector",
+        "C": "Method calls on a trait object are resolved at runtime by looking the method up in a table of function pointers",
+        "D": "Monomorphization generates a specialized, nongeneric copy of generic code for each concrete type it is used with",
+        "E": "Dynamic dispatch enables the compiler to inline trait-object method calls more aggressively than static dispatch"
+      },
+      "answer": ["A", "C", "D"],
+      "explanation": "A: trait objects allow heterogeneous collections. C: a trait object carries a pointer to the value plus a table used to find the right method at runtime. D: that is the definition of monomorphization. B is false because `T` is substituted with exactly one concrete type, so the vector is homogeneous. E is backwards: dynamic dispatch prevents inlining because the target is unknown at compile time."
+    },
+    {
+      "id": "ch18-q12",
+      "section": "18.3 Implementing an Object-Oriented Design Pattern",
+      "tag": "Concept",
+      "difficulty": 2,
+      "prompt": "In the blog example, `Post` stores `state: Option<Box<dyn State>>`, and `request_review` calls `self.state.take()`. Why is `take` needed?",
+      "code": "pub fn request_review(&mut self) {\n    if let Some(s) = self.state.take() {\n        self.state = Some(s.request_review())\n    }\n}",
+      "options": {
+        "A": "`take` clones the state so the old state and the new state can coexist",
+        "B": "`State::request_review` takes `self: Box<Self>` and consumes the old state; `take` moves the `Box` out of the field (leaving `None`) because Rust won't let you move a value out of a struct behind `&mut self`",
+        "C": "`take` is required to free the old state's memory before the new state is allocated",
+        "D": "`take` switches the call from dynamic dispatch to static dispatch for performance"
+      },
+      "answer": "B",
+      "explanation": "The transition methods consume the boxed state (`self: Box<Self>`) so the old state value is invalidated. Rust forbids moving a field out of a borrowed struct, so the field is `Option` and `take()` swaps in `None`, yielding ownership of the `Box`. The result of `s.request_review()` is then stored back with `Some(...)`. No cloning happens, and dispatch is still dynamic."
+    },
+    {
+      "id": "ch18-q13",
+      "section": "18.3 Implementing an Object-Oriented Design Pattern",
+      "tag": "Code Output",
+      "difficulty": 2,
+      "prompt": "Using the book's completed state-pattern `Post` (Draft -> PendingReview -> Published), what does this program print?",
+      "code": "fn main() {\n    let mut post = Post::new();\n    post.add_text(\"Hello\");\n    println!(\"[{}]\", post.content());\n    post.request_review();\n    println!(\"[{}]\", post.content());\n    post.approve();\n    println!(\"[{}]\", post.content());\n}",
+      "options": {
+        "A": "`[Hello]` then `[Hello]` then `[Hello]`",
+        "B": "`[]` then `[]` then `[Hello]`",
+        "C": "`[]` then `[Hello]` then `[Hello]`",
+        "D": "It panics on the first call to `content` because the post is still a draft"
+      },
+      "answer": "B",
+      "explanation": "The `State` trait's `content` method has a default implementation returning `\"\"`, which `Draft` and `PendingReview` use; only `Published` overrides it to return `&post.content`. So the text is invisible while the post is in `Draft` and `PendingReview`, and appears only after `approve` transitions the state to `Published`. Nothing panics; `content` on a draft just returns the empty string."
+    },
+    {
+      "id": "ch18-q14",
+      "section": "18.3 Implementing an Object-Oriented Design Pattern",
+      "tag": "Code Output",
+      "difficulty": 1,
+      "prompt": "Still using the book's state-pattern `Post`: `approve` on the `Draft` state returns `self` unchanged. What does this print?",
+      "code": "fn main() {\n    let mut post = Post::new();\n    post.add_text(\"Draft text\");\n    post.approve(); // approve without request_review\n    println!(\"[{}]\", post.content());\n}",
+      "options": {
+        "A": "`[Draft text]`",
+        "B": "`[]`",
+        "C": "It panics because `approve` is invalid in the `Draft` state",
+        "D": "It does not compile because `approve` may only be called after `request_review`"
+      },
+      "answer": "B",
+      "explanation": "`Draft::approve` returns `self`, so approving a draft is a silent no-op and the post stays in `Draft`, whose `content` is the default `\"\"`. This is exactly the behavior the pattern encodes: invalid transitions do nothing at runtime rather than being rejected. The compiler cannot enforce call order here, which motivates the alternative of encoding states as types."
+    },
+    {
+      "id": "ch18-q15",
+      "section": "18.3 Implementing an Object-Oriented Design Pattern",
+      "tag": "Concept",
+      "difficulty": 3,
+      "prompt": "Which of the following is a genuine downside of the trait-object state pattern that the book calls out?",
+      "options": {
+        "A": "The states are coupled to one another: `PendingReview` itself creates `Published`, so inserting a new state (e.g., `Scheduled`) between them requires changing existing state code; there is also duplicated transition logic",
+        "B": "It requires `unsafe` code to move the state between transitions",
+        "C": "Each state must be defined in a separate crate to satisfy the orphan rule",
+        "D": "Adding a new operation to `Post` requires editing every `match` on the state enum"
+      },
+      "answer": "A",
+      "explanation": "The book lists coupling between states (each state names its successor) and logic duplication (the similar `take`-delegate-restore bodies on `Post`, and states returning `self`, which can't be a default method because the trait wouldn't be dyn compatible). No `unsafe` or separate crates are involved, and there is no state enum or `match` in this implementation, which is precisely the point of the pattern."
+    },
+    {
+      "id": "ch18-q16",
+      "section": "18.3 Implementing an Object-Oriented Design Pattern",
+      "tag": "Misconception",
+      "difficulty": 3,
+      "prompt": "In the book's alternative that encodes states as separate types (`DraftPost`, `PendingReviewPost`, `Post`), a teammate claims: \"If you forget to call `approve` and try `content()` on a `PendingReviewPost`, the program panics at runtime.\" What actually happens?",
+      "code": "let mut post = Post::new(); // returns DraftPost\npost.add_text(\"Hello\");\nlet post = post.request_review(); // DraftPost -> PendingReviewPost\nassert_eq!(\"Hello\", post.content());",
+      "options": {
+        "A": "It panics, exactly as the teammate says",
+        "B": "It compiles and returns an empty string, like the trait-object version",
+        "C": "It fails to compile: `PendingReviewPost` simply has no `content` method, so the invalid use is impossible to express; transitions consume `self` and return the next type, moving the checks to compile time",
+        "D": "It compiles, but `content` returns `None` because the state is still pending"
+      },
+      "answer": "C",
+      "explanation": "Encoding states as types makes invalid states and transitions unrepresentable: only the published `Post` type defines `content`, and `request_review`/`approve` take `self` by value, consuming the old state so it cannot be reused. The cost is that callers must rebind (`let post = post.request_review();`) and the workflow is no longer fully encapsulated inside one type, but bugs like this one become compile-time errors instead of runtime behavior."
+    }
+  ]
+}

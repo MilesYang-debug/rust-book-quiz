@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">"Rust Book Quiz"</string>
+    <string name="main_activity_title">"Rust Book Quiz"</string>
+</resources>

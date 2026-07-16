@@ -1,0 +1,400 @@
+{
+ "chapter": 8,
+ "title": "Common Collections",
+ "link": "https://doc.rust-lang.org/book/ch08-00-common-collections.html",
+ "questions": [
+  {
+   "id": "ch08-q01",
+   "section": "8.1 Vectors",
+   "tag": "Concept",
+   "difficulty": 1,
+   "prompt": "Why does `let v: Vec<i32> = Vec::new();` need a type annotation, while `let v = vec![1, 2, 3];` does not?",
+   "options": {
+    "A": "The `vec!` macro can only ever create vectors of `i32`, so no annotation is possible",
+    "B": "`Vec::new()` provides no values, so the compiler cannot infer the element type; `vec![1, 2, 3]` lets it infer `i32` from the initial values",
+    "C": "`Vec::new()` requires an annotation because vectors store heterogeneous types by default",
+    "D": "The annotation is never actually required; it is purely a style convention"
+   },
+   "answer": "B",
+   "explanation": "`Vec<T>` is generic, and with an empty `Vec::new()` there are no elements from which to infer `T`. With `vec![1, 2, 3]`, the compiler infers `Vec<i32>` (the default integer type) from the values."
+  },
+  {
+   "id": "ch08-q02",
+   "section": "8.1 Vectors",
+   "tag": "Behavior",
+   "difficulty": 1,
+   "prompt": "Given `let v = vec![1, 2, 3, 4, 5];`, what is the difference between evaluating `&v[100]` and `v.get(100)`?",
+   "options": {
+    "A": "Both cause a panic at runtime",
+    "B": "`&v[100]` panics at runtime; `v.get(100)` returns `None`",
+    "C": "`&v[100]` is a compile-time error because the compiler can see the index is out of range",
+    "D": "`v.get(100)` panics at runtime; `&v[100]` returns `None`"
+   },
+   "answer": "B",
+   "explanation": "Indexing with `[]` panics on an out-of-bounds index, while `get` returns an `Option<&T>` (`None` when out of range), letting you handle the missing element gracefully."
+  },
+  {
+   "id": "ch08-q03",
+   "section": "8.1 Vectors",
+   "tag": "Spot the Bug",
+   "difficulty": 2,
+   "prompt": "What happens when you compile and run this program?",
+   "code": "fn main() {\n    let mut v = vec![1, 2, 3, 4, 5];\n\n    let first = &v[0];\n\n    v.push(6);\n\n    println!(\"The first element is: {first}\");\n}",
+   "options": {
+    "A": "It prints `The first element is: 1`",
+    "B": "It compiles but panics at runtime when `push` reallocates the vector",
+    "C": "It fails to compile: `v` cannot be borrowed as mutable because it is also borrowed as immutable (E0502)",
+    "D": "It prints `The first element is: 6`"
+   },
+   "answer": "C",
+   "explanation": "`first` is an immutable borrow of `v` that is still used after `v.push(6)`, which needs a mutable borrow. The borrow checker rejects this because `push` might reallocate the vector's memory and invalidate `first`."
+  },
+  {
+   "id": "ch08-q04",
+   "section": "8.1 Vectors",
+   "tag": "Code Output",
+   "difficulty": 2,
+   "prompt": "What does this program print?",
+   "code": "fn main() {\n    let mut v = vec![100, 32, 57];\n    for i in &mut v {\n        *i += 50;\n    }\n    println!(\"{:?}\", v);\n}",
+   "options": {
+    "A": "[100, 32, 57]",
+    "B": "[150, 82, 107]",
+    "C": "It fails to compile: cannot modify `v` while iterating over it",
+    "D": "[50, 50, 50]"
+   },
+   "answer": "B",
+   "explanation": "Iterating with `&mut v` yields mutable references to each element; the `*` dereference operator lets the loop add 50 to each value in place. Modifying element values through the loop's own mutable borrow is allowed."
+  },
+  {
+   "id": "ch08-q05",
+   "section": "8.1 Vectors",
+   "tag": "Concept",
+   "difficulty": 2,
+   "prompt": "A vector can only store elements of a single type. How does the book suggest storing an `i32`, an `f64`, and a `String` in the same vector?",
+   "options": {
+    "A": "Declare it as `Vec<i32, f64, String>` with multiple type parameters",
+    "B": "Define an enum whose variants hold each type and store enum values, since all variants are the same enum type",
+    "C": "Vectors automatically box mixed values, so you can push different types directly",
+    "D": "It is impossible to represent values of different kinds in one vector in any form"
+   },
+   "answer": "B",
+   "explanation": "An enum like `SpreadsheetCell { Int(i32), Float(f64), Text(String) }` gives every element the same type — the enum — while each variant carries different data. Trait objects cover cases where the set of types isn't known at compile time."
+  },
+  {
+   "id": "ch08-q06",
+   "section": "8.1 Vectors",
+   "tag": "Behavior",
+   "difficulty": 1,
+   "prompt": "What happens to a vector's elements when the vector goes out of scope?",
+   "options": {
+    "A": "Only the vector itself is freed; heap-allocated elements like `String`s must be freed manually",
+    "B": "The vector is freed and all of its contents are dropped as well",
+    "C": "The elements leak until the program exits",
+    "D": "The elements are dropped only if they implement the `Copy` trait"
+   },
+   "answer": "B",
+   "explanation": "Like any struct, a vector is freed when it goes out of scope, and dropping it also drops all of its elements. The borrow checker guarantees no references to elements outlive the vector."
+  },
+  {
+   "id": "ch08-q07",
+   "section": "8.1 Vectors",
+   "tag": "Code Output",
+   "difficulty": 1,
+   "prompt": "What does this program print?",
+   "code": "fn main() {\n    let mut v = vec![1, 2];\n    v.push(3);\n    println!(\"{}\", v[1] + v[2]);\n}",
+   "options": {
+    "A": "5",
+    "B": "3",
+    "C": "It fails to compile: `v[2]` is out of bounds",
+    "D": "It panics at runtime: index out of bounds"
+   },
+   "answer": "A",
+   "explanation": "After `push(3)` the vector is `[1, 2, 3]`, so `v[1]` is 2 and `v[2]` is 3, printing 5. Out-of-bounds indexing is a runtime check, not a compile-time one — and here both indices are valid."
+  },
+  {
+   "id": "ch08-q08",
+   "section": "8.1 Vectors",
+   "tag": "Behavior",
+   "difficulty": 2,
+   "prompt": "Which of the following statements about `Vec<T>` are true? (Select all that apply.)",
+   "options": {
+    "A": "Elements are stored next to each other in memory, and `push` may reallocate and move them",
+    "B": "`v.get(i)` returns an `Option<&T>` and never panics for an out-of-range index",
+    "C": "A vector can directly store elements of several different types without any enum or trait-object wrapper",
+    "D": "When a vector is dropped, all of its elements are dropped too",
+    "E": "Indexing with `&v[i]` returns `None` when `i` is out of bounds"
+   },
+   "answer": [
+    "A",
+    "B",
+    "D"
+   ],
+   "explanation": "Vectors store same-typed values contiguously on the heap, which is why growing may reallocate (and why holding a reference across a `push` is rejected). `get` returns an `Option`; `[]` indexing panics rather than returning `None`; mixed types require an enum or trait objects."
+  },
+  {
+   "id": "ch08-q09",
+   "section": "8.2 Strings",
+   "tag": "Concept",
+   "difficulty": 1,
+   "prompt": "What is the difference between `String` and `&str` in Rust?",
+   "options": {
+    "A": "`String` is an owned, growable, UTF-8 encoded string; `&str` is a borrowed string slice, which is what string literals are",
+    "B": "`String` is stored on the stack, while `&str` is always stored on the heap",
+    "C": "`String` can hold arbitrary bytes in any encoding, while `&str` must be ASCII",
+    "D": "They are interchangeable aliases for the same type"
+   },
+   "answer": "A",
+   "explanation": "`String` is the standard library's owned, growable string type (a wrapper around `Vec<u8>` holding UTF-8), while `str`/`&str` is a borrowed slice view into string data. Both must be valid UTF-8."
+  },
+  {
+   "id": "ch08-q10",
+   "section": "8.2 Strings",
+   "tag": "Behavior",
+   "difficulty": 2,
+   "prompt": "What happens when you compile and run this program?",
+   "code": "fn main() {\n    let mut s1 = String::from(\"foo\");\n    let s2 = \"bar\";\n    s1.push_str(s2);\n    println!(\"{s1} {s2}\");\n}",
+   "options": {
+    "A": "It fails to compile: `s2` was moved into `push_str` and can no longer be used",
+    "B": "It prints `foobar bar` — `push_str` takes a `&str`, so it does not take ownership of `s2`",
+    "C": "It fails to compile: `push_str` only accepts a `String`, not a string literal",
+    "D": "It prints `foo bar` because `push_str` returns a new string instead of modifying `s1`"
+   },
+   "answer": "B",
+   "explanation": "`push_str` has the signature `fn push_str(&mut self, s: &str)`: it borrows its argument rather than taking ownership, so `s2` remains usable afterward, and it appends in place to `s1`."
+  },
+  {
+   "id": "ch08-q11",
+   "section": "8.2 Strings",
+   "tag": "Spot the Bug",
+   "difficulty": 3,
+   "prompt": "What is wrong with this program?",
+   "code": "fn main() {\n    let s1 = String::from(\"Hello, \");\n    let s2 = String::from(\"world!\");\n    let s3 = s1 + &s2;\n    println!(\"{s1}{s3}\");\n}",
+   "options": {
+    "A": "Nothing; it prints `Hello, Hello, world!`",
+    "B": "`&s2` is the wrong type: `+` requires a `String` on the right-hand side, not a reference",
+    "C": "It fails to compile: `s1` was moved by the `+` operator (whose `add` method takes `self`) and cannot be used afterward",
+    "D": "It panics at runtime because `s1` was freed by the concatenation"
+   },
+   "answer": "C",
+   "explanation": "The `+` operator calls a method with a signature like `fn add(self, s: &str) -> String`, so it takes ownership of the left operand `s1`; using `s1` afterward is a compile-time \"borrow of moved value\" error. `&s2` is fine: `&String` deref-coerces to `&str`."
+  },
+  {
+   "id": "ch08-q12",
+   "section": "8.2 Strings",
+   "tag": "Spot the Bug",
+   "difficulty": 1,
+   "prompt": "What happens when you compile this program?",
+   "code": "fn main() {\n    let s = String::from(\"hello\");\n    let h = s[0];\n    println!(\"{h}\");\n}",
+   "options": {
+    "A": "It prints `h`",
+    "B": "It fails to compile: `String` cannot be indexed by an integer because it does not implement `Index<usize>`",
+    "C": "It compiles but panics at runtime with an index-out-of-bounds error",
+    "D": "It prints `104`, the byte value of `h`"
+   },
+   "answer": "B",
+   "explanation": "Rust rejects integer indexing of strings at compile time. Because `String` stores variable-width UTF-8 bytes, `s[0]` would be ambiguous (byte? char?) and could return an invalid fragment of a character, so the `Index<usize>` operation simply isn't implemented."
+  },
+  {
+   "id": "ch08-q13",
+   "section": "8.2 Strings",
+   "tag": "Code Output",
+   "difficulty": 3,
+   "prompt": "Each character in this Cyrillic string takes 2 bytes in UTF-8. What happens when you run this program?",
+   "code": "fn main() {\n    let hello = \"Здравствуйте\";\n    let s = &hello[0..1];\n    println!(\"{s}\");\n}",
+   "options": {
+    "A": "It prints the first letter, `З`",
+    "B": "It fails to compile: ranges cannot be used to slice strings",
+    "C": "It panics at runtime: byte index 1 is not a char boundary",
+    "D": "It prints the first byte of `З` as a number"
+   },
+   "answer": "C",
+   "explanation": "Slicing a string by a byte range compiles, but if the range ends in the middle of a multi-byte character, the program panics at runtime — exactly as if an invalid vector index were accessed. `&hello[0..4]` would work and yield `Зд`."
+  },
+  {
+   "id": "ch08-q14",
+   "section": "8.2 Strings",
+   "tag": "Code Output",
+   "difficulty": 2,
+   "prompt": "What does this program print?",
+   "code": "fn main() {\n    let s = \"Зд\";\n    println!(\"{} {}\", s.len(), s.chars().count());\n}",
+   "options": {
+    "A": "2 2",
+    "B": "4 2",
+    "C": "2 4",
+    "D": "4 4"
+   },
+   "answer": "B",
+   "explanation": "`len` returns the number of bytes, and each of these Cyrillic letters takes 2 bytes in UTF-8, so `len` is 4. `.chars()` iterates over Unicode scalar values, of which there are 2."
+  },
+  {
+   "id": "ch08-q15",
+   "section": "8.2 Strings",
+   "tag": "Concept",
+   "difficulty": 2,
+   "prompt": "Which statements about building and concatenating strings are true? (Select all that apply.)",
+   "options": {
+    "A": "`push_str` takes a `&str` parameter and does not take ownership of its argument",
+    "B": "`push` appends a single `char` to a `String`",
+    "C": "The `+` operator takes ownership of its left-hand `String` operand",
+    "D": "`format!` takes ownership of all of its arguments",
+    "E": "`push_str` takes ownership of the string passed to it, so it cannot be used afterward"
+   },
+   "answer": [
+    "A",
+    "B",
+    "C"
+   ],
+   "explanation": "`push_str(&mut self, s: &str)` borrows its argument, `push` takes a single `char`, and `+` calls `add(self, s: &str)`, consuming the left operand. `format!` uses references, so none of its arguments are moved — which is one reason the book recommends it for combining multiple strings."
+  },
+  {
+   "id": "ch08-q16",
+   "section": "8.2 Strings",
+   "tag": "Misconception",
+   "difficulty": 3,
+   "prompt": "Which statements about inspecting UTF-8 encoded strings are true? (Select all that apply.)",
+   "options": {
+    "A": "The standard library includes an iterator over grapheme clusters (user-perceived letters)",
+    "B": "`len()` on a `String` returns the number of bytes, not the number of characters",
+    "C": "`.chars()` yields Unicode scalar values, so combining diacritics appear as separate items rather than as part of one letter",
+    "D": "Slicing `&s[0..n]` always succeeds as long as `n <= s.len()`",
+    "E": "`.bytes()` yields the raw `u8` values of the string's UTF-8 encoding"
+   },
+   "answer": [
+    "B",
+    "C",
+    "E"
+   ],
+   "explanation": "Strings are `Vec<u8>` wrappers, so `len` counts bytes and `.bytes()` exposes them; `.chars()` gives Unicode scalar values, which don't always match user-perceived letters (e.g., Devanagari diacritics). Grapheme-cluster iteration requires an external crate, and byte-range slicing panics if a boundary falls mid-character."
+  },
+  {
+   "id": "ch08-q17",
+   "section": "8.3 Hash Maps",
+   "tag": "Concept",
+   "difficulty": 1,
+   "prompt": "What must you do before you can use `HashMap` in your code?",
+   "options": {
+    "A": "Nothing — `HashMap` is included in the prelude like `Vec` and `String`",
+    "B": "Bring it into scope with `use std::collections::HashMap;`, since it is not in the prelude",
+    "C": "Add the external `hashmap` crate to `Cargo.toml`",
+    "D": "Import it with `use std::hash::HashMap;`"
+   },
+   "answer": "B",
+   "explanation": "Of the three common collections, `HashMap` is the least often used, so it's not brought into scope automatically by the prelude. It lives in `std::collections` and requires a `use` statement (no external crate needed)."
+  },
+  {
+   "id": "ch08-q18",
+   "section": "8.3 Hash Maps",
+   "tag": "Code Output",
+   "difficulty": 2,
+   "prompt": "What does this program print?",
+   "code": "use std::collections::HashMap;\n\nfn main() {\n    let mut scores = HashMap::new();\n    scores.insert(String::from(\"Blue\"), 10);\n\n    let team_name = String::from(\"Red\");\n    let score = scores.get(&team_name).copied().unwrap_or(0);\n    println!(\"{score}\");\n}",
+   "options": {
+    "A": "10",
+    "B": "0",
+    "C": "It panics at runtime because the key `Red` is missing",
+    "D": "It fails to compile: `get` returns an `i32`, so `copied` cannot be called on it"
+   },
+   "answer": "B",
+   "explanation": "`get` returns `Option<&V>` — here `None` because `\"Red\"` was never inserted. `.copied()` turns `Option<&i32>` into `Option<i32>`, and `.unwrap_or(0)` supplies the default 0 instead of panicking."
+  },
+  {
+   "id": "ch08-q19",
+   "section": "8.3 Hash Maps",
+   "tag": "Behavior",
+   "difficulty": 1,
+   "prompt": "When you iterate over a hash map with `for (key, value) in &scores`, in what order are the pairs visited?",
+   "options": {
+    "A": "In the order the keys were inserted",
+    "B": "Sorted alphabetically by key",
+    "C": "In an arbitrary order that may differ from run to run",
+    "D": "Sorted by value, ascending"
+   },
+   "answer": "C",
+   "explanation": "A `HashMap` stores entries according to its hashing function, so iteration order is arbitrary and not guaranteed to be stable. If you need ordering, you must sort the entries yourself or use a different structure."
+  },
+  {
+   "id": "ch08-q20",
+   "section": "8.3 Hash Maps",
+   "tag": "Spot the Bug",
+   "difficulty": 3,
+   "prompt": "What happens when you compile this program?",
+   "code": "use std::collections::HashMap;\n\nfn main() {\n    let field_name = String::from(\"Favorite color\");\n    let field_value = String::from(\"Blue\");\n\n    let mut map = HashMap::new();\n    map.insert(field_name, field_value);\n\n    println!(\"{field_name}\");\n}",
+   "options": {
+    "A": "It prints `Favorite color`",
+    "B": "It fails to compile: `field_name` was moved into the map by `insert` and cannot be used afterward",
+    "C": "It fails to compile: hash map keys must be `&str`, not `String`",
+    "D": "It compiles but prints an empty string because the map now owns the data"
+   },
+   "answer": "B",
+   "explanation": "For owned types like `String`, `insert` moves both the key and the value into the hash map, which becomes their owner. Using `field_name` afterward is a compile-time \"borrow of moved value\" error; `Copy` types like `i32` would be copied instead."
+  },
+  {
+   "id": "ch08-q21",
+   "section": "8.3 Hash Maps",
+   "tag": "Code Output",
+   "difficulty": 2,
+   "prompt": "What does this program print?",
+   "code": "use std::collections::HashMap;\n\nfn main() {\n    let mut scores = HashMap::new();\n    scores.insert(String::from(\"Blue\"), 10);\n    scores.insert(String::from(\"Blue\"), 25);\n    println!(\"{:?}\", scores);\n}",
+   "options": {
+    "A": "{\"Blue\": 10}",
+    "B": "{\"Blue\": 25}",
+    "C": "{\"Blue\": 10, \"Blue\": 25}",
+    "D": "It panics at runtime: duplicate key inserted"
+   },
+   "answer": "B",
+   "explanation": "Each key in a hash map can have only one value at a time. Calling `insert` with a key that already exists replaces the old value, so only `\"Blue\": 25` remains."
+  },
+  {
+   "id": "ch08-q22",
+   "section": "8.3 Hash Maps",
+   "tag": "Code Output",
+   "difficulty": 3,
+   "prompt": "What does this program print?",
+   "code": "use std::collections::HashMap;\n\nfn main() {\n    let text = \"hello world wonderful world\";\n\n    let mut map = HashMap::new();\n    for word in text.split_whitespace() {\n        let count = map.entry(word).or_insert(0);\n        *count += 1;\n    }\n\n    println!(\"{}\", map[\"world\"]);\n}",
+   "options": {
+    "A": "1",
+    "B": "2",
+    "C": "It fails to compile: `count` is a `&mut i32`, which cannot be incremented",
+    "D": "0"
+   },
+   "answer": "B",
+   "explanation": "`entry(word).or_insert(0)` returns a mutable reference (`&mut i32`) to the word's counter, inserting 0 first if the word is new. Dereferencing with `*count += 1` increments it, and `\"world\"` appears twice in the text."
+  },
+  {
+   "id": "ch08-q23",
+   "section": "8.3 Hash Maps",
+   "tag": "Misconception",
+   "difficulty": 2,
+   "prompt": "After this code runs, what value is associated with the key `Blue`?",
+   "code": "use std::collections::HashMap;\n\nfn main() {\n    let mut scores = HashMap::new();\n    scores.insert(String::from(\"Blue\"), 10);\n\n    scores.entry(String::from(\"Blue\")).or_insert(50);\n    scores.entry(String::from(\"Yellow\")).or_insert(50);\n}",
+   "options": {
+    "A": "50, because `or_insert` always sets the value",
+    "B": "10, because `or_insert` only inserts when the key has no value; `Blue` already has one",
+    "C": "60, because `or_insert` adds to the existing value",
+    "D": "The program fails to compile because `entry` cannot be called on a key that already exists"
+   },
+   "answer": "B",
+   "explanation": "The `entry` API's `or_insert` inserts the given value only if the key is vacant and otherwise leaves the existing value untouched, returning a mutable reference to whichever value is there. So `Blue` stays 10 while `Yellow` gets 50."
+  },
+  {
+   "id": "ch08-q24",
+   "section": "8.3 Hash Maps",
+   "tag": "Concept",
+   "difficulty": 3,
+   "prompt": "Which statements about `HashMap<K, V>` are true? (Select all that apply.)",
+   "options": {
+    "A": "Calling `insert` with a key that already exists keeps the old value unchanged",
+    "B": "`get` returns an `Option<&V>` rather than the value itself",
+    "C": "Iterating over `&map` visits key/value pairs in an arbitrary order",
+    "D": "Owned `String` keys and values are moved into the map when inserted",
+    "E": "The default SipHash hasher was chosen because it is the fastest hashing algorithm available"
+   },
+   "answer": [
+    "B",
+    "C",
+    "D"
+   ],
+   "explanation": "`get` yields `Option<&V>`, iteration order is arbitrary, and the map takes ownership of owned keys and values. `insert` on an existing key overwrites the old value, and SipHash was chosen for resistance to hash-flooding DoS attacks, trading away some speed (you can swap hashers via `BuildHasher`)."
+  }
+ ]
+}

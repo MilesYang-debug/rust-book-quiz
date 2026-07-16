@@ -1,0 +1,262 @@
+{
+ "chapter": 7,
+ "title": "Managing Growing Projects with Packages, Crates, and Modules",
+ "link": "https://doc.rust-lang.org/book/ch07-00-managing-growing-projects-with-packages-crates-and-modules.html",
+ "questions": [
+  {
+   "id": "ch07-q01",
+   "section": "7.1 Packages and Crates",
+   "tag": "Concept",
+   "difficulty": 1,
+   "prompt": "By Cargo's conventions, which files does the compiler treat as crate roots in a package?",
+   "options": {
+    "A": "`Cargo.toml` for the library crate and `Cargo.lock` for the binary crate",
+    "B": "`src/main.rs` for a binary crate and `src/lib.rs` for a library crate",
+    "C": "Any file in `src/` that contains a `mod` declaration",
+    "D": "`src/root.rs`, which must be created manually for every crate"
+   },
+   "answer": "B",
+   "explanation": "Cargo passes the crate root files to `rustc`: `src/main.rs` is the crate root of a binary crate and `src/lib.rs` is the crate root of a library crate, both named after the package. The crate root is the source file the compiler starts from and forms the root module of the crate."
+  },
+  {
+   "id": "ch07-q02",
+   "section": "7.1 Packages and Crates",
+   "tag": "Misconception",
+   "difficulty": 1,
+   "prompt": "What is the difference between a binary crate and a library crate?",
+   "options": {
+    "A": "Library crates may not contain modules; binary crates may",
+    "B": "Binary crates cannot depend on library crates in the same package",
+    "C": "The word `crate` in Rust always refers to a library; binaries are called `targets`",
+    "D": "A binary crate compiles to an executable and must have a `fn main`; a library crate has no `main` and does not produce an executable"
+   },
+   "answer": "D",
+   "explanation": "Binary crates are programs you can compile to an executable and each must define `fn main`. Library crates define functionality to be shared (like `rand`) and have no `main`; when Rustaceans casually say \"crate\" they often mean a library crate, but both kinds exist."
+  },
+  {
+   "id": "ch07-q03",
+   "section": "7.1 Packages and Crates",
+   "tag": "Concept",
+   "difficulty": 2,
+   "prompt": "Which of the following statements about a Cargo package are true? (Select all that apply.)",
+   "options": {
+    "A": "A package can contain at most one library crate",
+    "B": "A package must contain at least one crate, either a library or a binary",
+    "C": "A package can contain at most one binary crate",
+    "D": "Each file placed in `src/bin/` becomes a separate binary crate",
+    "E": "A library crate in a package must contain a `fn main` function"
+   },
+   "answer": [
+    "A",
+    "B",
+    "D"
+   ],
+   "explanation": "A package can hold at most one library crate, any number of binary crates, and must contain at least one crate of some kind. Extra binaries go in `src/bin/`, where each file is its own binary crate; library crates never need `fn main`."
+  },
+  {
+   "id": "ch07-q04",
+   "section": "7.2 Defining Modules to Control Scope and Privacy",
+   "tag": "Concept",
+   "difficulty": 1,
+   "prompt": "In the crate root you write `mod garden;` with a semicolon instead of a body. Where does the compiler look for the module's code?",
+   "options": {
+    "A": "In `src/garden.rs` or, in the older style, `src/garden/mod.rs`",
+    "B": "In `garden.rs` in the package root, next to `Cargo.toml`",
+    "C": "Nowhere; `mod garden;` is only a forward declaration and the code must appear later in the same file",
+    "D": "In whatever file is listed under `[modules]` in `Cargo.toml`"
+   },
+   "answer": "A",
+   "explanation": "For a module declared in the crate root, the compiler checks (in order) for an inline body, then `src/garden.rs`, then the older-style `src/garden/mod.rs`. Modules are never registered in `Cargo.toml`."
+  },
+  {
+   "id": "ch07-q05",
+   "section": "7.2 Defining Modules to Control Scope and Privacy",
+   "tag": "Behavior",
+   "difficulty": 2,
+   "prompt": "A library crate defines `mod front_of_house` at the top level of `src/lib.rs`. In the module tree, what is the parent of `front_of_house`?",
+   "options": {
+    "A": "It has no parent; top-level modules are roots of their own trees",
+    "B": "A module named `lib`, created from the file name `lib.rs`",
+    "C": "An implicit module named `crate`, formed by the contents of the crate root",
+    "D": "The package itself, referred to by the package name from `Cargo.toml`"
+   },
+   "answer": "C",
+   "explanation": "The crate root file forms an implicit module named `crate` at the root of the module tree, so `front_of_house` is a child of `crate`. That is why absolute paths such as `crate::front_of_house::hosting` start with the `crate` keyword."
+  },
+  {
+   "id": "ch07-q06",
+   "section": "7.2 Defining Modules to Control Scope and Privacy",
+   "tag": "Code Output",
+   "difficulty": 2,
+   "prompt": "What happens when this program in `src/main.rs` is compiled and run?",
+   "code": "mod garden {\n    pub mod vegetables {\n        pub fn grow() -> &'static str {\n            \"Asparagus\"\n        }\n    }\n}\n\nuse garden::vegetables;\n\nfn main() {\n    println!(\"Growing {}!\", vegetables::grow());\n}",
+   "options": {
+    "A": "Compile error: `garden` is private, so the `use` statement cannot name it",
+    "B": "It compiles and prints `Growing Asparagus!`",
+    "C": "Compile error: `use` paths must always begin with `crate::`",
+    "D": "Compile error: `grow` cannot be called through the `vegetables` shortcut"
+   },
+   "answer": "B",
+   "explanation": "Both the `use` and `mod garden` live directly in the crate root, so the private `garden` module is visible from that same scope; `vegetables` and `grow` are `pub`, so the path resolves. Relative `use` paths starting from the current module are allowed, so it prints `Growing Asparagus!`."
+  },
+  {
+   "id": "ch07-q07",
+   "section": "7.3 Paths for Referring to an Item in the Module Tree",
+   "tag": "Concept",
+   "difficulty": 1,
+   "prompt": "Which statement correctly describes absolute and relative paths in the module tree?",
+   "options": {
+    "A": "Absolute paths begin with the package name from `Cargo.toml`, even inside the same crate",
+    "B": "Relative paths must always begin with the `self` keyword",
+    "C": "Absolute paths use `.` as a separator, relative paths use `::`",
+    "D": "An absolute path for code in the current crate starts with the literal `crate`; a relative path starts from the current module using an identifier, `self`, or `super`"
+   },
+   "answer": "D",
+   "explanation": "Absolute paths begin at the crate root: with `crate::` for the current crate, or with the crate's name for an external crate. Relative paths start from the current module and may begin with an identifier, `self`, or `super`; both styles separate identifiers with `::`."
+  },
+  {
+   "id": "ch07-q08",
+   "section": "7.3 Paths for Referring to an Item in the Module Tree",
+   "tag": "Spot the Bug",
+   "difficulty": 2,
+   "prompt": "This library crate fails to compile. What is the bug?",
+   "code": "mod front_of_house {\n    pub mod hosting {\n        fn add_to_waitlist() {}\n    }\n}\n\npub fn eat_at_restaurant() {\n    crate::front_of_house::hosting::add_to_waitlist();\n}",
+   "options": {
+    "A": "`front_of_house` must be marked `pub` for `eat_at_restaurant` to name it",
+    "B": "Absolute paths starting with `crate::` cannot be used inside the crate that defines the item",
+    "C": "`add_to_waitlist` is private: making `hosting` public does not make its contents public, so the function also needs `pub`",
+    "D": "A `pub mod` is not allowed inside a private module"
+   },
+   "answer": "C",
+   "explanation": "Making a module public with `pub mod` only lets ancestor code refer to the module; the items inside stay private until each is marked `pub`, so the call fails with E0603. `front_of_house` itself is fine because `eat_at_restaurant` is defined in the same module (the crate root) and siblings can see each other."
+  },
+  {
+   "id": "ch07-q09",
+   "section": "7.3 Paths for Referring to an Item in the Module Tree",
+   "tag": "Code Output",
+   "difficulty": 3,
+   "prompt": "What is the result of compiling and running this program?",
+   "code": "fn deliver_order() {\n    println!(\"delivered\");\n}\n\nmod back_of_house {\n    pub fn fix_incorrect_order() {\n        cook_order();\n        super::deliver_order();\n    }\n\n    fn cook_order() {\n        println!(\"cooked\");\n    }\n}\n\nfn main() {\n    back_of_house::fix_incorrect_order();\n}",
+   "options": {
+    "A": "Compile error: `deliver_order` is private, so it cannot be reached via `super::`",
+    "B": "Compile error: `cook_order` is private and cannot be called",
+    "C": "It prints `delivered` then `cooked`",
+    "D": "It prints `cooked` then `delivered`"
+   },
+   "answer": "D",
+   "explanation": "Child modules can use items in their ancestor modules even when those items are not `pub`, so `super::deliver_order()` (like `..` in a filesystem) is legal, and `cook_order` is called from within its own module. The calls run in order: `cooked`, then `delivered`."
+  },
+  {
+   "id": "ch07-q10",
+   "section": "7.3 Paths for Referring to an Item in the Module Tree",
+   "tag": "Misconception",
+   "difficulty": 2,
+   "prompt": "Inside a module you declare `pub struct Breakfast { toast: String }` and `pub enum Appetizer { Soup, Salad }`. What can code outside the module access?",
+   "options": {
+    "A": "The `Breakfast` type but not its `toast` field, and the `Appetizer` enum with both variants: struct fields stay private by default while `pub enum` makes all variants public",
+    "B": "Everything: `pub` on a type always exposes all of its contents",
+    "C": "Neither field nor variants: `pub` on a type only exposes its name for use in signatures",
+    "D": "The `toast` field but not the enum variants: variants each need their own `pub`"
+   },
+   "answer": "A",
+   "explanation": "A `pub struct` is public but each field is still private unless individually marked `pub`, which is why the book's `Breakfast` needs a public constructor like `summer`. In contrast, marking an enum `pub` makes all of its variants public, since an enum is not very useful otherwise."
+  },
+  {
+   "id": "ch07-q11",
+   "section": "7.4 Bringing Paths into Scope with the use Keyword",
+   "tag": "Concept",
+   "difficulty": 2,
+   "prompt": "According to the book, what is the idiomatic way to bring the function `add_to_waitlist` (in `crate::front_of_house::hosting`) into scope and call it?",
+   "options": {
+    "A": "`use crate::front_of_house::hosting::add_to_waitlist;` and call `add_to_waitlist()`",
+    "B": "`use crate::front_of_house::*;` and call `hosting::add_to_waitlist()`",
+    "C": "`use crate::front_of_house::hosting;` and call `hosting::add_to_waitlist()`",
+    "D": "Functions cannot be brought into scope with `use`; only types can"
+   },
+   "answer": "C",
+   "explanation": "For functions, the idiom is to bring the parent module into scope so the call `hosting::add_to_waitlist()` makes clear the function is not locally defined. For structs, enums, and other items, the idiom is the opposite: spell out the full path, as in `use std::collections::HashMap;`."
+  },
+  {
+   "id": "ch07-q12",
+   "section": "7.4 Bringing Paths into Scope with the use Keyword",
+   "tag": "Concept",
+   "difficulty": 3,
+   "prompt": "Which of the following statements about `use` are true? (Select all that apply.)",
+   "options": {
+    "A": "A `use` statement only creates the shortcut in the particular scope where it appears",
+    "B": "`use std::io::Result as IoResult;` brings `std::io::Result` into scope under the new name `IoResult`",
+    "C": "With `pub use`, external code can refer to the re-exported name as if it were defined in the re-exporting module",
+    "D": "Bringing a private item into scope with `use` makes it accessible from anywhere",
+    "E": "The glob operator `*` also imports the private items of a module"
+   },
+   "answer": [
+    "A",
+    "B",
+    "C"
+   ],
+   "explanation": "A `use` shortcut is limited to the scope it is declared in, `as` renames an import, and `pub use` re-exports the name so callers can use the new path (useful for shaping a public API). `use` still obeys privacy rules, and the glob operator brings in only public items."
+  },
+  {
+   "id": "ch07-q13",
+   "section": "7.4 Bringing Paths into Scope with the use Keyword",
+   "tag": "Spot the Bug",
+   "difficulty": 3,
+   "prompt": "This library crate fails to compile with `failed to resolve: use of undeclared crate or module hosting`. Why?",
+   "code": "mod front_of_house {\n    pub mod hosting {\n        pub fn add_to_waitlist() {}\n    }\n}\n\nuse crate::front_of_house::hosting;\n\nmod customer {\n    pub fn eat_at_restaurant() {\n        hosting::add_to_waitlist();\n    }\n}",
+   "options": {
+    "A": "The `use` shortcut applies only in the crate root scope, not inside the child module `customer`; the `use` must be moved into `customer` or the call changed to `super::hosting::add_to_waitlist()`",
+    "B": "`use` statements must appear before all `mod` declarations in a file",
+    "C": "`add_to_waitlist` is private to `hosting`, so the shortcut cannot see it",
+    "D": "Relative paths are forbidden inside nested modules, so `hosting::` can never work there"
+   },
+   "answer": "A",
+   "explanation": "A `use` only creates a shortcut in the scope where it occurs; module `customer` is a different scope, so the crate-root shortcut does not apply there (and the compiler also warns the `use` is unused). Moving the `use` inside `customer` or writing `super::hosting::add_to_waitlist()` fixes it."
+  },
+  {
+   "id": "ch07-q14",
+   "section": "7.4 Bringing Paths into Scope with the use Keyword",
+   "tag": "Behavior",
+   "difficulty": 1,
+   "prompt": "Which single statement brings exactly the same items into scope as the two lines `use std::cmp::Ordering;` and `use std::io;`?",
+   "options": {
+    "A": "`use std::cmp::{Ordering, io};`",
+    "B": "`use std::{cmp::Ordering, io};`",
+    "C": "`use std::*;`",
+    "D": "`use std::io::{self, cmp::Ordering};`"
+   },
+   "answer": "B",
+   "explanation": "Nested paths merge imports that share a prefix: `use std::{cmp::Ordering, io};` brings in both items in one line. Option A wrongly nests `io` under `cmp`, and the glob in option C imports every public item of `std`, not just those two."
+  },
+  {
+   "id": "ch07-q15",
+   "section": "7.5 Separating Modules into Different Files",
+   "tag": "Spot the Bug",
+   "difficulty": 3,
+   "prompt": "A crate is split into files as shown in the comments below, but compilation fails with `file not found for module hosting`. What is wrong?",
+   "code": "// src/lib.rs\nmod front_of_house;\n\n// src/front_of_house.rs\npub mod hosting;\n\n// src/hosting.rs   <-- the file was placed here\npub fn add_to_waitlist() {}",
+   "options": {
+    "A": "`pub mod hosting;` is illegal in a non-root file; submodules must be declared in `src/lib.rs`",
+    "B": "`src/front_of_house.rs` must be renamed `src/front_of_house/mod.rs` before it may declare submodules",
+    "C": "Because `hosting` is declared inside `front_of_house`, its file must live in the parent's directory: `src/front_of_house/hosting.rs` (or `src/front_of_house/hosting/mod.rs`), not `src/hosting.rs`",
+    "D": "The `hosting` module also needs an entry in `Cargo.toml` to be compiled"
+   },
+   "answer": "C",
+   "explanation": "The directory structure must mirror the module tree: a submodule declared in `src/front_of_house.rs` is looked up at `src/front_of_house/hosting.rs` or the older-style `src/front_of_house/hosting/mod.rs`. A file at `src/hosting.rs` would only match a `mod hosting;` declared in the crate root."
+  },
+  {
+   "id": "ch07-q16",
+   "section": "7.5 Separating Modules into Different Files",
+   "tag": "Misconception",
+   "difficulty": 2,
+   "prompt": "`src/lib.rs` already contains `mod front_of_house;`, and the module's code lives in `src/front_of_house.rs`. Another part of the crate now needs to call code in that module. What should you do?",
+   "options": {
+    "A": "Add another `mod front_of_house;` declaration in each file that needs it, like `#include` in C",
+    "B": "Use the `include!` macro to paste `src/front_of_house.rs` into the calling file",
+    "C": "List `front_of_house.rs` under a `[modules]` section in `Cargo.toml`",
+    "D": "Nothing extra: `mod` is declared only once in the module tree, and other code refers to the module's items with absolute or relative paths (optionally shortened with `use`)"
+   },
+   "answer": "D",
+   "explanation": "`mod` is not an include operation: you declare a module once, the compiler loads its file, and from then on it is part of the module tree. All other code reaches it through paths such as `crate::front_of_house::hosting`, possibly shortened with `use`."
+  }
+ ]
+}

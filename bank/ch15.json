@@ -1,0 +1,415 @@
+{
+  "chapter": 15,
+  "title": "Smart Pointers",
+  "link": "https://doc.rust-lang.org/book/ch15-00-smart-pointers.html",
+  "questions": [
+    {
+      "id": "ch15-q01",
+      "section": "15.1 Using Box<T> to Point to Data on the Heap",
+      "tag": "Concept",
+      "difficulty": 1,
+      "prompt": "Why does the definition `enum List { Cons(i32, List), Nil }` fail to compile, and how does changing it to `Cons(i32, Box<List>)` fix the problem?",
+      "options": {
+        "A": "Enums cannot contain other enum values at all; `Box` converts the inner value into a trait object, which enums are allowed to hold.",
+        "B": "The compiler forbids recursion in type names; `Box` renames the inner type so the recursion is hidden.",
+        "C": "The type would need infinite size because each `Cons` directly contains another `List`; `Box<List>` stores the next element on the heap, so the variant only holds a pointer of known, fixed size.",
+        "D": "The original version compiles but overflows the stack at runtime; `Box` merely moves the overflow to the heap."
+      },
+      "answer": "C",
+      "explanation": "Rust must know a type's size at compile time. A `Cons` that directly contains a `List` makes the size calculation recurse forever (\"recursive type has infinite size\"). `Box<T>` is a pointer with a fixed size, so `Cons(i32, Box<List>)` breaks the infinite chain: the variant stores an `i32` plus one pointer, and the rest of the list lives on the heap."
+    },
+    {
+      "id": "ch15-q02",
+      "section": "15.1 Using Box<T> to Point to Data on the Heap",
+      "tag": "Code Output",
+      "difficulty": 1,
+      "prompt": "What does this program print?",
+      "code": "fn main() {\n    let b = Box::new(5);\n    println!(\"b = {}\", *b + 1);\n}",
+      "options": {
+        "A": "`b = 5`",
+        "B": "`b = 6`",
+        "C": "It fails to compile: a `Box<i32>` cannot be dereferenced with `*`.",
+        "D": "It panics at runtime when dereferencing the box."
+      },
+      "answer": "B",
+      "explanation": "`Box<T>` implements `Deref`, so `*b` yields the `i32` value `5` stored on the heap, and `*b + 1` is `6`. Dereferencing a `Box` is safe and always valid while the box exists — no panic is possible here."
+    },
+    {
+      "id": "ch15-q03",
+      "section": "15.1 Using Box<T> to Point to Data on the Heap",
+      "tag": "Misconception",
+      "difficulty": 2,
+      "prompt": "A colleague says: \"You should wrap values in `Box<T>` whenever possible because heap allocation makes access faster.\" Which response is accurate?",
+      "options": {
+        "A": "Correct — heap data is cached more aggressively by the CPU, so `Box` speeds up reads.",
+        "B": "Incorrect — `Box` is faster only for integers; for structs it is slower.",
+        "C": "Correct, but only in release builds where the allocator is optimized.",
+        "D": "Incorrect — `Box` adds an allocation and a level of indirection with no access-speed benefit. Its real uses are: types whose size is unknown at compile time (e.g., recursive types), transferring ownership of large data without copying it, and owning trait objects."
+      },
+      "answer": "D",
+      "explanation": "Boxes provide indirection and heap allocation, nothing more — dereferencing a pointer is never faster than direct access. The book lists the three motivating situations: unknown-size types (recursive types like the cons list), avoiding copies of large data when transferring ownership (only the pointer is copied), and owning a value that only needs to implement a trait."
+    },
+    {
+      "id": "ch15-q04",
+      "section": "15.1 Using Box<T> to Point to Data on the Heap",
+      "tag": "Spot the Bug",
+      "difficulty": 2,
+      "prompt": "What is wrong with this code?",
+      "code": "enum List {\n    Cons(i32, List),\n    Nil,\n}\n\nfn main() {\n    let list = List::Cons(1, List::Cons(2, List::Nil));\n}",
+      "options": {
+        "A": "Nothing — the list is finite (two elements), so it compiles and runs.",
+        "B": "It fails to compile with \"recursive type `List` has infinite size\"; the fix is to add indirection, e.g. `Cons(i32, Box<List>)`.",
+        "C": "It compiles but overflows the stack at runtime because each `Cons` copies the whole tail.",
+        "D": "It fails to compile because enum variants may hold at most one field."
+      },
+      "answer": "B",
+      "explanation": "The error is about the type definition, not any particular value: to lay out `List`, the compiler would need the size of `List` itself, recursively, which is infinite. The compiler explicitly suggests inserting indirection such as `Box`, `Rc`, or `&` to break the cycle. That a specific list is short does not help — sizes are computed per type at compile time."
+    },
+    {
+      "id": "ch15-q05",
+      "section": "15.1 Using Box<T> to Point to Data on the Heap",
+      "tag": "Behavior",
+      "difficulty": 2,
+      "prompt": "Which statements about `Box<T>` are true? (Select all that apply.)",
+      "options": {
+        "A": "`Box::new(v)` moves `v` onto the heap; the box itself is a fixed-size pointer stored on the stack.",
+        "B": "When a `Box<T>` goes out of scope, its `Drop` implementation frees the heap data as well as the pointer.",
+        "C": "`Box<T>` implements `Deref`, so a box can be treated like a regular reference to `T`.",
+        "D": "`Box<T>` maintains a reference count so several boxes can own the same heap value.",
+        "E": "Beyond the heap allocation itself, `Box<T>` adds essentially no bookkeeping overhead."
+      },
+      "answer": ["A", "B", "C", "E"],
+      "explanation": "A box is just an owning pointer: the value lives on the heap, the pointer on the stack (A), and both are cleaned up when the box is dropped thanks to `Drop` (B). `Deref` lets it be used like `&T` (C), and it carries no extra metadata such as a count (E). Reference counting is what `Rc<T>` does, not `Box<T>` — a box always has exactly one owner (D is false)."
+    },
+    {
+      "id": "ch15-q06",
+      "section": "15.2 Treating Smart Pointers Like Regular References with Deref",
+      "tag": "Concept",
+      "difficulty": 2,
+      "prompt": "In an implementation of `Deref`, why is the method signature `fn deref(&self) -> &Self::Target` — returning a reference rather than the inner value itself?",
+      "options": {
+        "A": "If `deref` returned the value directly, it would be moved out of the smart pointer; returning `&Self::Target` lets `*y` desugar to `*(y.deref())` without taking ownership of the inner value.",
+        "B": "Returning by value is impossible in trait methods, so a reference is the only option.",
+        "C": "References are always faster to return than values, and `Deref` is performance-critical.",
+        "D": "Because `Self::Target` is an associated type, it can only be named behind a reference."
+      },
+      "answer": "A",
+      "explanation": "When you write `*y`, Rust actually runs `*(y.deref())`. If `deref` returned `Self::Target` by value, the inner value would be moved out of `self`, which is almost never what you want when merely dereferencing. Returning a reference preserves ownership; the outer `*` then performs a plain dereference of that reference."
+    },
+    {
+      "id": "ch15-q07",
+      "section": "15.2 Treating Smart Pointers Like Regular References with Deref",
+      "tag": "Code Output",
+      "difficulty": 2,
+      "prompt": "What is the result of running this program?",
+      "code": "use std::ops::Deref;\n\nstruct MyBox<T>(T);\n\nimpl<T> Deref for MyBox<T> {\n    type Target = T;\n    fn deref(&self) -> &T {\n        &self.0\n    }\n}\n\nfn hello(name: &str) {\n    println!(\"Hello, {name}!\");\n}\n\nfn main() {\n    let m = MyBox(String::from(\"Rust\"));\n    hello(&m);\n}",
+      "options": {
+        "A": "Compile error: expected `&str`, found `&MyBox<String>` — the cast must be written explicitly.",
+        "B": "It compiles but panics because `String` cannot be viewed as `&str` implicitly.",
+        "C": "It prints `Hello, Rust!` — deref coercion converts `&MyBox<String>` to `&String` and then to `&str`.",
+        "D": "It prints `Hello, MyBox(\"Rust\")!` because the wrapper is formatted directly."
+      },
+      "answer": "C",
+      "explanation": "Because `MyBox<T>` implements `Deref<Target = T>`, deref coercion turns `&MyBox<String>` into `&String`, and since the standard library implements `Deref<Target = str>` for `String`, that becomes `&str`. Without coercion you would have to write the noisy equivalent `hello(&(*m)[..])`."
+    },
+    {
+      "id": "ch15-q08",
+      "section": "15.2 Treating Smart Pointers Like Regular References with Deref",
+      "tag": "Concept",
+      "difficulty": 3,
+      "prompt": "Which of the following are deref coercions Rust performs automatically when types don't match at a function or method call? (Select all that apply.)",
+      "options": {
+        "A": "From `&T` to `&U` when `T: Deref<Target = U>`.",
+        "B": "From `&mut T` to `&mut U` when `T: DerefMut<Target = U>`.",
+        "C": "From `&mut T` to `&U` when `T: Deref<Target = U>`.",
+        "D": "From `&T` to `&mut U` when `T: Deref<Target = U>`.",
+        "E": "All required `deref`/`deref_mut` insertions are resolved at compile time, so coercion has no runtime cost."
+      },
+      "answer": ["A", "B", "C", "E"],
+      "explanation": "Rust performs exactly three coercions: immutable to immutable (A), mutable to mutable via `DerefMut` (B), and mutable to immutable (C) — downgrading a mutable borrow is always safe. The reverse, `&T` to `&mut U` (D), is never allowed: it would create a mutable reference from an immutable one, violating the borrowing rules. The number of `deref` calls is determined at compile time (E)."
+    },
+    {
+      "id": "ch15-q09",
+      "section": "15.2 Treating Smart Pointers Like Regular References with Deref",
+      "tag": "Spot the Bug",
+      "difficulty": 2,
+      "prompt": "Why does this code fail?",
+      "code": "struct MyBox<T>(T);\n\nimpl<T> MyBox<T> {\n    fn new(x: T) -> MyBox<T> {\n        MyBox(x)\n    }\n}\n\nfn main() {\n    let y = MyBox::new(5);\n    assert_eq!(5, *y);\n}",
+      "options": {
+        "A": "It compiles but the assertion fails because `*y` reads uninitialized memory.",
+        "B": "It panics at runtime: dereferencing a struct is undefined until `new` finishes.",
+        "C": "It fails because `assert_eq!` cannot compare an `i32` with a generic `T`.",
+        "D": "It fails to compile (E0614): `MyBox<i32>` cannot be dereferenced because it does not implement `Deref`; adding `impl<T> Deref for MyBox<T>` with `fn deref(&self) -> &T { &self.0 }` fixes it."
+      },
+      "answer": "D",
+      "explanation": "The `*` operator only works on references and on types implementing `Deref`. `MyBox` is a plain tuple struct with no `Deref` impl, so `*y` is a compile-time error (E0614: type cannot be dereferenced) — nothing ever runs. Implementing `Deref` with `Target = T` returning `&self.0` makes `*y` desugar to `*(y.deref())`."
+    },
+    {
+      "id": "ch15-q10",
+      "section": "15.2 Treating Smart Pointers Like Regular References with Deref",
+      "tag": "Behavior",
+      "difficulty": 3,
+      "prompt": "A function `fn takes(s: &str)` is called as `takes(&b)` where `b: Box<String>`. When and how does the argument become a `&str`?",
+      "options": {
+        "A": "At runtime: each call walks the chain `Box<String>` → `String` → `str` through dynamic dispatch, adding a small per-call cost.",
+        "B": "At compile time: the compiler inserts the exact sequence of `deref` calls (`&Box<String>` → `&String` → `&str`) into the generated code, so there is no runtime penalty compared with writing the conversions by hand.",
+        "C": "It does not compile — only one level of deref coercion is applied per call, so `&Box<String>` can reach `&String` but not `&str`.",
+        "D": "The allocator reallocates the `String` as a `str` slice the first time the coercion happens."
+      },
+      "answer": "B",
+      "explanation": "Deref coercion chains as many times as needed: `Box<String>: Deref<Target = String>` and `String: Deref<Target = str>`, so `&Box<String>` coerces to `&String` and then `&str`. The number of `Deref::deref` insertions is resolved entirely at compile time, so using the coercion costs nothing at runtime — option C's \"one level only\" limit does not exist."
+    },
+    {
+      "id": "ch15-q11",
+      "section": "15.3 Running Code on Cleanup with the Drop Trait",
+      "tag": "Code Output",
+      "difficulty": 1,
+      "prompt": "What does this program print?",
+      "code": "struct P(&'static str);\n\nimpl Drop for P {\n    fn drop(&mut self) {\n        println!(\"Dropping {}\", self.0);\n    }\n}\n\nfn main() {\n    let _a = P(\"first\");\n    let _b = P(\"second\");\n    println!(\"created\");\n}",
+      "options": {
+        "A": "`created`, then `Dropping second`, then `Dropping first`",
+        "B": "`created`, then `Dropping first`, then `Dropping second`",
+        "C": "`Dropping first`, `Dropping second`, then `created`",
+        "D": "Only `created` — `drop` runs solely when `std::mem::drop` is called explicitly."
+      },
+      "answer": "A",
+      "explanation": "Values are dropped at the end of scope in reverse order of declaration (LIFO): `_b` was created last, so it is dropped first. The `Drop::drop` method is called automatically when each value goes out of scope — no explicit call is needed."
+    },
+    {
+      "id": "ch15-q12",
+      "section": "15.3 Running Code on Cleanup with the Drop Trait",
+      "tag": "Spot the Bug",
+      "difficulty": 1,
+      "prompt": "This code tries to free a value early. What happens?",
+      "code": "struct CustomSmartPointer {\n    data: String,\n}\n\nimpl Drop for CustomSmartPointer {\n    fn drop(&mut self) {\n        println!(\"Dropping `{}`!\", self.data);\n    }\n}\n\nfn main() {\n    let c = CustomSmartPointer { data: String::from(\"some data\") };\n    c.drop();\n    println!(\"dropped before the end of main\");\n}",
+      "options": {
+        "A": "It works: `c.drop()` runs the destructor immediately, and `c` is not dropped again.",
+        "B": "It compiles, but the destructor runs twice — once for `c.drop()` and once at end of scope.",
+        "C": "It fails to compile with E0040 \"explicit use of destructor method\"; the fix is to call `drop(c)` (i.e., `std::mem::drop`, in the prelude) instead.",
+        "D": "It panics at runtime with a double-free error."
+      },
+      "answer": "C",
+      "explanation": "Rust forbids calling the `Drop` trait method directly, because it would still automatically drop the value at end of scope, causing a double free. The compile error E0040 even suggests the fix: `drop(c)`. `std::mem::drop` takes ownership of the value, so it is dropped exactly once, immediately."
+    },
+    {
+      "id": "ch15-q13",
+      "section": "15.3 Running Code on Cleanup with the Drop Trait",
+      "tag": "Code Output",
+      "difficulty": 2,
+      "prompt": "What is the exact output of this program?",
+      "code": "struct CustomSmartPointer {\n    data: String,\n}\n\nimpl Drop for CustomSmartPointer {\n    fn drop(&mut self) {\n        println!(\"Dropping `{}`!\", self.data);\n    }\n}\n\nfn main() {\n    let c = CustomSmartPointer { data: String::from(\"some data\") };\n    println!(\"created\");\n    drop(c);\n    println!(\"done\");\n}",
+      "options": {
+        "A": "`created`, `done`, `Dropping \\`some data\\`!` — destructors always run last, at the end of `main`.",
+        "B": "`created`, `Dropping \\`some data\\`!`, `done` — `drop(c)` takes ownership and destroys the value immediately, and it is not dropped again later.",
+        "C": "`created`, `Dropping \\`some data\\`!`, `done`, `Dropping \\`some data\\`!` — dropped both early and at end of scope.",
+        "D": "Compile error: `drop` cannot be called on a type that implements `Drop`."
+      },
+      "answer": "B",
+      "explanation": "`std::mem::drop` (in the prelude) is a plain function that takes ownership of its argument; the value is dropped when that function's parameter goes out of scope — i.e., immediately. Because ownership moved into `drop`, `c` is not dropped a second time at the end of `main`, so the destructor line appears exactly once, between `created` and `done`."
+    },
+    {
+      "id": "ch15-q14",
+      "section": "15.4 Rc<T>, the Reference Counted Smart Pointer",
+      "tag": "Concept",
+      "difficulty": 1,
+      "prompt": "Which situation is `Rc<T>` designed for?",
+      "options": {
+        "A": "Sharing data between threads — each thread holds one `Rc` handle.",
+        "B": "Allowing several handles to mutate the same value simultaneously.",
+        "C": "Allocating any value on the heap when its size is unknown at compile time.",
+        "D": "Letting multiple parts of a single-threaded program share read-only ownership of the same heap data, freeing it only when the last owner goes away."
+      },
+      "answer": "D",
+      "explanation": "`Rc<T>` enables multiple ownership via a reference count: the value is dropped when the count reaches zero. It is strictly single-threaded (its count updates are not thread-safe — use `Arc<T>` across threads, so A is wrong) and it hands out only immutable access (pair it with `RefCell<T>` for mutation, so B is wrong). Plain heap allocation with one owner is `Box<T>`'s job (C)."
+    },
+    {
+      "id": "ch15-q15",
+      "section": "15.4 Rc<T>, the Reference Counted Smart Pointer",
+      "tag": "Code Output",
+      "difficulty": 2,
+      "prompt": "What does this program print?",
+      "code": "use std::rc::Rc;\n\nenum List {\n    Cons(i32, Rc<List>),\n    Nil,\n}\nuse List::{Cons, Nil};\n\nfn main() {\n    let a = Rc::new(Cons(5, Rc::new(Cons(10, Rc::new(Nil)))));\n    println!(\"count after creating a = {}\", Rc::strong_count(&a));\n    let _b = Cons(3, Rc::clone(&a));\n    println!(\"count after creating b = {}\", Rc::strong_count(&a));\n    {\n        let _c = Cons(4, Rc::clone(&a));\n        println!(\"count after creating c = {}\", Rc::strong_count(&a));\n    }\n    println!(\"count after c goes out of scope = {}\", Rc::strong_count(&a));\n}",
+      "options": {
+        "A": "1, 2, 3, 2",
+        "B": "1, 2, 3, 3",
+        "C": "0, 1, 2, 1",
+        "D": "1, 1, 1, 1 — `Rc::clone` copies the data, so the count of `a` never changes"
+      },
+      "answer": "A",
+      "explanation": "Creating the `Rc` sets the strong count to 1; each `Rc::clone(&a)` bumps it (2, then 3). When `_c` goes out of scope at the end of the inner block, its `Rc` is dropped and the count automatically decreases back to 2. `Rc::clone` does not copy the list data — it only increments the counter."
+    },
+    {
+      "id": "ch15-q16",
+      "section": "15.4 Rc<T>, the Reference Counted Smart Pointer",
+      "tag": "Spot the Bug",
+      "difficulty": 2,
+      "prompt": "Why does this code fail?",
+      "code": "use std::rc::Rc;\n\nfn main() {\n    let a = Rc::new(String::from(\"hi\"));\n    let b = Rc::clone(&a);\n    a.push_str(\" there\");\n    println!(\"{b}\");\n}",
+      "options": {
+        "A": "It compiles but panics: two owners may not exist while the string is being modified.",
+        "B": "It fails to compile: `Rc<T>` only gives immutable access to its contents, so `push_str` (which needs `&mut self`) is rejected; use `Rc<RefCell<String>>` if shared mutation is needed.",
+        "C": "It fails to compile because `Rc::clone` moved `a`, so `a` can no longer be used.",
+        "D": "It prints `hi there` — `Rc` transparently forwards mutable calls to the inner value."
+      },
+      "answer": "B",
+      "explanation": "If `Rc<T>` allowed mutation, multiple owners could hold mutable access to the same data at once, violating the borrowing rules — so `Rc` dereferences only to `&T`, and calling `push_str` fails at compile time (cannot borrow data in an `Rc` as mutable). The standard pattern for shared mutable data in single-threaded code is `Rc<RefCell<T>>`. `Rc::clone` takes `&a`, so `a` is not moved (C is wrong)."
+    },
+    {
+      "id": "ch15-q17",
+      "section": "15.4 Rc<T>, the Reference Counted Smart Pointer",
+      "tag": "Misconception",
+      "difficulty": 1,
+      "prompt": "\"`Rc::clone(&a)` performs a deep copy of the data, so it should be avoided in performance-sensitive code.\" What is wrong with this claim?",
+      "options": {
+        "A": "Nothing — `Rc::clone` deep-copies, which is why `a.clone()` is preferred as the shallow variant.",
+        "B": "`Rc::clone` is deep only for types that implement `Clone`; otherwise it is shallow.",
+        "C": "`Rc::clone` never copies the data at all — it just increments the strong reference count, which is cheap. The `Rc::clone(&a)` spelling is a convention so readers can tell at a glance it is not a deep copy (unlike most `.clone()` calls).",
+        "D": "The claim is right about the copy but wrong about performance: deep copies of reference-counted data are optimized away."
+      },
+      "answer": "C",
+      "explanation": "Cloning an `Rc` only bumps an integer counter; the heap data is shared, not duplicated. `a.clone()` would compile and do exactly the same thing, but Rust convention prefers `Rc::clone(&a)` so that a visual scan for expensive `clone()` calls can skip reference-count bumps."
+    },
+    {
+      "id": "ch15-q18",
+      "section": "15.5 RefCell<T> and the Interior Mutability Pattern",
+      "tag": "Concept",
+      "difficulty": 2,
+      "prompt": "What is the interior mutability pattern, as implemented by `RefCell<T>`?",
+      "options": {
+        "A": "Mutating data even when there are only immutable references to it: `RefCell` uses `unsafe` code internally behind a safe API, and enforces the borrowing rules (many readers XOR one writer) at runtime instead of compile time.",
+        "B": "A compiler flag that disables the borrow checker for a single type.",
+        "C": "A way to get compile-time-checked mutation through shared references, with zero runtime bookkeeping.",
+        "D": "A pattern where the inner value is copied on every mutation so the original stays immutable."
+      },
+      "answer": "A",
+      "explanation": "`RefCell<T>` lets you mutate the value inside even when the `RefCell` itself is accessed through `&self` or another immutable handle. The borrowing rules still apply — they are just checked dynamically: `borrow()` returns a `Ref<T>`, `borrow_mut()` a `RefMut<T>`, and the cell tracks active borrows at runtime, panicking on violations rather than failing to compile."
+    },
+    {
+      "id": "ch15-q19",
+      "section": "15.5 RefCell<T> and the Interior Mutability Pattern",
+      "tag": "Code Output",
+      "difficulty": 3,
+      "prompt": "What is the result of running this program?",
+      "code": "use std::cell::RefCell;\n\nfn main() {\n    let cell = RefCell::new(vec![1, 2]);\n    let mut one = cell.borrow_mut();\n    let mut two = cell.borrow_mut();\n    one.push(3);\n    two.push(4);\n    println!(\"{:?}\", one);\n}",
+      "options": {
+        "A": "It fails to compile: two mutable borrows of `cell` are active at once.",
+        "B": "It compiles, but panics at runtime on the second `borrow_mut()` with `already borrowed: BorrowMutError`.",
+        "C": "It prints `[1, 2, 3, 4]` — `RefCell` permits any number of mutable borrows.",
+        "D": "It is undefined behavior: both handles write to the vector unsynchronized."
+      },
+      "answer": "B",
+      "explanation": "This is the defining trade-off of `RefCell<T>`: the borrow checker sees only calls to safe methods, so the code compiles. At runtime the cell tracks active borrows; the second `borrow_mut()` while the first `RefMut` is still alive violates the one-mutable-borrow rule and panics with `BorrowMutError`. With `&mut` references instead, this would have been a compile error — `RefCell` defers the check to runtime, it never removes it."
+    },
+    {
+      "id": "ch15-q20",
+      "section": "15.5 RefCell<T> and the Interior Mutability Pattern",
+      "tag": "Spot the Bug",
+      "difficulty": 3,
+      "prompt": "This mock object for testing does not compile. The `Messenger` trait is fixed and cannot be changed. What is the problem and the idiomatic fix?",
+      "code": "pub trait Messenger {\n    fn send(&self, msg: &str);\n}\n\nstruct MockMessenger {\n    sent_messages: Vec<String>,\n}\n\nimpl Messenger for MockMessenger {\n    fn send(&self, message: &str) {\n        self.sent_messages.push(String::from(message));\n    }\n}",
+      "options": {
+        "A": "The problem is the missing `mut` on `message`; declare `fn send(&self, mut msg: &str)`.",
+        "B": "`Vec<String>` cannot live inside a struct; store `Box<Vec<String>>` instead.",
+        "C": "The trait itself is unimplementable; wrap `MockMessenger` in `Rc` so `send` can be called.",
+        "D": "`send` takes `&self`, so `self.sent_messages` cannot be mutated; since the trait signature is fixed, store the field as `RefCell<Vec<String>>` and call `self.sent_messages.borrow_mut().push(...)` — interior mutability."
+      },
+      "answer": "D",
+      "explanation": "`push` needs `&mut self.sent_messages`, but everything reachable through `&self` is immutable, so the compiler rejects the call. Changing `send` to `&mut self` would no longer match the trait. `RefCell<Vec<String>>` is exactly the escape hatch: the field can be mutated through `borrow_mut()` even behind `&self`, with the borrow rules checked at runtime; the test then reads it via `borrow()`."
+    },
+    {
+      "id": "ch15-q21",
+      "section": "15.5 RefCell<T> and the Interior Mutability Pattern",
+      "tag": "Code Output",
+      "difficulty": 2,
+      "prompt": "What does this program print?",
+      "code": "use std::cell::RefCell;\nuse std::rc::Rc;\n\nfn main() {\n    let value = Rc::new(RefCell::new(5));\n    let shared = Rc::clone(&value);\n    *value.borrow_mut() += 10;\n    println!(\"{}\", shared.borrow());\n}",
+      "options": {
+        "A": "`5` — `shared` was cloned before the mutation, so it still sees the old value.",
+        "B": "Compile error: the contents of an `Rc` cannot be mutated.",
+        "C": "`15` — both `Rc` handles point to the same `RefCell`, so the mutation through `value` is visible through `shared`.",
+        "D": "Runtime panic: `borrow()` after a `borrow_mut()` always fails."
+      },
+      "answer": "C",
+      "explanation": "`Rc<RefCell<T>>` is the standard combo for shared mutable data: `Rc` gives multiple owners of the *same* `RefCell` (cloning the `Rc` does not copy the cell), and `RefCell` allows mutation through those shared handles. The `RefMut` returned by `borrow_mut()` is a temporary that is dropped at the end of its statement, so the later `borrow()` succeeds and prints `15`."
+    },
+    {
+      "id": "ch15-q22",
+      "section": "15.5 RefCell<T> and the Interior Mutability Pattern",
+      "tag": "Concept",
+      "difficulty": 3,
+      "prompt": "Which statements from the `Box<T>` / `Rc<T>` / `RefCell<T>` comparison are correct? (Select all that apply.)",
+      "options": {
+        "A": "`Box<T>` has a single owner and allows immutable or mutable borrows checked at compile time.",
+        "B": "`Rc<T>` allows multiple owners of the same data but only immutable borrows, checked at compile time.",
+        "C": "`RefCell<T>` has a single owner and allows immutable or mutable borrows checked at runtime.",
+        "D": "Because `RefCell<T>` checks borrows at runtime, you can mutate the value inside it even when the `RefCell` itself is behind an immutable reference.",
+        "E": "`Rc<T>` and `RefCell<T>` are both safe to share between threads."
+      },
+      "answer": ["A", "B", "C", "D"],
+      "explanation": "A, B, and C restate the book's comparison table exactly: the axes are number of owners (only `Rc` allows several) and when borrow rules are enforced (only `RefCell` defers to runtime). D is the essence of interior mutability. E is false — neither type is thread-safe; across threads you would reach for `Arc<T>` and `Mutex<T>` instead."
+    },
+    {
+      "id": "ch15-q23",
+      "section": "15.5 RefCell<T> and the Interior Mutability Pattern",
+      "tag": "Behavior",
+      "difficulty": 3,
+      "prompt": "What happens when this program runs?",
+      "code": "use std::cell::RefCell;\n\nfn main() {\n    let cell = RefCell::new(String::from(\"hi\"));\n    {\n        let mut m = cell.borrow_mut();\n        m.push_str(\" there\");\n    }\n    let r = cell.borrow();\n    println!(\"{r}\");\n}",
+      "options": {
+        "A": "It panics with `BorrowError`: once a `RefCell` has been mutably borrowed, it can never be immutably borrowed again.",
+        "B": "Compile error: `borrow` and `borrow_mut` may not be called on the same cell in one function.",
+        "C": "It prints `hi there` — the `RefMut` is dropped at the end of the inner block, decrementing the runtime borrow counter, so the later `borrow()` succeeds.",
+        "D": "It prints `hi` — mutations through a `RefMut` are discarded when it is dropped."
+      },
+      "answer": "C",
+      "explanation": "`RefCell`'s runtime tracking is scoped just like compile-time borrows: the `RefMut` guard returned by `borrow_mut()` releases the mutable borrow when it is dropped at the closing brace. After that, the borrow counter is back to zero, so `borrow()` succeeds. A panic would only occur if the two borrows were *simultaneously* active. Mutations happen in place — nothing is rolled back (D is wrong)."
+    },
+    {
+      "id": "ch15-q24",
+      "section": "15.6 Reference Cycles Can Leak Memory",
+      "tag": "Concept",
+      "difficulty": 2,
+      "prompt": "Two `Rc` values end up pointing at each other (`a`'s tail refers to `b`, and `b`'s tail is mutated via a `RefCell` to refer back to `a`). What happens when both variables go out of scope?",
+      "options": {
+        "A": "Each drop decrements the other's strong count from 2 to 1, never reaching 0, so neither value is freed: the memory is leaked. Safe Rust permits this — leaks are not undefined behavior, and the compiler does not detect cycles.",
+        "B": "The compiler detects the cycle at compile time and refuses to build the program.",
+        "C": "Rust's runtime includes a cycle-collecting garbage collector that eventually reclaims the pair.",
+        "D": "The program panics with a `CycleError` as soon as the second link is created."
+      },
+      "answer": "A",
+      "explanation": "`Rc` frees its value only when the strong count hits 0. In a cycle each value is kept alive by the other's strong reference, so after the stack variables drop, both counts sit at 1 forever — a silent memory leak (and trying to print the cyclic list would recurse until the stack overflows). Rust has no cycle detector or GC; preventing cycles is the programmer's job, typically using `Weak<T>` for back-links."
+    },
+    {
+      "id": "ch15-q25",
+      "section": "15.6 Reference Cycles Can Leak Memory",
+      "tag": "Code Output",
+      "difficulty": 3,
+      "prompt": "What does this program print?",
+      "code": "use std::cell::RefCell;\nuse std::rc::{Rc, Weak};\n\nstruct Node {\n    parent: RefCell<Weak<Node>>,\n    children: RefCell<Vec<Rc<Node>>>,\n}\n\nfn main() {\n    let leaf = Rc::new(Node {\n        parent: RefCell::new(Weak::new()),\n        children: RefCell::new(vec![]),\n    });\n    {\n        let branch = Rc::new(Node {\n            parent: RefCell::new(Weak::new()),\n            children: RefCell::new(vec![Rc::clone(&leaf)]),\n        });\n        *leaf.parent.borrow_mut() = Rc::downgrade(&branch);\n    }\n    println!(\"{}\", leaf.parent.borrow().upgrade().is_some());\n    println!(\"{} {}\", Rc::strong_count(&leaf), Rc::weak_count(&leaf));\n}",
+      "options": {
+        "A": "`true` then `2 0` — `branch` is kept alive by `leaf`'s parent pointer.",
+        "B": "`false` then `1 0` — `branch` was dropped at the end of the block despite the weak reference to it, so `upgrade()` returns `None`; dropping `branch` also released its `Rc` to `leaf`, leaving `leaf` with strong count 1 and weak count 0.",
+        "C": "Compile error: `branch` cannot be dropped while `leaf.parent` still refers to it.",
+        "D": "It panics: calling `upgrade()` on a dangling `Weak` is a runtime error."
+      },
+      "answer": "B",
+      "explanation": "A `Weak` reference does not keep its target alive: only the strong count controls dropping. At the end of the inner block `branch`'s strong count falls to 0 (the weak count of 1 from `leaf.parent` does not matter), so it is freed, its `children` vector drops the `Rc<Node>` to `leaf`, and `leaf`'s strong count returns to 1. `upgrade()` then safely returns `None` (printed as `false`) — no panic, no dangling pointer. This is exactly why parent links use `Weak`: it breaks the parent↔child cycle."
+    },
+    {
+      "id": "ch15-q26",
+      "section": "15.6 Reference Cycles Can Leak Memory",
+      "tag": "Concept",
+      "difficulty": 3,
+      "prompt": "Which statements about `Weak<T>` are true? (Select all that apply.)",
+      "options": {
+        "A": "`Rc::downgrade(&rc)` creates a `Weak<T>` and increments `weak_count`, leaving `strong_count` unchanged.",
+        "B": "`Weak<T>::upgrade()` returns `Option<Rc<T>>`: `Some` if the value is still alive, `None` if it has been dropped.",
+        "C": "A value cannot be dropped while its `weak_count` is greater than zero.",
+        "D": "In a parent-child tree, children should hold their parent as `Weak<Node>` (while parents own children via `Rc<Node>`) so the parent↔child references do not form a leaking cycle.",
+        "E": "Code using a `Weak<T>` must handle the possibility that the value no longer exists, which is what makes weak references memory-safe."
+      },
+      "answer": ["A", "B", "D", "E"],
+      "explanation": "`downgrade` only touches the weak count (A), and `upgrade` is the checked way in — the `Option` forces you to handle a dead target (B, E), so weak references can never dangle. C is exactly backwards: cleanup depends only on `strong_count` reaching zero; any number of outstanding `Weak`s will simply start upgrading to `None`. The tree pattern in D gives ownership one direction (`Rc` down) and a non-owning back-link (`Weak` up), so no strong cycle can form."
+    }
+  ]
+}

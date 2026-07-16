@@ -1,0 +1,202 @@
+{
+ "chapter": 2,
+ "title": "Programming a Guessing Game",
+ "link": "https://doc.rust-lang.org/book/ch02-00-guessing-game-tutorial.html",
+ "questions": [
+  {
+   "id": "ch02-q01",
+   "section": "Guessing Game Tutorial",
+   "tag": "Concept",
+   "difficulty": 1,
+   "prompt": "In `let mut guess = String::new();`, why is the `mut` keyword required?",
+   "options": {
+    "A": "Variables in Rust are immutable by default, and `read_line` needs to modify `guess` later",
+    "B": "All `String` values must be declared with `mut` because strings are growable",
+    "C": "`mut` tells the compiler to allocate the string on the heap instead of the stack",
+    "D": "Without `mut`, the variable would be a constant that must be known at compile time"
+   },
+   "answer": "A",
+   "explanation": "Rust variables are immutable by default; `mut` makes `guess` mutable so `read_line` can append the user's input to it. `String` values do not require `mut` in general, and `mut` has nothing to do with heap allocation."
+  },
+  {
+   "id": "ch02-q02",
+   "section": "Guessing Game Tutorial",
+   "tag": "Concept",
+   "difficulty": 1,
+   "prompt": "What does the `::` syntax in `String::new()` indicate?",
+   "options": {
+    "A": "`new` is a macro defined inside the `String` module",
+    "B": "`new` is an associated function implemented on the `String` type",
+    "C": "`new` is a method being called on an existing `String` instance",
+    "D": "`new` is a keyword that constructs any type, similar to `new` in other languages"
+   },
+   "answer": "B",
+   "explanation": "The `::` syntax indicates that `new` is an associated function of the `String` type — a function implemented on a type rather than on an instance. Rust has no `new` keyword; `new` is just a conventional constructor name."
+  },
+  {
+   "id": "ch02-q03",
+   "section": "Guessing Game Tutorial",
+   "tag": "Behavior",
+   "difficulty": 2,
+   "prompt": "Which of the following statements about `io::stdin().read_line(&mut guess)` are true? (Select all that apply.)",
+   "options": {
+    "A": "It appends the user's input to the string rather than overwriting it",
+    "B": "It requires a mutable reference because it needs to change the string's contents",
+    "C": "It returns a `Result` value that should be handled",
+    "D": "It automatically strips the trailing newline from the input",
+    "E": "It converts the input to a number if the string is annotated with a numeric type"
+   },
+   "answer": [
+    "A",
+    "B",
+    "C"
+   ],
+   "explanation": "`read_line` appends input to the provided `String` (it does not overwrite), takes `&mut` because it mutates the string, and returns a `Result` (`Ok`/`Err`). It keeps the trailing newline — that's why the tutorial calls `trim()` — and it never performs numeric conversion."
+  },
+  {
+   "id": "ch02-q04",
+   "section": "Guessing Game Tutorial",
+   "tag": "Spot the Bug",
+   "difficulty": 2,
+   "prompt": "This code fails to compile. Why?",
+   "code": "use std::io;\n\nfn main() {\n    let mut guess = String::new();\n\n    io::stdin()\n        .read_line(&guess)\n        .expect(\"Failed to read line\");\n\n    println!(\"You guessed: {guess}\");\n}",
+   "options": {
+    "A": "`read_line` expects `&mut String`, but `&guess` is an immutable reference",
+    "B": "`guess` must be declared without `mut` when passing a reference to it",
+    "C": "`expect` cannot be called on the return value of `read_line`",
+    "D": "`io::stdin()` must be stored in a variable before calling `read_line`"
+   },
+   "answer": "A",
+   "explanation": "References are immutable by default, so `&guess` is a `&String` while `read_line` needs `&mut String` to modify the string; the fix is `&mut guess`. Declaring the variable with `mut` alone is not enough — the reference itself must also be mutable."
+  },
+  {
+   "id": "ch02-q05",
+   "section": "Guessing Game Tutorial",
+   "tag": "Behavior",
+   "difficulty": 1,
+   "prompt": "What does calling `.expect(\"Failed to read line\")` on a `Result` value do?",
+   "options": {
+    "A": "If the `Result` is `Err`, it crashes the program and displays the given message; if `Ok`, it returns the value inside",
+    "B": "It prints the message to the screen every time the line is executed",
+    "C": "It retries the failed operation until it succeeds, logging the message on each failure",
+    "D": "It silently discards any error and returns a default value"
+   },
+   "answer": "A",
+   "explanation": "`expect` unwraps the `Ok` value on success; if the `Result` is an `Err`, it causes the program to crash (panic) and displays the message passed to it. It neither retries nor substitutes a default."
+  },
+  {
+   "id": "ch02-q06",
+   "section": "Guessing Game Tutorial",
+   "tag": "Concept",
+   "difficulty": 2,
+   "prompt": "Which of the following statements about Cargo dependencies and `Cargo.lock` are true? (Select all that apply.)",
+   "options": {
+    "A": "Adding `rand = \"0.8.5\"` under `[dependencies]` makes Cargo download the crate from crates.io",
+    "B": "`Cargo.lock` records the exact dependency versions used, so future builds are reproducible",
+    "C": "You must edit `Cargo.lock` by hand whenever you want to upgrade a dependency",
+    "D": "`cargo update` upgrades dependencies to newer versions allowed by the constraints in `Cargo.toml`",
+    "E": "`Cargo.lock` is regenerated from scratch on every `cargo build`, so versions may change each build"
+   },
+   "answer": [
+    "A",
+    "B",
+    "D"
+   ],
+   "explanation": "Cargo fetches dependencies listed in `Cargo.toml` from crates.io, and `Cargo.lock` (created on the first build) pins exact versions for reproducible builds. You never edit `Cargo.lock` manually — `cargo update` moves versions forward within the `Cargo.toml` constraints — and Cargo reuses the lock file rather than regenerating it each build."
+  },
+  {
+   "id": "ch02-q07",
+   "section": "Guessing Game Tutorial",
+   "tag": "Behavior",
+   "difficulty": 2,
+   "prompt": "In the guessing game, what range of numbers can `rand::thread_rng().gen_range(1..=100)` produce?",
+   "options": {
+    "A": "1 through 100, inclusive of both endpoints",
+    "B": "1 through 99, because the upper bound is exclusive",
+    "C": "0 through 100, because ranges start at zero by default",
+    "D": "2 through 100, because the lower bound is exclusive"
+   },
+   "answer": "A",
+   "explanation": "The `1..=100` syntax is a range inclusive on both ends, so `gen_range` returns a number between 1 and 100 including both. The exclusive-upper-bound form would be `1..101`."
+  },
+  {
+   "id": "ch02-q08",
+   "section": "Guessing Game Tutorial",
+   "tag": "Code Output",
+   "difficulty": 2,
+   "prompt": "What does this program print?",
+   "code": "fn main() {\n    let guess = String::from(\" 42\\n\");\n    let guess: u32 = guess.trim().parse().expect(\"Please type a number!\");\n    println!(\"You guessed: {guess}\");\n}",
+   "options": {
+    "A": "It prints `You guessed: 42`",
+    "B": "It fails to compile because `guess` is declared twice",
+    "C": "It panics with `Please type a number!` because the string contains whitespace",
+    "D": "It prints `You guessed:  42` including the leading space"
+   },
+   "answer": "A",
+   "explanation": "Shadowing lets the second `let guess` reuse the name with a new type (`u32`), and `trim()` removes the surrounding whitespace and newline before `parse()`, so parsing succeeds and `42` is printed. Redeclaring with `let` is legal shadowing, not an error."
+  },
+  {
+   "id": "ch02-q09",
+   "section": "Guessing Game Tutorial",
+   "tag": "Code Output",
+   "difficulty": 3,
+   "prompt": "What does this program print?",
+   "code": "use std::cmp::Ordering;\n\nfn main() {\n    let secret_number = 50;\n    let guess = 100;\n\n    match guess.cmp(&secret_number) {\n        Ordering::Less => println!(\"Too small!\"),\n        Ordering::Greater => println!(\"Too big!\"),\n        Ordering::Equal => println!(\"You win!\"),\n    }\n}",
+   "options": {
+    "A": "`Too small!`",
+    "B": "`Too big!`",
+    "C": "`You win!`",
+    "D": "It fails to compile because `cmp` needs two references"
+   },
+   "answer": "B",
+   "explanation": "`guess.cmp(&secret_number)` compares `guess` (100) to `secret_number` (50); since 100 is greater, the result is `Ordering::Greater` and the `Too big!` arm runs. `cmp` is called on the value with one reference argument, which is fine."
+  },
+  {
+   "id": "ch02-q10",
+   "section": "Guessing Game Tutorial",
+   "tag": "Spot the Bug",
+   "difficulty": 3,
+   "prompt": "This code fails to compile. Why?",
+   "code": "use std::io;\n\nfn main() {\n    let mut guess = String::new();\n\n    io::stdin()\n        .read_line(&mut guess)\n        .expect(\"Failed to read line\");\n\n    let guess = guess.trim().parse().expect(\"Please type a number!\");\n\n    println!(\"You guessed: {guess}\");\n}",
+   "options": {
+    "A": "The compiler cannot infer which numeric type `parse` should produce, so a type annotation like `let guess: u32` is needed",
+    "B": "`parse` cannot be called on the result of `trim` because `trim` returns a `&str`",
+    "C": "Shadowing a `String` with a number is not allowed; the new variable needs a different name",
+    "D": "`expect` cannot be chained directly after `parse`; the `Result` must be matched first"
+   },
+   "answer": "A",
+   "explanation": "`parse` can convert a string into many number types, so without a target type such as `let guess: u32` (or a turbofish like `parse::<u32>()`), the compiler reports that type annotations are needed. Shadowing across types is allowed, and `parse` is normally called on the `&str` returned by `trim`."
+  },
+  {
+   "id": "ch02-q11",
+   "section": "Guessing Game Tutorial",
+   "tag": "Code Output",
+   "difficulty": 3,
+   "prompt": "What happens when this program runs?",
+   "code": "fn main() {\n    let input = String::from(\"5\\n\");\n    let n: u32 = input.parse().expect(\"Please type a number!\");\n    println!(\"You guessed: {n}\");\n}",
+   "options": {
+    "A": "It panics with the message `Please type a number!`",
+    "B": "It prints `You guessed: 5`",
+    "C": "It fails to compile because `parse` cannot return a `u32`",
+    "D": "It prints `You guessed: 5` followed by a blank line"
+   },
+   "answer": "A",
+   "explanation": "The string still contains the trailing newline, and parsing `\"5\\n\"` as a `u32` fails, so `parse` returns `Err` and `expect` panics with the given message. This is exactly why the tutorial calls `trim()` before `parse()`."
+  },
+  {
+   "id": "ch02-q12",
+   "section": "Guessing Game Tutorial",
+   "tag": "Misconception",
+   "difficulty": 1,
+   "prompt": "A learner says: \"To convert `guess` from a `String` to a `u32`, we must mark it `mut`, because its type is changing.\" What is wrong with this claim?",
+   "options": {
+    "A": "Nothing — a variable's type can only change if it is mutable",
+    "B": "The tutorial uses shadowing: `let guess: u32 = ...` creates a brand-new variable that reuses the name, so no `mut` is needed for the conversion",
+    "C": "The claim is wrong because `mut` is never allowed on `String` variables",
+    "D": "The claim is wrong because Rust converts the type automatically when you compare a `String` with a number"
+   },
+   "answer": "B",
+   "explanation": "Mutability never allows a variable's type to change; instead, the tutorial shadows `guess` with a new `let` binding of type `u32`, reusing the name rather than mutating the old variable. Rust also performs no implicit `String`-to-number conversions."
+  }
+ ]
+}

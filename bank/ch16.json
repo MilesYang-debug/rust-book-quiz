@@ -1,0 +1,350 @@
+{
+  "chapter": 16,
+  "title": "Fearless Concurrency",
+  "link": "https://doc.rust-lang.org/book/ch16-00-concurrency.html",
+  "questions": [
+    {
+      "id": "ch16-q01",
+      "section": "16.1 Using Threads",
+      "tag": "Concept",
+      "difficulty": 1,
+      "prompt": "How do you create a new thread in Rust's standard library?",
+      "options": {
+        "A": "Call `thread::spawn` and pass it a closure containing the code the new thread should run",
+        "B": "Call `thread::new` and pass it a function pointer registered with the runtime",
+        "C": "Annotate a function with `#[thread]` so the compiler runs it concurrently",
+        "D": "Call `thread::spawn` with a string naming the function to execute"
+      },
+      "answer": "A",
+      "explanation": "`thread::spawn` takes a closure (or other `FnOnce`) containing the code to run in the new thread. The standard library uses a 1:1 model, so each call creates one OS thread."
+    },
+    {
+      "id": "ch16-q02",
+      "section": "16.1 Using Threads",
+      "tag": "Code Output",
+      "difficulty": 2,
+      "prompt": "What is the most accurate description of this program's output?",
+      "code": "use std::thread;\nuse std::time::Duration;\n\nfn main() {\n    thread::spawn(|| {\n        for i in 1..10 {\n            println!(\"spawned: {i}\");\n            thread::sleep(Duration::from_millis(1));\n        }\n    });\n\n    for i in 1..5 {\n        println!(\"main: {i}\");\n        thread::sleep(Duration::from_millis(1));\n    }\n}",
+      "options": {
+        "A": "It always prints all 9 `spawned` lines and all 4 `main` lines, in some interleaved order",
+        "B": "The `main` lines print, but the spawned thread's output is most likely truncated, because the program exits when the main thread finishes",
+        "C": "It fails to compile because the closure does not use the `move` keyword",
+        "D": "It prints all 9 `spawned` lines first, then the 4 `main` lines"
+      },
+      "answer": "B",
+      "explanation": "When the main thread ends, the whole program exits and all spawned threads are shut down, whether or not they finished. Since nothing joins the spawned thread, it will most likely be cut off before printing all 9 lines. The interleaving of the lines that do print is nondeterministic."
+    },
+    {
+      "id": "ch16-q03",
+      "section": "16.1 Using Threads",
+      "tag": "Behavior",
+      "difficulty": 1,
+      "prompt": "What does calling `join()` on the `JoinHandle` returned by `thread::spawn` do?",
+      "options": {
+        "A": "It merges the spawned thread's stack into the main thread's stack",
+        "B": "It blocks the calling thread until the spawned thread finishes, returning a `Result`",
+        "C": "It immediately terminates the spawned thread and reclaims its resources",
+        "D": "It schedules the spawned thread to run at a higher priority"
+      },
+      "answer": "B",
+      "explanation": "`join()` blocks the thread that calls it until the thread the handle belongs to terminates. It returns a `Result` (an `Err` if the spawned thread panicked), which the book's examples handle with `unwrap()`."
+    },
+    {
+      "id": "ch16-q04",
+      "section": "16.1 Using Threads",
+      "tag": "Code Output",
+      "difficulty": 2,
+      "prompt": "What does this program print?",
+      "code": "use std::thread;\nuse std::time::Duration;\n\nfn main() {\n    let handle = thread::spawn(|| {\n        for i in 1..4 {\n            println!(\"spawned: {i}\");\n            thread::sleep(Duration::from_millis(1));\n        }\n    });\n\n    handle.join().unwrap();\n\n    for i in 1..3 {\n        println!(\"main: {i}\");\n        thread::sleep(Duration::from_millis(1));\n    }\n}",
+      "options": {
+        "A": "`spawned: 1`, `spawned: 2`, `spawned: 3`, then `main: 1`, `main: 2` — always in that order",
+        "B": "The `spawned` and `main` lines interleave in a nondeterministic order",
+        "C": "Only the `main` lines, because the spawned thread is killed when `main` continues",
+        "D": "It deadlocks, because `join` cannot be called before the main thread's loop"
+      },
+      "answer": "A",
+      "explanation": "Because `join` is called before the main thread's loop, main blocks until the spawned thread completes all its iterations. The output is deterministic: all `spawned` lines, then all `main` lines. Moving `join` after the loop would allow nondeterministic interleaving — where you call `join` changes the behavior."
+    },
+    {
+      "id": "ch16-q05",
+      "section": "16.1 Using Threads",
+      "tag": "Spot the Bug",
+      "difficulty": 2,
+      "prompt": "Why does this code fail to compile?",
+      "code": "use std::thread;\n\nfn main() {\n    let v = vec![1, 2, 3];\n\n    let handle = thread::spawn(|| {\n        println!(\"Here's a vector: {v:?}\");\n    });\n\n    handle.join().unwrap();\n}",
+      "options": {
+        "A": "`Vec<i32>` does not implement the `Send` trait, so it can never be used in another thread",
+        "B": "The closure borrows `v`, but the spawned thread may outlive `main`'s ownership of `v`; the compiler suggests adding `move` (error E0373)",
+        "C": "It compiles fine but panics at runtime when the spawned thread accesses freed memory",
+        "D": "`println!` cannot be used inside a spawned thread"
+      },
+      "answer": "B",
+      "explanation": "The closure only borrows `v`, and Rust can't guarantee the spawned thread won't outlive `v` (e.g., if the handle were leaked or `v` were dropped first). The compiler rejects it with E0373 (\"closure may outlive the current function, but it borrows `v`\") and suggests `move` to transfer ownership into the closure. Rust turns this potential dangling reference into a compile error, not a runtime crash."
+    },
+    {
+      "id": "ch16-q06",
+      "section": "16.1 Using Threads",
+      "tag": "Misconception",
+      "difficulty": 3,
+      "prompt": "Select ALL statements that are true about `move` closures used with `thread::spawn`.",
+      "options": {
+        "A": "`move` forces the closure to take ownership of the environment values it uses, rather than borrowing them",
+        "B": "After moving `v` into the closure, `main` can still use `v`, because `move` only moves a reference",
+        "C": "Without `move`, a closure that captures a local variable by reference cannot be passed to `thread::spawn`, because the new thread might outlive the borrowed value",
+        "D": "`move` guarantees the spawned thread runs before any code after `thread::spawn` in the main thread",
+        "E": "If both threads need the data, cloning it before the `move` closure captures it is a valid fix"
+      },
+      "answer": ["A", "C", "E"],
+      "explanation": "A and C are the core rules: `thread::spawn` requires the closure to own its captures (or capture only `'static` data), and `move` accomplishes that. E is the compiler's own suggested workaround for E0382. B is false — using `v` in `main` after the move is a compile error (use of moved value). D is false — `move` affects ownership, not scheduling."
+    },
+    {
+      "id": "ch16-q07",
+      "section": "16.2 Using Message Passing to Transfer Data Between Threads",
+      "tag": "Concept",
+      "difficulty": 1,
+      "prompt": "What does `mpsc::channel()` return, and what does `mpsc` stand for?",
+      "options": {
+        "A": "A single `Channel` object shared by all threads; `mpsc` means \"multi-purpose synchronized channel\"",
+        "B": "A `(transmitter, receiver)` tuple, conventionally `(tx, rx)`; `mpsc` means \"multiple producer, single consumer\"",
+        "C": "A `(receiver, transmitter)` tuple; `mpsc` means \"multiple producer, single consumer\"",
+        "D": "A `(transmitter, receiver)` tuple; `mpsc` means \"multiple producer, shared consumer\", so `rx` can also be cloned"
+      },
+      "answer": "B",
+      "explanation": "`mpsc::channel()` returns a tuple whose first element is the transmitter (`tx`) and second is the receiver (`rx`). `mpsc` stands for multiple producer, single consumer: you can clone `tx` to get many senders, but there is only one receiver."
+    },
+    {
+      "id": "ch16-q08",
+      "section": "16.2 Using Message Passing to Transfer Data Between Threads",
+      "tag": "Spot the Bug",
+      "difficulty": 2,
+      "prompt": "What is wrong with this code?",
+      "code": "use std::sync::mpsc;\nuse std::thread;\n\nfn main() {\n    let (tx, rx) = mpsc::channel();\n\n    thread::spawn(move || {\n        let val = String::from(\"hi\");\n        tx.send(val).unwrap();\n        println!(\"val is {val}\");\n    });\n\n    let received = rx.recv().unwrap();\n    println!(\"Got: {received}\");\n}",
+      "options": {
+        "A": "Nothing — it prints `val is hi` and `Got: hi`",
+        "B": "It compiles, but `println!(\"val is {val}\")` prints garbage at runtime because the receiver may have modified the string",
+        "C": "It fails to compile with E0382: `send` takes ownership of `val`, so using `val` afterwards is a use after move",
+        "D": "It fails to compile because `tx` cannot be moved into the closure"
+      },
+      "answer": "C",
+      "explanation": "`send` moves its argument, transferring ownership down the channel. Using `val` after `tx.send(val)` is rejected at compile time with E0382 (\"borrow of moved value: `val`\"). This compile-time rule prevents a thread from accidentally using or mutating a value after another thread may have taken it."
+    },
+    {
+      "id": "ch16-q09",
+      "section": "16.2 Using Message Passing to Transfer Data Between Threads",
+      "tag": "Behavior",
+      "difficulty": 1,
+      "prompt": "What is the difference between `rx.recv()` and `rx.try_recv()`?",
+      "options": {
+        "A": "`recv` blocks until a message arrives (or the channel closes), while `try_recv` returns immediately with `Ok` or an `Err` if no message is waiting",
+        "B": "`recv` is non-blocking, while `try_recv` retries in a loop until a message arrives",
+        "C": "They behave identically, but `try_recv` returns an `Option` instead of a `Result`",
+        "D": "`recv` can only be called once, while `try_recv` can be called repeatedly"
+      },
+      "answer": "A",
+      "explanation": "`recv` blocks the calling thread until a value is available or all senders have been dropped, returning `Result<T, RecvError>`. `try_recv` never blocks: it returns immediately, with `Err` if no message is currently available — useful when the receiving thread has other work to do."
+    },
+    {
+      "id": "ch16-q10",
+      "section": "16.2 Using Message Passing to Transfer Data Between Threads",
+      "tag": "Code Output",
+      "difficulty": 2,
+      "prompt": "What does this program do?",
+      "code": "use std::sync::mpsc;\nuse std::thread;\n\nfn main() {\n    let (tx, rx) = mpsc::channel();\n\n    thread::spawn(move || {\n        for word in [\"hi\", \"from\", \"the\", \"thread\"] {\n            tx.send(String::from(word)).unwrap();\n        }\n    });\n\n    for received in rx {\n        println!(\"Got: {received}\");\n    }\n}",
+      "options": {
+        "A": "It prints the four `Got:` lines, then hangs forever waiting for more messages",
+        "B": "It prints the four `Got:` lines, then the loop ends and the program exits, because iteration over `rx` stops when all senders are dropped",
+        "C": "It fails to compile because a `Receiver` cannot be used in a `for` loop",
+        "D": "It panics after the fourth message because `recv` returns an `Err` on a closed channel"
+      },
+      "answer": "B",
+      "explanation": "`Receiver` can be used as an iterator: each iteration waits for the next message, and the iteration ends cleanly when the channel closes — which happens when every transmitter (`tx`) has been dropped. Here `tx` was moved into the spawned thread and is dropped when that thread finishes, so the loop terminates after four messages. No panic occurs; the iterator just yields `None` internally."
+    },
+    {
+      "id": "ch16-q11",
+      "section": "16.2 Using Message Passing to Transfer Data Between Threads",
+      "tag": "Code Output",
+      "difficulty": 3,
+      "prompt": "Two threads send over the same channel via a cloned transmitter. What is true of the output?",
+      "code": "use std::sync::mpsc;\nuse std::thread;\n\nfn main() {\n    let (tx, rx) = mpsc::channel();\n    let tx1 = tx.clone();\n\n    thread::spawn(move || {\n        for word in [\"hi\", \"from\", \"the\", \"thread\"] {\n            tx1.send(String::from(word)).unwrap();\n        }\n    });\n\n    thread::spawn(move || {\n        for word in [\"more\", \"messages\", \"for\", \"you\"] {\n            tx.send(String::from(word)).unwrap();\n        }\n    });\n\n    for received in rx {\n        println!(\"Got: {received}\");\n    }\n}",
+      "options": {
+        "A": "It fails to compile: a `Sender` cannot be cloned because the channel is single-producer",
+        "B": "All 8 messages are printed; messages from each thread stay in their per-thread order, but how the two threads' messages interleave is nondeterministic",
+        "C": "Only the first thread's 4 messages are printed, because cloning `tx` creates a second, separate channel",
+        "D": "The loop never ends, because the original `tx` still exists in `main` after cloning"
+      },
+      "answer": "B",
+      "explanation": "Cloning the transmitter is exactly how mpsc supports multiple producers. All 8 messages reach the single receiver; each sender's own messages arrive in the order it sent them, but the interleaving between the two threads varies run to run. Both `tx` and `tx1` were moved into threads, so once both threads finish, all senders are dropped and the loop ends. (If `tx` had stayed usable in `main`, D's concern would be real.)"
+    },
+    {
+      "id": "ch16-q12",
+      "section": "16.2 Using Message Passing to Transfer Data Between Threads",
+      "tag": "Behavior",
+      "difficulty": 3,
+      "prompt": "Select ALL statements that are true about `std::sync::mpsc` channels.",
+      "options": {
+        "A": "`send` takes ownership of the value being sent, and the receiver takes ownership when the value arrives",
+        "B": "`recv` blocks the calling thread until a value arrives or all senders have been dropped",
+        "C": "`try_recv` blocks for a short built-in timeout before returning an error",
+        "D": "A `for` loop over the receiver ends when the channel is closed, i.e. when all transmitters have been dropped",
+        "E": "`send` panics automatically whenever the receiver has been dropped"
+      },
+      "answer": ["A", "B", "D"],
+      "explanation": "A, B, and D describe the actual API. C is false: `try_recv` returns immediately, never blocking. E is false: `send` returns `Result<(), SendError<T>>` — it returns an `Err` if the receiver was dropped, and only panics if you choose to `unwrap()` that error."
+    },
+    {
+      "id": "ch16-q13",
+      "section": "16.3 Shared-State Concurrency",
+      "tag": "Concept",
+      "difficulty": 1,
+      "prompt": "What does `Mutex::lock()` return, and when is it an `Err`?",
+      "options": {
+        "A": "It returns the inner value `T` directly, and panics if the lock is held",
+        "B": "It returns a `Result` containing a `MutexGuard`; it is an `Err` if another thread holding the lock panicked (the mutex is poisoned)",
+        "C": "It returns `Option<MutexGuard>`; `None` means another thread currently holds the lock",
+        "D": "It returns a `Result`; it is an `Err` whenever the lock is currently held by another thread"
+      },
+      "answer": "B",
+      "explanation": "`lock()` blocks until the lock is acquired and returns `LockResult<MutexGuard<T>>`. The `Err` case occurs when the mutex is poisoned — a thread panicked while holding the lock — not merely because the lock is busy. The book's examples call `unwrap()` to panic in that situation."
+    },
+    {
+      "id": "ch16-q14",
+      "section": "16.3 Shared-State Concurrency",
+      "tag": "Behavior",
+      "difficulty": 2,
+      "prompt": "How is a `Mutex` lock released in safe Rust?",
+      "options": {
+        "A": "You must call `mutex.unlock()` explicitly, or the lock is held forever",
+        "B": "The lock is released when the `MutexGuard` is dropped — typically when it goes out of scope — because `MutexGuard` implements `Drop`",
+        "C": "The lock is released as soon as you finish reading or writing through the guard, tracked automatically at runtime",
+        "D": "The lock is released when the owning thread calls `thread::yield_now()`"
+      },
+      "answer": "B",
+      "explanation": "`lock()` returns a smart pointer, `MutexGuard`, which implements `Deref` to reach the inner data and `Drop` to release the lock automatically when the guard goes out of scope. This design means you can't forget to unlock — releasing happens deterministically at guard drop, and there is no `unlock` method to call in safe code."
+    },
+    {
+      "id": "ch16-q15",
+      "section": "16.3 Shared-State Concurrency",
+      "tag": "Code Output",
+      "difficulty": 1,
+      "prompt": "What does this single-threaded program print?",
+      "code": "use std::sync::Mutex;\n\nfn main() {\n    let m = Mutex::new(5);\n\n    {\n        let mut num = m.lock().unwrap();\n        *num = 6;\n    }\n\n    println!(\"m = {m:?}\");\n}",
+      "options": {
+        "A": "It prints the mutex with inner value `6`, e.g. `m = Mutex { data: 6, ... }`",
+        "B": "It prints the mutex with inner value `5`, because `m` was not declared `mut`",
+        "C": "It fails to compile: you cannot mutate through `m` because `m` is an immutable binding",
+        "D": "It deadlocks at `println!` because the lock from the inner scope is still held"
+      },
+      "answer": "A",
+      "explanation": "`Mutex<T>` provides interior mutability, so the value can be changed through a shared binding once the lock is acquired. Dereferencing the `MutexGuard` sets the value to 6, and the guard is dropped at the end of the inner scope, releasing the lock — so the `println!` can safely observe the mutex containing 6. No `mut` on `m` is needed."
+    },
+    {
+      "id": "ch16-q16",
+      "section": "16.3 Shared-State Concurrency",
+      "tag": "Spot the Bug",
+      "difficulty": 2,
+      "prompt": "Why does this code fail to compile?",
+      "code": "use std::sync::Mutex;\nuse std::thread;\n\nfn main() {\n    let counter = Mutex::new(0);\n    let mut handles = vec![];\n\n    for _ in 0..10 {\n        let handle = thread::spawn(move || {\n            let mut num = counter.lock().unwrap();\n            *num += 1;\n        });\n        handles.push(handle);\n    }\n\n    for handle in handles {\n        handle.join().unwrap();\n    }\n\n    println!(\"Result: {}\", *counter.lock().unwrap());\n}",
+      "options": {
+        "A": "E0382: `counter` is moved into the closure on the first loop iteration, so later iterations (and the final `println!`) use a moved value",
+        "B": "`Mutex<i32>` does not implement `Send`, so it cannot be used from a spawned thread",
+        "C": "It compiles, but the result is nondeterministic because the increments race",
+        "D": "The closure needs `&mut counter`, which requires `counter` to be declared `mut`"
+      },
+      "answer": "A",
+      "explanation": "The `move` closure takes ownership of `counter`, and ownership can only be given away once — the second loop iteration already has no `counter` to move. The compiler reports E0382 (\"borrow of moved value: `counter`\"). The fix is shared ownership across threads: wrap the mutex in `Arc` and give each thread its own `Arc::clone`. Note the mutex itself would prevent a data race (C), but this code never gets past the compiler."
+    },
+    {
+      "id": "ch16-q17",
+      "section": "16.3 Shared-State Concurrency",
+      "tag": "Spot the Bug",
+      "difficulty": 3,
+      "prompt": "To share the counter, a programmer wraps it in `Rc`. What happens?",
+      "code": "use std::rc::Rc;\nuse std::sync::Mutex;\nuse std::thread;\n\nfn main() {\n    let counter = Rc::new(Mutex::new(0));\n    let mut handles = vec![];\n\n    for _ in 0..10 {\n        let counter = Rc::clone(&counter);\n        let handle = thread::spawn(move || {\n            let mut num = counter.lock().unwrap();\n            *num += 1;\n        });\n        handles.push(handle);\n    }\n\n    for handle in handles {\n        handle.join().unwrap();\n    }\n\n    println!(\"Result: {}\", *counter.lock().unwrap());\n}",
+      "options": {
+        "A": "It works: `Rc::clone` gives each thread shared ownership, and the mutex serializes the increments",
+        "B": "It compiles but the reference count gets corrupted at runtime, causing a use-after-free",
+        "C": "It fails to compile with E0277: `Rc<Mutex<i32>>` cannot be sent between threads safely, because `Rc` does not implement `Send`; the fix is to use `Arc` instead",
+        "D": "It fails to compile because `Rc::clone` cannot be called inside a loop"
+      },
+      "answer": "C",
+      "explanation": "`Rc<T>` updates its reference count with non-atomic operations, so it is not thread-safe and does not implement `Send`. The compiler rejects moving it into `thread::spawn` with E0277. `Arc<T>` (atomically reference counted) has the same API but uses atomic count updates, making it safe to share across threads — the potential runtime corruption in B is exactly what Rust prevents at compile time."
+    },
+    {
+      "id": "ch16-q18",
+      "section": "16.3 Shared-State Concurrency",
+      "tag": "Code Output",
+      "difficulty": 2,
+      "prompt": "What does this program print?",
+      "code": "use std::sync::{Arc, Mutex};\nuse std::thread;\n\nfn main() {\n    let counter = Arc::new(Mutex::new(0));\n    let mut handles = vec![];\n\n    for _ in 0..10 {\n        let counter = Arc::clone(&counter);\n        let handle = thread::spawn(move || {\n            let mut num = counter.lock().unwrap();\n            *num += 1;\n        });\n        handles.push(handle);\n    }\n\n    for handle in handles {\n        handle.join().unwrap();\n    }\n\n    println!(\"Result: {}\", *counter.lock().unwrap());\n}",
+      "options": {
+        "A": "`Result: 10`, every time — the mutex serializes the increments and every handle is joined before printing",
+        "B": "A number between 0 and 10, varying by run, because the increments race",
+        "C": "It fails to compile because `Arc` does not provide mutable access to its contents",
+        "D": "`Result: 0`, because each thread increments its own clone of the counter"
+      },
+      "answer": "A",
+      "explanation": "Each thread gets an `Arc` clone pointing at the same `Mutex`; the lock makes each `+= 1` exclusive, and joining all 10 handles guarantees every increment happened before the final read. So the output is deterministically `Result: 10`. `Arc::clone` clones the pointer, not the data (ruling out D), and the `Mutex` inside supplies the mutability `Arc` alone lacks (ruling out C)."
+    },
+    {
+      "id": "ch16-q19",
+      "section": "16.3 Shared-State Concurrency",
+      "tag": "Concept",
+      "difficulty": 3,
+      "prompt": "Select ALL statements that are true about `Mutex<T>` in Rust.",
+      "options": {
+        "A": "`Mutex<T>` provides interior mutability: you can mutate the inner value through a shared reference, similar to `RefCell<T>`",
+        "B": "The `MutexGuard` returned by `lock()` releases the lock automatically when it is dropped",
+        "C": "Rust's compiler statically prevents deadlocks when using multiple mutexes",
+        "D": "Using `Mutex<T>` carries a deadlock risk (e.g., two threads each holding one of two locks and waiting for the other), which Rust cannot catch at compile time",
+        "E": "You must call an explicit `unlock()` method after mutating the data, or other threads block forever"
+      },
+      "answer": ["A", "B", "D"],
+      "explanation": "A: `Arc<Mutex<T>>` mirrors `Rc<RefCell<T>>` — the mutex supplies interior mutability. B and D: unlocking is automatic via `Drop`, but logic errors like deadlocks remain possible; Rust's type system prevents data races and invalid references, not deadlocks. C is therefore false, and E is false because there is no explicit unlock in safe Rust — dropping the guard releases the lock."
+    },
+    {
+      "id": "ch16-q20",
+      "section": "16.4 Extensible Concurrency with the Send and Sync Traits",
+      "tag": "Concept",
+      "difficulty": 2,
+      "prompt": "Which statement correctly describes the `Send` and `Sync` marker traits?",
+      "options": {
+        "A": "`Send` means ownership of the type can be transferred to another thread; `Sync` means the type can be referenced from multiple threads — formally, `T` is `Sync` if `&T` is `Send`",
+        "B": "`Send` means the type can be serialized over a channel; `Sync` means the type is protected by an internal lock",
+        "C": "`Send` means the type can be referenced from multiple threads; `Sync` means ownership can be transferred between threads",
+        "D": "`Send` and `Sync` are equivalent; every `Send` type is automatically `Sync` and vice versa"
+      },
+      "answer": "A",
+      "explanation": "`Send` allows transferring ownership of a value across threads; `Sync` allows a type to be safely referenced from multiple threads, defined precisely as: `T` is `Sync` if and only if `&T` is `Send`. They are distinct properties — e.g., `RefCell<T>` can be `Send` yet is not `Sync`."
+    },
+    {
+      "id": "ch16-q21",
+      "section": "16.4 Extensible Concurrency with the Send and Sync Traits",
+      "tag": "Misconception",
+      "difficulty": 2,
+      "prompt": "Which statement is true about `Rc<T>` and `RefCell<T>` in multithreaded code?",
+      "options": {
+        "A": "`Rc<T>` is `Send` but not `Sync`, so it can be moved to another thread but not shared",
+        "B": "`Rc<T>` implements neither `Send` nor `Sync`, and `RefCell<T>` is not `Sync`; their thread-safe counterparts are `Arc<T>` and `Mutex<T>`",
+        "C": "`RefCell<T>` is `Sync` because its borrow rules are checked at runtime",
+        "D": "Wrapping an `Rc<T>` inside a `Mutex` makes it safe to send between threads"
+      },
+      "answer": "B",
+      "explanation": "`Rc<T>` uses non-atomic reference counting, so it is neither `Send` nor `Sync`. `RefCell<T>`'s runtime borrow tracking is not thread-safe, so it is not `Sync`. The thread-safe alternatives are `Arc<T>` and `Mutex<T>` (or `RwLock<T>`). D is false: a composite type is only `Send` if its components are, so `Mutex<Rc<T>>` still is not `Send`."
+    },
+    {
+      "id": "ch16-q22",
+      "section": "16.4 Extensible Concurrency with the Send and Sync Traits",
+      "tag": "Concept",
+      "difficulty": 3,
+      "prompt": "How do types come to implement `Send` and `Sync`, and what does implementing them manually involve?",
+      "options": {
+        "A": "You derive them with `#[derive(Send, Sync)]`, and the compiler generates the required methods",
+        "B": "Every type must implement them explicitly in safe code by writing the traits' required methods",
+        "C": "Types composed entirely of `Send`/`Sync` parts are automatically `Send`/`Sync`; since these marker traits have no methods, implementing them manually requires an `unsafe impl`, because you are asserting thread-safety guarantees the compiler cannot verify",
+        "D": "Only standard library types can implement `Send` and `Sync`; user-defined types never do"
+      },
+      "answer": "C",
+      "explanation": "`Send` and `Sync` are marker traits with no methods. The compiler implements them automatically for any type made entirely of `Send`/`Sync` components — so user code almost never implements them by hand. Doing so (e.g., `unsafe impl Send for MyType {}`) requires the `unsafe` keyword because you, not the compiler, are guaranteeing the concurrency invariants; getting it wrong can cause data races and undefined behavior."
+    }
+  ]
+}

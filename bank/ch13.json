@@ -1,0 +1,384 @@
+{
+  "chapter": 13,
+  "title": "Functional Language Features: Iterators and Closures",
+  "link": "https://doc.rust-lang.org/book/ch13-00-functional-features.html",
+  "questions": [
+    {
+      "id": "ch13-q01",
+      "section": "13.1 Closures",
+      "tag": "Concept",
+      "difficulty": 1,
+      "prompt": "What is the key capability that closures have but plain `fn` functions do not?",
+      "options": {
+        "A": "Closures can be called recursively, while functions cannot",
+        "B": "Closures can capture values from the scope in which they are defined",
+        "C": "Closures can return multiple values, while functions return only one",
+        "D": "Closures run asynchronously by default"
+      },
+      "answer": "B",
+      "explanation": "Closures are anonymous functions that can capture values from their enclosing environment (by reference, mutable reference, or by value). Plain `fn` items cannot capture their environment. Recursion, return values, and async behavior are unrelated distinctions."
+    },
+    {
+      "id": "ch13-q02",
+      "section": "13.1 Closures",
+      "tag": "Spot the Bug",
+      "difficulty": 2,
+      "prompt": "This code fails to compile. Why?",
+      "code": "let example_closure = |x| x;\n\nlet s = example_closure(String::from(\"hello\"));\nlet n = example_closure(5);",
+      "options": {
+        "A": "Closures without type annotations can never be called",
+        "B": "The first call locked the closure's parameter type to `String`, so calling it with an integer is a type mismatch",
+        "C": "`example_closure` was moved by the first call, so it cannot be called a second time",
+        "D": "A closure body consisting of just `x` is not a valid expression"
+      },
+      "answer": "B",
+      "explanation": "Closure parameter and return types are inferred once, from the first use. After `example_closure(String::from(\"hello\"))`, the closure's type is locked to `String -> String`, so `example_closure(5)` produces `expected String, found integer`. The closure implements `Fn`, so calling it twice is fine; the problem is purely the type lock-in."
+    },
+    {
+      "id": "ch13-q03",
+      "section": "13.1 Closures",
+      "tag": "Concept",
+      "difficulty": 1,
+      "prompt": "How does the closure `only_borrows` capture `list`?",
+      "code": "let list = vec![1, 2, 3];\nlet only_borrows = || println!(\"From closure: {list:?}\");\nonly_borrows();",
+      "options": {
+        "A": "By immutable borrow, because the body only reads `list`",
+        "B": "By mutable borrow, because closures always capture mutably",
+        "C": "By value, because `Vec` is not `Copy`",
+        "D": "It does not capture `list`; `println!` reads it directly from the outer scope"
+      },
+      "answer": "A",
+      "explanation": "The compiler infers the least restrictive capture mode the body needs: printing only requires reading, so `list` is captured by immutable borrow (`&Vec<i32>`). Ownership is only taken if the body requires it or `move` is used."
+    },
+    {
+      "id": "ch13-q04",
+      "section": "13.1 Closures",
+      "tag": "Code Output",
+      "difficulty": 2,
+      "prompt": "What does this program print?",
+      "code": "fn main() {\n    let mut list = vec![1, 2, 3];\n    let mut borrows_mutably = || list.push(7);\n\n    borrows_mutably();\n    borrows_mutably();\n    println!(\"{list:?}\");\n}",
+      "options": {
+        "A": "[1, 2, 3]",
+        "B": "[1, 2, 3, 7]",
+        "C": "[1, 2, 3, 7, 7]",
+        "D": "It does not compile: `list` is still mutably borrowed at the `println!`"
+      },
+      "answer": "C",
+      "explanation": "The closure captures `list` by mutable borrow (its body calls `push`), so the binding must be `mut`. Each call pushes 7, giving `[1, 2, 3, 7, 7]`. The mutable borrow ends after the closure's last use, so the later `println!` is allowed by non-lexical lifetimes."
+    },
+    {
+      "id": "ch13-q05",
+      "section": "13.1 Closures",
+      "tag": "Concept",
+      "difficulty": 2,
+      "prompt": "Why is the `move` keyword required in this code?",
+      "code": "use std::thread;\n\nfn main() {\n    let list = vec![1, 2, 3];\n    thread::spawn(move || println!(\"From thread: {list:?}\"))\n        .join()\n        .unwrap();\n}",
+      "options": {
+        "A": "`println!` always requires ownership of its arguments",
+        "B": "The new thread might outlive `main`'s stack frame, so borrowing `list` would risk a dangling reference; `move` transfers ownership into the closure",
+        "C": "`move` is required for every closure passed to another function",
+        "D": "`Vec` cannot be borrowed across function boundaries"
+      },
+      "answer": "B",
+      "explanation": "Without `move`, the closure would capture `list` by immutable borrow, but the compiler cannot prove the spawned thread finishes before `list` is dropped. `move` forces the closure to take ownership so the data lives as long as the thread. The body itself only needs a read, which is why `move` must be explicit here."
+    },
+    {
+      "id": "ch13-q06",
+      "section": "13.1 Closures",
+      "tag": "Concept",
+      "difficulty": 3,
+      "prompt": "Which of the following statements about the `Fn`, `FnMut`, and `FnOnce` traits are TRUE? (Select all that apply.)",
+      "options": {
+        "A": "Every closure implements at least `FnOnce`",
+        "B": "A closure that mutates a captured variable but does not move anything out of its body implements `FnMut` (and `FnOnce`)",
+        "C": "A closure that only reads captured values (or captures nothing) implements `Fn`, `FnMut`, and `FnOnce`",
+        "D": "Adding the `move` keyword means the closure can only implement `FnOnce`",
+        "E": "Plain functions defined with `fn` can also be used where an `Fn` trait bound is required"
+      },
+      "answer": ["A", "B", "C", "E"],
+      "explanation": "The traits are additive: all closures implement `FnOnce`; those that don't move captured values out also implement `FnMut`; those that additionally don't mutate implement `Fn`. D is false: `move` changes how values are captured (by value), not what the body does with them, so a `move` closure that only reads still implements `Fn`. E is true: `fn` items implement all three traits."
+    },
+    {
+      "id": "ch13-q07",
+      "section": "13.1 Closures",
+      "tag": "Behavior",
+      "difficulty": 2,
+      "prompt": "The standard library defines `Option::unwrap_or_else` with the bound `F: FnOnce() -> T`. Why is `FnOnce` the right choice?",
+      "options": {
+        "A": "`FnOnce` closures are faster to call than `Fn` closures",
+        "B": "`unwrap_or_else` calls the closure at most once, so requiring only `FnOnce` accepts the widest range of closures, including ones that move captured values out",
+        "C": "`FnOnce` is required because the closure takes no arguments",
+        "D": "Only `FnOnce` closures can return a value of type `T`"
+      },
+      "answer": "B",
+      "explanation": "`unwrap_or_else` invokes the closure at most once (only in the `None` case), so `FnOnce` is sufficient. Because `Fn` and `FnMut` closures also implement `FnOnce`, this bound is the most permissive: callers may even pass closures that consume captured values. The trait choice has nothing to do with speed, argument count, or return types."
+    },
+    {
+      "id": "ch13-q08",
+      "section": "13.1 Closures",
+      "tag": "Spot the Bug",
+      "difficulty": 3,
+      "prompt": "This code fails to compile. What is the actual problem?",
+      "code": "let mut list = [\n    Rectangle { width: 10, height: 1 },\n    Rectangle { width: 3, height: 5 },\n];\n\nlet mut sort_operations = vec![];\nlet value = String::from(\"closure called\");\n\nlist.sort_by_key(|r| {\n    sort_operations.push(value);\n    r.width\n});",
+      "options": {
+        "A": "The closure moves `value` out of its environment, so it implements only `FnOnce`, but `sort_by_key` requires `FnMut` because it calls the closure many times",
+        "B": "`sort_by_key` requires `Fn`, and pushing to `sort_operations` mutates captured state, which is forbidden",
+        "C": "`String` does not implement `Ord`, so it cannot be used inside a sort",
+        "D": "Arrays cannot be sorted with `sort_by_key`; only `Vec` can"
+      },
+      "answer": "A",
+      "explanation": "`push(value)` moves the `String` out of the closure's environment, which can only happen once, so the closure implements only `FnOnce`. `sort_by_key` needs `FnMut` because it invokes the key closure once per comparison. B is wrong: `FnMut` explicitly allows mutating captured state (pushing to `sort_operations` alone would be fine, e.g. `sort_operations.push(value.clone())`). Slices/arrays do support `sort_by_key`."
+    },
+    {
+      "id": "ch13-q09",
+      "section": "13.1 Closures",
+      "tag": "Code Output",
+      "difficulty": 2,
+      "prompt": "What does this program print?",
+      "code": "fn main() {\n    let list = vec![1, 2, 3];\n    let only_borrows = || println!(\"From closure: {list:?}\");\n\n    println!(\"Before calling closure: {list:?}\");\n    only_borrows();\n}",
+      "options": {
+        "A": "It does not compile: `list` is borrowed by the closure and cannot be used by the first `println!`",
+        "B": "From closure: [1, 2, 3]\nBefore calling closure: [1, 2, 3]",
+        "C": "Before calling closure: [1, 2, 3]\nFrom closure: [1, 2, 3]",
+        "D": "Before calling closure: [1, 2, 3] only; defining a closure that is never stored does nothing"
+      },
+      "answer": "C",
+      "explanation": "Defining a closure does not run its body; it runs when called. The closure holds only an immutable borrow of `list`, and multiple immutable borrows may coexist, so reading `list` in the first `println!` is fine. Output order follows execution: the \"Before\" line, then the closure's line."
+    },
+    {
+      "id": "ch13-q10",
+      "section": "13.1 Closures",
+      "tag": "Misconception",
+      "difficulty": 2,
+      "prompt": "A colleague claims: \"If you write `move` in front of a closure, it becomes `FnOnce`-only, so you can't call it twice.\" Which statement is correct?",
+      "options": {
+        "A": "The colleague is right: `move` closures always implement only `FnOnce`",
+        "B": "The colleague is wrong: which `Fn` traits a closure implements depends on what its body does with the captured values, not on how they were captured; a `move` closure that only reads its captures still implements `Fn` and can be called repeatedly",
+        "C": "The colleague is wrong, but for another reason: `move` closures implement no `Fn` traits at all",
+        "D": "The colleague is right only for closures that capture `Copy` types"
+      },
+      "answer": "B",
+      "explanation": "`move` controls capture (take ownership instead of borrowing); the trait a closure implements is determined by how the body uses the captures. `move || println!(\"{list:?}\")` owns `list` but only reads it, so it implements `Fn` (and `FnMut`, `FnOnce`) and is freely callable multiple times. Only moving a captured value out of the body restricts a closure to `FnOnce`."
+    },
+    {
+      "id": "ch13-q11",
+      "section": "13.1 Closures",
+      "tag": "Code Output",
+      "difficulty": 3,
+      "prompt": "What is the result of compiling and running this program?",
+      "code": "fn main() {\n    let s = String::from(\"rust\");\n    let consume = move || {\n        let owned = s;\n        owned.len()\n    };\n    println!(\"{}\", consume());\n}",
+      "options": {
+        "A": "It prints `4`",
+        "B": "It prints `rust`",
+        "C": "It does not compile: `s` is used after being moved into the closure",
+        "D": "It does not compile: a closure body cannot move a captured value into a local binding"
+      },
+      "answer": "A",
+      "explanation": "The closure takes ownership of `s` and its body moves `s` into `owned`, so `consume` implements only `FnOnce`. Calling it exactly once is fine and returns `owned.len()`, which is 4. It would fail to compile only if `consume()` were called a second time (or if `s` were used in `main` after the closure definition)."
+    },
+    {
+      "id": "ch13-q12",
+      "section": "13.2 Processing a Series of Items with Iterators",
+      "tag": "Spot the Bug",
+      "difficulty": 1,
+      "prompt": "This code compiles with a warning and has no visible effect. What went wrong?",
+      "code": "let v1 = vec![1, 2, 3];\n\nv1.iter().map(|x| x + 1);",
+      "options": {
+        "A": "`map` mutated `v1` in place, so the result was silently discarded",
+        "B": "Iterator adapters are lazy: `map` just builds a new iterator and the closure never runs until a consuming method like `collect` is called",
+        "C": "The closure should take `&x` instead of `x`",
+        "D": "`iter()` returns owned values, so `x + 1` is a type error"
+      },
+      "answer": "B",
+      "explanation": "Adapters such as `map` are lazy; they return a new iterator and do nothing until it is consumed. The compiler warns `unused Map that must be used: iterators are lazy and do nothing unless consumed`. The fix is to consume it, e.g. `let v2: Vec<_> = v1.iter().map(|x| x + 1).collect();`."
+    },
+    {
+      "id": "ch13-q13",
+      "section": "13.2 Processing a Series of Items with Iterators",
+      "tag": "Concept",
+      "difficulty": 1,
+      "prompt": "For a `Vec<String>` named `v`, which method creates an iterator that yields owned `String` values, consuming the vector?",
+      "options": {
+        "A": "`v.iter()`",
+        "B": "`v.iter_mut()`",
+        "C": "`v.into_iter()`",
+        "D": "`v.drain_owned()`"
+      },
+      "answer": "C",
+      "explanation": "`iter()` yields immutable references (`&String`), `iter_mut()` yields mutable references (`&mut String`), and `into_iter()` takes ownership of the collection and yields owned `String` values. `drain_owned` does not exist."
+    },
+    {
+      "id": "ch13-q14",
+      "section": "13.2 Processing a Series of Items with Iterators",
+      "tag": "Code Output",
+      "difficulty": 2,
+      "prompt": "What does this program print?",
+      "code": "fn main() {\n    let v = vec![1, 2, 3];\n    let mut iter = v.iter();\n\n    iter.next();\n    println!(\"{:?}\", iter.next());\n    println!(\"{:?}\", iter.next());\n    println!(\"{:?}\", iter.next());\n}",
+      "options": {
+        "A": "Some(1)\nSome(2)\nSome(3)",
+        "B": "Some(2)\nSome(3)\nNone",
+        "C": "Some(&2)\nSome(&3)\nNone",
+        "D": "1\n2\n3"
+      },
+      "answer": "B",
+      "explanation": "Each `next()` call advances the iterator's internal state. The first (unprinted) call consumes `Some(&1)`, so the printed values are `Some(2)`, `Some(3)`, and `None`. Debug formatting of `Some(&2)` prints as `Some(2)` because references format transparently."
+    },
+    {
+      "id": "ch13-q15",
+      "section": "13.2 Processing a Series of Items with Iterators",
+      "tag": "Spot the Bug",
+      "difficulty": 2,
+      "prompt": "This code fails to compile. Why?",
+      "code": "let v = vec![1, 2, 3];\nlet iter = v.iter();\n\nassert_eq!(iter.next(), Some(&1));",
+      "options": {
+        "A": "`next()` takes `&mut self` because it updates the iterator's internal state, so `iter` must be declared `mut`",
+        "B": "`next()` returns `1`, not `Some(&1)`, so the assertion has a type mismatch",
+        "C": "`v.iter()` cannot be stored in a variable; it must be consumed immediately",
+        "D": "`assert_eq!` cannot compare `Option` values"
+      },
+      "answer": "A",
+      "explanation": "Calling `next()` mutates the iterator (it tracks where it is in the sequence), so its signature is `fn next(&mut self) -> Option<Self::Item>`. The fix is `let mut iter = v.iter();`. Note that a `for` loop does not need `mut` because the loop takes ownership of the iterator and makes it mutable internally."
+    },
+    {
+      "id": "ch13-q16",
+      "section": "13.2 Processing a Series of Items with Iterators",
+      "tag": "Code Output",
+      "difficulty": 2,
+      "prompt": "What does this program print?",
+      "code": "fn main() {\n    let threshold = 2;\n    let v = vec![1, 2, 3, 4];\n\n    let result: Vec<i32> = v\n        .into_iter()\n        .filter(|x| *x > threshold)\n        .map(|x| x * 10)\n        .collect();\n\n    println!(\"{result:?}\");\n}",
+      "options": {
+        "A": "[30, 40]",
+        "B": "[10, 20, 30, 40]",
+        "C": "[3, 4]",
+        "D": "It does not compile: the `filter` closure cannot capture `threshold` from the surrounding scope"
+      },
+      "answer": "A",
+      "explanation": "Closures passed to adapters can freely capture their environment: `filter` captures `threshold` by immutable borrow. `into_iter` yields owned `i32` values; `filter` receives `&i32` (hence `*x`), keeping 3 and 4; `map` multiplies by 10; `collect` materializes `[30, 40]`."
+    },
+    {
+      "id": "ch13-q17",
+      "section": "13.2 Processing a Series of Items with Iterators",
+      "tag": "Concept",
+      "difficulty": 2,
+      "prompt": "Which of these iterator methods are consuming adapters, i.e. they call `next` repeatedly and use up the iterator? (Select all that apply.)",
+      "options": {
+        "A": "`sum`",
+        "B": "`map`",
+        "C": "`collect`",
+        "D": "`filter`",
+        "E": "`count`"
+      },
+      "answer": ["A", "C", "E"],
+      "explanation": "`sum`, `collect`, and `count` take ownership of the iterator and drive it to completion, producing a final value; the iterator cannot be used afterward. `map` and `filter` are iterator adapters: they lazily wrap the iterator in a new one and do no work until something consumes it."
+    },
+    {
+      "id": "ch13-q18",
+      "section": "13.2 Processing a Series of Items with Iterators",
+      "tag": "Concept",
+      "difficulty": 1,
+      "prompt": "To implement the `Iterator` trait for your own type, what is the minimum you must provide?",
+      "options": {
+        "A": "The associated type `Item` and the `next` method; every other method has a default implementation",
+        "B": "`next`, `size_hint`, and `collect`",
+        "C": "Only `into_iter`, which the compiler uses to derive `next`",
+        "D": "All adapter methods you intend to use, such as `map` and `filter`"
+      },
+      "answer": "A",
+      "explanation": "The trait is `pub trait Iterator { type Item; fn next(&mut self) -> Option<Self::Item>; ... }`. You define `Item` and `next`; the dozens of other methods (`map`, `zip`, `sum`, etc.) come for free as default implementations built on `next`."
+    },
+    {
+      "id": "ch13-q19",
+      "section": "13.2 Processing a Series of Items with Iterators",
+      "tag": "Code Output",
+      "difficulty": 3,
+      "prompt": "What does this program print?",
+      "code": "fn main() {\n    let a = [1, 2, 3, 4, 5];\n    let sum: i32 = a\n        .iter()\n        .zip(a.iter().skip(1))\n        .map(|(x, y)| x * y)\n        .filter(|p| p % 3 == 0)\n        .sum();\n    println!(\"{sum}\");\n}",
+      "options": {
+        "A": "18",
+        "B": "40",
+        "C": "38",
+        "D": "6"
+      },
+      "answer": "A",
+      "explanation": "`zip` pairs each element with its successor and stops when either side is exhausted: (1,2), (2,3), (3,4), (4,5). Products are 2, 6, 12, 20. `filter` keeps multiples of 3: 6 and 12. Their sum is 18. This mirrors the book's `Counter` example combining `zip`, `skip`, `map`, `filter`, and `sum`."
+    },
+    {
+      "id": "ch13-q20",
+      "section": "13.2 Processing a Series of Items with Iterators",
+      "tag": "Misconception",
+      "difficulty": 3,
+      "prompt": "Calling `next()` directly requires a mutable iterator, yet this compiles even though `v1_iter` is not declared `mut`. Why?",
+      "code": "let v1 = vec![1, 2, 3];\nlet v1_iter = v1.iter();\n\nfor val in v1_iter {\n    println!(\"Got: {val}\");\n}",
+      "options": {
+        "A": "`for` loops use a special immutable form of `next` that does not change iterator state",
+        "B": "The `for` loop takes ownership of `v1_iter` and makes it mutable behind the scenes, so no `mut` is needed on the original binding",
+        "C": "`v1.iter()` returns an iterator that is always implicitly mutable",
+        "D": "The compiler silently clones the iterator on each loop pass"
+      },
+      "answer": "B",
+      "explanation": "A `for` loop desugars to code that moves the iterator into a new binding it controls and declares that binding mutable, then calls `next` until `None`. Ownership transfer is also why `v1_iter` cannot be used after the loop. There is no immutable `next` and no per-iteration cloning."
+    },
+    {
+      "id": "ch13-q21",
+      "section": "13.3 Improving Our I/O Project",
+      "tag": "Concept",
+      "difficulty": 2,
+      "prompt": "In the minigrep project, `Config::build` was changed from taking `args: &[String]` to `mut args: impl Iterator<Item = String>`. What is the main benefit?",
+      "options": {
+        "A": "It makes argument parsing case-insensitive",
+        "B": "Owning the iterator lets `build` move each `String` out with `args.next()`, eliminating the `clone()` calls (and their allocations) needed with the slice version",
+        "C": "Iterators can be indexed faster than slices",
+        "D": "It allows `Config` to store references into the original arguments"
+      },
+      "answer": "B",
+      "explanation": "With a borrowed slice, `Config` could not take ownership of the `String`s, forcing `args[1].clone()` and `args[2].clone()`. By taking any `Iterator<Item = String>` by value (e.g. `env::args()` passed directly), `build` calls `next()` to move the values into `Config` — no clones. The first `next()` call skips the program name."
+    },
+    {
+      "id": "ch13-q22",
+      "section": "13.3 Improving Our I/O Project",
+      "tag": "Behavior",
+      "difficulty": 3,
+      "prompt": "The `search` function was rewritten from a `for` loop pushing into a `Vec` to:\n`contents.lines().filter(|line| line.contains(query)).collect()`. Which statements about this version are TRUE? (Select all that apply.)",
+      "options": {
+        "A": "It removes the mutable intermediate `results` vector",
+        "B": "The `filter` closure captures `query` from the surrounding environment",
+        "C": "It is significantly slower because each adapter adds a function-call layer at runtime",
+        "D": "It returns the same matching lines as the loop version",
+        "E": "`filter` scans all of `contents` eagerly the moment it is called, before `collect` runs"
+      },
+      "answer": ["A", "B", "D"],
+      "explanation": "The adapter chain expresses the filtering directly, with no mutable state (A) and the same behavior as the loop (D); the closure borrows `query` from the enclosing function (B). C is false: the book's benchmark showed the two versions perform about the same, since adapters compile down to equivalent code. E is false: `filter` is lazy and no lines are examined until `collect` consumes the iterator."
+    },
+    {
+      "id": "ch13-q23",
+      "section": "13.4 Comparing Performance: Loops vs. Iterators",
+      "tag": "Concept",
+      "difficulty": 1,
+      "prompt": "The book calls iterators one of Rust's \"zero-cost abstractions\". What does that mean?",
+      "options": {
+        "A": "Using the abstraction imposes no additional runtime overhead compared to writing the lower-level code by hand",
+        "B": "Iterators never allocate memory under any circumstances",
+        "C": "Iterator code compiles instantly, costing zero compile time",
+        "D": "Iterators are free to use only in release builds"
+      },
+      "answer": "A",
+      "explanation": "Zero-cost abstraction, echoing Stroustrup's \"What you do use, you couldn't hand code any better\", means the high-level iterator code compiles down to roughly the same machine code as an equivalent hand-written loop. It says nothing about allocation in general, compile times, or build profiles."
+    },
+    {
+      "id": "ch13-q24",
+      "section": "13.4 Comparing Performance: Loops vs. Iterators",
+      "tag": "Concept",
+      "difficulty": 3,
+      "prompt": "Which statements about iterator performance from this section are TRUE? (Select all that apply.)",
+      "options": {
+        "A": "In the book's `search` benchmark over the text of The Adventures of Sherlock Holmes, the iterator version performed about the same as (even slightly faster than) the explicit loop",
+        "B": "The compiler can unroll loops originating from iterator chains: in the audio decoder example, the loop over 12 coefficients compiled to repeated instructions with no loop at all",
+        "C": "Because coefficient values ended up in registers and bounds checks were removed, accessing the array in that example was extremely fast",
+        "D": "Closures passed to adapters are dispatched through vtables at runtime, adding indirect-call overhead by default",
+        "E": "For hot code paths, you should routinely rewrite iterator chains as manual index-based loops"
+      },
+      "answer": ["A", "B", "C"],
+      "explanation": "The benchmark timings were nearly identical (about 19.2M ns/iter for the iterator vs 19.6M for the loop), and the audio decoder example showed full unrolling, registers holding coefficients, and eliminated bounds checks. D is false: adapters and closures are monomorphized and inlined, not dynamically dispatched by default. E is false: the book's advice is to prefer the clearer iterator style, since it compiles to comparable code."
+    }
+  ]
+}

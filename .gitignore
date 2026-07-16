@@ -1,0 +1,32 @@
+# Rust / Trunk 构建产物
+/app/target/
+/app/src-tauri/target/
+/app/dist/
+
+# Tauri 构建时自动生成
+/app/src-tauri/gen/schemas/
+
+# Android / Gradle 构建缓存与产物
+/app/src-tauri/gen/android/.gradle/
+/app/src-tauri/gen/android/.kotlin/
+/app/src-tauri/gen/android/build/
+/app/src-tauri/gen/android/app/build/
+/app/src-tauri/gen/android/app/.cxx/
+/app/src-tauri/gen/android/buildSrc/build/
+/app/src-tauri/gen/android/buildSrc/.gradle/
+/app/src-tauri/gen/android/buildSrc/.kotlin/
+local.properties
+
+# 签名密钥（切勿提交）
+*.keystore
+*.jks
+key.properties
+
+# 最终交付产物（发 Releases，不进仓库）
+/RustBookQuiz.exe
+/RustBookQuiz.apk
+/RustBookQuiz.apk.idsig
+
+# 操作系统杂项
+.DS_Store
+Thumbs.db

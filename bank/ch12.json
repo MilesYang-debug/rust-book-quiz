@@ -1,0 +1,256 @@
+{
+  "chapter": 12,
+  "title": "An I/O Project: Building a Command Line Program",
+  "link": "https://doc.rust-lang.org/book/ch12-00-an-io-project.html",
+  "questions": [
+    {
+      "id": "ch12-q01",
+      "section": "12.1 Accepting Command Line Arguments",
+      "tag": "Concept",
+      "difficulty": 1,
+      "prompt": "What happens if a program iterates over `std::env::args()` and one of the command-line arguments contains invalid Unicode?",
+      "options": {
+        "A": "The invalid bytes are silently replaced with the Unicode replacement character.",
+        "B": "The program panics as soon as the iterator reaches the invalid argument.",
+        "C": "The iterator yields an `Err` value that can be handled with a `match`.",
+        "D": "The invalid argument is skipped and iteration continues with the next one."
+      },
+      "answer": "B",
+      "explanation": "`env::args()` panics if any argument contains invalid Unicode, because it yields `String` values. Programs that must accept arguments containing invalid Unicode should use `std::env::args_os()` instead, which yields platform-specific `OsString` values."
+    },
+    {
+      "id": "ch12-q02",
+      "section": "12.1 Accepting Command Line Arguments",
+      "tag": "Code Output",
+      "difficulty": 1,
+      "prompt": "This program is compiled to the binary `minigrep` and run with `cargo run -- needle haystack`. What does it print?",
+      "code": "use std::env;\n\nfn main() {\n    let args: Vec<String> = env::args().collect();\n    println!(\"{}\", args[0]);\n}",
+      "options": {
+        "A": "`needle`, because indexing starts at the first user-supplied argument",
+        "B": "The path to the binary, such as `target/debug/minigrep`",
+        "C": "`haystack`, because `collect` reverses the iterator",
+        "D": "Nothing; the program panics because `args[0]` is out of bounds"
+      },
+      "answer": "B",
+      "explanation": "Like in C, the first element of the argument vector is the path used to invoke the program binary (e.g., `target/debug/minigrep`). The user's arguments start at `args[1]` (`needle`) and `args[2]` (`haystack`)."
+    },
+    {
+      "id": "ch12-q03",
+      "section": "12.2 Reading a File",
+      "tag": "Spot the Bug",
+      "difficulty": 2,
+      "prompt": "This program is supposed to print the contents of `poem.txt`, but it does not work. What is wrong?",
+      "code": "use std::fs;\n\nfn main() {\n    let contents = fs::read_to_string(\"poem.txt\");\n    println!(\"With text:\\n{contents}\");\n}",
+      "options": {
+        "A": "It compiles but prints the file path instead of the file contents.",
+        "B": "It fails to compile: `read_to_string` returns `Result<String, io::Error>`, which does not implement `Display`; the code needs something like `.expect(...)` to get the `String` out.",
+        "C": "It panics at runtime because `read_to_string` always requires an absolute path.",
+        "D": "It compiles and runs, but prints an empty string because the `Result` is never awaited."
+      },
+      "answer": "B",
+      "explanation": "`fs::read_to_string` returns a `Result<String, std::io::Error>`, not a `String`. `Result` does not implement `Display`, so `println!(\"{contents}\")` is a compile error. The chapter first handles this with `.expect(\"Should have been able to read the file\")`, and later propagates the error with `?` inside `run`."
+    },
+    {
+      "id": "ch12-q04",
+      "section": "12.3 Improving Error Handling and Modularity",
+      "tag": "Concept",
+      "difficulty": 2,
+      "prompt": "After the chapter's separation-of-concerns refactor splits the program into `main.rs` and `lib.rs`, which responsibilities remain in the `main` function? Select all that apply.",
+      "options": {
+        "A": "Calling the command-line parsing logic with the argument values",
+        "B": "Calling a `run` function in `lib.rs` and handling the error if `run` returns one",
+        "C": "Implementing the `search` logic that finds matching lines",
+        "D": "Containing the unit tests for the program's core logic",
+        "E": "Setting up any other configuration"
+      },
+      "answer": ["A", "B", "E"],
+      "explanation": "The book's guideline keeps `main` small: it calls the parsing logic, sets up any other configuration, calls `run` in `lib.rs`, and handles `run`'s error. All program logic like `search` moves to `lib.rs`, where it can be exercised by unit tests; `main` itself cannot be tested directly."
+    },
+    {
+      "id": "ch12-q05",
+      "section": "12.3 Improving Error Handling and Modularity",
+      "tag": "Behavior",
+      "difficulty": 2,
+      "prompt": "Given this `main` and a `Config::build` that returns `Err(\"not enough arguments\")` when `args.len() < 3`, what happens when the user runs `cargo run` with no extra arguments?",
+      "code": "let args: Vec<String> = env::args().collect();\n\nlet config = Config::build(&args).unwrap_or_else(|err| {\n    println!(\"Problem parsing arguments: {err}\");\n    process::exit(1);\n});",
+      "options": {
+        "A": "The program panics with `index out of bounds` and prints a backtrace.",
+        "B": "It prints `Problem parsing arguments: not enough arguments` and exits with status code 1, without a panic backtrace.",
+        "C": "It prints the message but continues running with a default `Config`.",
+        "D": "It prints the message and exits with status code 0, signaling success."
+      },
+      "answer": "B",
+      "explanation": "`Config::build` checks `args.len() < 3` and returns an `Err` instead of indexing out of bounds, so there is no panic. `unwrap_or_else` invokes the closure with the error value, which prints a friendly message and calls `process::exit(1)` — a nonzero exit code that signals failure to the calling shell."
+    },
+    {
+      "id": "ch12-q06",
+      "section": "12.3 Improving Error Handling and Modularity",
+      "tag": "Concept",
+      "difficulty": 1,
+      "prompt": "In `Config::build(&args).unwrap_or_else(|err| { ... })`, what does `unwrap_or_else` do when `Config::build` returns `Ok(config)`?",
+      "options": {
+        "A": "It calls the closure anyway, passing the `Config` as the `err` parameter.",
+        "B": "It returns the inner `Config` value and never runs the closure.",
+        "C": "It wraps the `Config` in another `Result` for later handling.",
+        "D": "It clones the `Config` and passes the clone to the closure for validation."
+      },
+      "answer": "B",
+      "explanation": "`unwrap_or_else` behaves like `unwrap` on the `Ok` variant: it returns the value inside `Ok`. Only when the value is an `Err` does it call the closure, passing the error value (here a `&'static str`) as the argument between the vertical pipes."
+    },
+    {
+      "id": "ch12-q07",
+      "section": "12.3 Improving Error Handling and Modularity",
+      "tag": "Concept",
+      "difficulty": 2,
+      "prompt": "Why does the chapter give `run` the return type `Result<(), Box<dyn Error>>` rather than a concrete error type like `std::io::Error`?",
+      "options": {
+        "A": "`Box<dyn Error>` is a trait object that lets `run` return values of any type that implements the `Error` trait, giving flexibility across different error cases.",
+        "B": "`Box<dyn Error>` is required because the `?` operator only works with boxed errors.",
+        "C": "Boxing the error stores it on the stack, which is faster than heap allocation.",
+        "D": "Concrete error types cannot be returned from library functions in Rust."
+      },
+      "answer": "A",
+      "explanation": "`Box<dyn Error>` is a trait object: it means the function returns some type implementing `Error` without specifying which one. This lets `run` propagate error values of different concrete types from different failure cases. The `?` operator works with any error type that can convert into the return's error type; boxing is not a requirement of `?` itself."
+    },
+    {
+      "id": "ch12-q08",
+      "section": "12.3 Improving Error Handling and Modularity",
+      "tag": "Spot the Bug",
+      "difficulty": 2,
+      "prompt": "This refactored `run` function does not compile. What is the problem?",
+      "code": "use std::fs;\n\nfn run(config: Config) {\n    let contents = fs::read_to_string(config.file_path)?;\n    println!(\"With text:\\n{contents}\");\n}",
+      "options": {
+        "A": "`fs::read_to_string` cannot be used inside a function that takes ownership of `Config`.",
+        "B": "The `?` operator can only be used in a function that returns `Result` (or `Option`), but `run` returns `()`; it should return `Result<(), Box<dyn Error>>` and end with `Ok(())`.",
+        "C": "`config.file_path` must be borrowed with `&` before being passed to `read_to_string`.",
+        "D": "`println!` cannot appear after a `?` expression in the same function body."
+      },
+      "answer": "B",
+      "explanation": "`?` propagates an `Err` by returning it from the enclosing function, so that function's return type must be compatible — e.g., `Result<(), Box<dyn Error>>`. With a `()` return type, the compiler rejects the `?`. The fix is to change the signature and return `Ok(())` in the success case."
+    },
+    {
+      "id": "ch12-q09",
+      "section": "12.3 Improving Error Handling and Modularity",
+      "tag": "Misconception",
+      "difficulty": 1,
+      "prompt": "A learner asks: \"Why does `main` use `if let Err(e) = run(config)` instead of `unwrap_or_else`, like it does for `Config::build`?\" What is the book's reasoning?",
+      "options": {
+        "A": "`unwrap_or_else` cannot be used on a `Result` whose error type is `Box<dyn Error>`.",
+        "B": "`run` returns `()` in the success case, so there is no value to unwrap; the code only needs to detect an error, print it, and exit.",
+        "C": "`if let` is faster than `unwrap_or_else` because it avoids a closure allocation.",
+        "D": "`unwrap_or_else` would swallow the error message instead of printing it."
+      },
+      "answer": "B",
+      "explanation": "`Config::build` produces a `Config` value we need on success, so `unwrap_or_else` extracts it. `run` returns `Ok(())` on success — nothing worth unwrapping — so `if let Err(e) = run(config)` expresses the intent exactly: act only when there is an error, print it, and `process::exit(1)`."
+    },
+    {
+      "id": "ch12-q10",
+      "section": "12.4 Testing the Library's Functionality",
+      "tag": "Concept",
+      "difficulty": 1,
+      "prompt": "The chapter develops `search` using test-driven development (TDD). Which sequence matches the process it follows?",
+      "options": {
+        "A": "Write the full implementation, then add tests to document its behavior, then optimize.",
+        "B": "Write a test that fails, write just enough code to make it pass, then refactor while keeping tests passing.",
+        "C": "Write tests and implementation simultaneously in the same commit, then delete tests that fail.",
+        "D": "Benchmark a prototype first, then write tests only for the slow paths."
+      },
+      "answer": "B",
+      "explanation": "The TDD flow in the book is: write a failing test and confirm it fails for the expected reason, write or modify just enough code to make it pass, then refactor while ensuring the tests continue to pass — and repeat. The `one_result` test is written before `search` has a real body."
+    },
+    {
+      "id": "ch12-q11",
+      "section": "12.4 Testing the Library's Functionality",
+      "tag": "Spot the Bug",
+      "difficulty": 3,
+      "prompt": "This first attempt at `search` fails to compile. Why?",
+      "code": "pub fn search(query: &str, contents: &str) -> Vec<&str> {\n    let mut results = Vec::new();\n\n    for line in contents.lines() {\n        if line.contains(query) {\n            results.push(line);\n        }\n    }\n\n    results\n}",
+      "options": {
+        "A": "`contents.lines()` consumes `contents`, so it cannot be borrowed again by `results`.",
+        "B": "The compiler reports a missing lifetime specifier (E0106): with two `&str` parameters it cannot tell whether the returned slices borrow from `query` or `contents`; the signature needs `<'a>` tying the return to `contents`.",
+        "C": "`Vec::new()` requires a type annotation such as `Vec::<&str>::new()` in function bodies.",
+        "D": "`line.contains(query)` needs `&query` because `contains` takes its pattern by reference."
+      },
+      "answer": "B",
+      "explanation": "The returned `Vec<&str>` holds slices borrowed from one of the inputs, but with two reference parameters the compiler cannot infer which. Rust rejects the signature with error E0106, \"missing lifetime specifier.\" The fix is `pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str>`, declaring that the returned slices live as long as `contents`."
+    },
+    {
+      "id": "ch12-q12",
+      "section": "12.4 Testing the Library's Functionality",
+      "tag": "Code Output",
+      "difficulty": 2,
+      "prompt": "Using the book's final `search` implementation (case-sensitive, matching lines that contain the query), what does this print?",
+      "code": "let contents = \"\\\nRust:\nsafe, fast, productive.\nPick three.\";\n\nprintln!(\"{:?}\", search(\"duct\", contents));",
+      "options": {
+        "A": "`[]` — no line is exactly equal to `\"duct\"`",
+        "B": "`[\"safe, fast, productive.\"]` — `\"productive\"` contains the substring `\"duct\"`",
+        "C": "`[\"duct\"]` — search returns the query for each match",
+        "D": "`[\"Rust:\", \"safe, fast, productive.\", \"Pick three.\"]` — every line matches"
+      },
+      "answer": "B",
+      "explanation": "`search` iterates over `contents.lines()` and pushes each line for which `line.contains(query)` is true. Only `safe, fast, productive.` contains `duct` (inside the word `productive`), so the result is `[\"safe, fast, productive.\"]` — exactly what the chapter's `one_result` test asserts."
+    },
+    {
+      "id": "ch12-q13",
+      "section": "12.4 Testing the Library's Functionality",
+      "tag": "Misconception",
+      "difficulty": 3,
+      "prompt": "A colleague looks at `pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str>` and claims: \"The lifetime `'a` means `query` and `contents` must live equally long.\" Which statement is correct?",
+      "options": {
+        "A": "The colleague is right: all reference parameters in a generic function share one lifetime.",
+        "B": "The colleague is wrong: `'a` connects only the returned slices to `contents`, telling the compiler the returned data lives as long as `contents`; `query` has its own independent (elided) lifetime and may be shorter-lived.",
+        "C": "The colleague is wrong, but for a different reason: `'a` applies to `query`, not `contents`, because `query` appears first.",
+        "D": "The colleague is right in release builds only; in debug builds lifetimes are not checked."
+      },
+      "answer": "B",
+      "explanation": "The returned `Vec` holds string slices that point into `contents`, so `'a` ties the return value's lifetime to `contents` alone. `query` is annotated with a separate elided lifetime and is unrelated to the return value. Lifetimes are a compile-time check in all build profiles."
+    },
+    {
+      "id": "ch12-q14",
+      "section": "12.5 Working with Environment Variables",
+      "tag": "Behavior",
+      "difficulty": 3,
+      "prompt": "`Config::build` sets `let ignore_case = env::var(\"IGNORE_CASE\").is_ok();`. A user runs the program with the environment variable set to `IGNORE_CASE=0`, intending to disable case-insensitive search. What actually happens?",
+      "options": {
+        "A": "The search is case-sensitive, because `\"0\"` is treated as false.",
+        "B": "The search is case-insensitive, because `is_ok()` only checks whether the variable is set at all — its value (even `\"0\"` or `\"false\"`) is ignored.",
+        "C": "`Config::build` returns an `Err` because `\"0\"` is not a valid boolean.",
+        "D": "The program panics, because `env::var` cannot parse `\"0\"` into a `bool`."
+      },
+      "answer": "B",
+      "explanation": "`env::var` returns `Ok(value)` whenever the variable is set and `Err` when it is unset. `is_ok()` therefore treats the variable as a presence flag: any value, including `0` or `false`, turns case-insensitive search on. The book notes that a real program might want to inspect the value instead."
+    },
+    {
+      "id": "ch12-q15",
+      "section": "12.5 Working with Environment Variables",
+      "tag": "Code Output",
+      "difficulty": 3,
+      "prompt": "Using the book's `search_case_insensitive` (which lowercases the query and each line for comparison), what does this print?",
+      "code": "let contents = \"\\\nRust:\nTrust me.\nDuct tape.\";\n\nprintln!(\"{:?}\", search_case_insensitive(\"rUsT\", contents));",
+      "options": {
+        "A": "`[\"rust:\", \"trust me.\"]` — matching lines are returned lowercased",
+        "B": "`[\"Rust:\"]` — only lines starting with the query match",
+        "C": "`[\"Rust:\", \"Trust me.\"]` — comparison is done on lowercased copies, but the original lines are returned with their casing intact",
+        "D": "`[\"Rust:\", \"Trust me.\", \"Duct tape.\"]` — every line contains at least one of the query's letters"
+      },
+      "answer": "C",
+      "explanation": "The function shadows `query` with `query.to_lowercase()` (yielding `\"rust\"`) and tests `line.to_lowercase().contains(&query)`. `\"rust:\"` and `\"trust me.\"` both contain `\"rust\"`; `\"duct tape.\"` does not. Because it pushes the original `line` slice, not the lowercased `String`, the output preserves original casing: `[\"Rust:\", \"Trust me.\"]`."
+    },
+    {
+      "id": "ch12-q16",
+      "section": "12.6 Writing Error Messages to Standard Error Instead of Standard Output",
+      "tag": "Behavior",
+      "difficulty": 2,
+      "prompt": "After the final refactor, error messages are printed with `eprintln!` and `main` calls `process::exit(1)` on failure. The user runs `cargo run > output.txt` with no arguments, triggering the `not enough arguments` error. Which statements are true? Select all that apply.",
+      "options": {
+        "A": "The error message appears on the terminal screen.",
+        "B": "`output.txt` is created but contains no error text, because `>` redirects only standard output.",
+        "C": "The error message is written into `output.txt`.",
+        "D": "`>` redirects both stdout and stderr, so nothing appears on the terminal.",
+        "E": "The process exits with a nonzero status code."
+      },
+      "answer": ["A", "B", "E"],
+      "explanation": "`eprintln!` writes to standard error, and the shell's `>` operator redirects only standard output. So the error stays visible on the terminal while `output.txt` ends up empty — exactly the behavior the chapter wants, so successful output can be piped to a file without losing error messages. `process::exit(1)` makes the process exit with status 1. Capturing stderr would require `2>` or `2>&1`."
+    }
+  ]
+}

@@ -1,0 +1,224 @@
+{
+  "chapter": 14,
+  "title": "More About Cargo and Crates.io",
+  "link": "https://doc.rust-lang.org/book/ch14-00-more-about-cargo.html",
+  "questions": [
+    {
+      "id": "ch14-q01",
+      "section": "14.1 Release Profiles",
+      "tag": "Concept",
+      "difficulty": 1,
+      "prompt": "What are the default `opt-level` values for the `dev` and `release` profiles?",
+      "options": {
+        "A": "`dev` is 0 and `release` is 3",
+        "B": "`dev` is 1 and `release` is 2",
+        "C": "Both default to 0; you must opt in to optimizations explicitly",
+        "D": "`dev` is 3 and `release` is 0"
+      },
+      "answer": "A",
+      "explanation": "The `dev` profile defaults to `opt-level = 0` (fast compiles, few optimizations) and the `release` profile defaults to `opt-level = 3` (slower compiles, faster runtime). `opt-level` ranges from 0 to 3."
+    },
+    {
+      "id": "ch14-q02",
+      "section": "14.1 Release Profiles",
+      "tag": "Spot the Bug",
+      "difficulty": 2,
+      "prompt": "A developer wants release builds to use `opt-level = 2` and adds this to `Cargo.toml`, but release builds still use `opt-level = 3`. What is wrong?",
+      "code": "[profiles.release]\nopt-level = 2",
+      "options": {
+        "A": "The table name is wrong: profile customization must go under `[profile.release]`, not `[profiles.release]`",
+        "B": "`opt-level` cannot be lowered below the profile default of 3",
+        "C": "Profile settings belong in `Cargo.lock`, not `Cargo.toml`",
+        "D": "The setting must be written as `opt_level = 2` with an underscore"
+      },
+      "answer": "A",
+      "explanation": "Cargo profiles are customized with `[profile.*]` sections (singular `profile`), e.g. `[profile.release]`. A `[profiles.release]` table is not recognized, so the default `opt-level = 3` remains in effect. Any subset of a profile's defaults can be overridden."
+    },
+    {
+      "id": "ch14-q03",
+      "section": "14.1 Release Profiles",
+      "tag": "Behavior",
+      "difficulty": 2,
+      "prompt": "With no `[profile.*]` sections in `Cargo.toml`, which profile does `cargo build` use, and which does `cargo build --release` use?",
+      "options": {
+        "A": "`cargo build` uses the `debug` profile; `--release` uses the `optimized` profile",
+        "B": "`cargo build` uses the `dev` profile; `--release` uses the `release` profile — each with its own defaults",
+        "C": "Both use the `dev` profile; `--release` only strips debug symbols",
+        "D": "`cargo build` fails unless a profile is declared in `Cargo.toml`"
+      },
+      "answer": "B",
+      "explanation": "Cargo has two main built-in profiles with sensible defaults: `dev`, used by plain `cargo build` (shown as `Finished dev [unoptimized + debuginfo]`), and `release`, used by `cargo build --release` (shown as `Finished release [optimized]`). No configuration is required to use them."
+    },
+    {
+      "id": "ch14-q04",
+      "section": "14.2 Publishing a Crate to Crates.io",
+      "tag": "Concept",
+      "difficulty": 1,
+      "prompt": "What is the difference between `///` and `//!` documentation comments?",
+      "options": {
+        "A": "`///` documents the item that follows it; `//!` documents the enclosing item, such as the crate root in `src/lib.rs`",
+        "B": "`///` is for public items and `//!` is for private items",
+        "C": "`//!` comments support Markdown, while `///` comments are plain text only",
+        "D": "They are interchangeable; `//!` is simply the older syntax"
+      },
+      "answer": "A",
+      "explanation": "`///` doc comments describe the item immediately following them, while `//!` describes the item that contains the comment — typically used at the top of `src/lib.rs` to document the whole crate. Both support Markdown, and `cargo doc --open` builds and opens the generated HTML."
+    },
+    {
+      "id": "ch14-q05",
+      "section": "14.2 Publishing a Crate to Crates.io",
+      "tag": "Code Output",
+      "difficulty": 3,
+      "prompt": "This is the entire `src/lib.rs` of crate `my_crate`. What happens when you run `cargo test`?",
+      "code": "/// Adds one to the number given.\n///\n/// # Examples\n///\n/// ```\n/// let answer = my_crate::add_one(5);\n/// assert_eq!(7, answer);\n/// ```\npub fn add_one(x: i32) -> i32 {\n    x + 1\n}",
+      "options": {
+        "A": "All tests pass; code in doc comments is rendered but never executed",
+        "B": "The doc-test compiles and runs, then fails because `assert_eq!(7, answer)` panics — 6 is not equal to 7",
+        "C": "`cargo test` reports 0 tests since there is no `#[test]` function",
+        "D": "Compilation of the doc-test fails because `my_crate` cannot reference itself"
+      },
+      "answer": "B",
+      "explanation": "Code blocks inside doc comments are run as documentation tests by `cargo test` (in a `Doc-tests my_crate` section). Here `add_one(5)` returns 6, so `assert_eq!(7, answer)` panics and the doc-test fails. This mechanism keeps examples in docs in sync with the actual code."
+    },
+    {
+      "id": "ch14-q06",
+      "section": "14.2 Publishing a Crate to Crates.io",
+      "tag": "Concept",
+      "difficulty": 2,
+      "prompt": "The crate `art` defines `PrimaryColor` in module `kinds` and `mix` in module `utils`. What does adding these lines to the crate root accomplish?",
+      "code": "pub use self::kinds::PrimaryColor;\npub use self::utils::mix;",
+      "options": {
+        "A": "It moves the items out of their modules, so `art::kinds::PrimaryColor` no longer compiles",
+        "B": "It re-exports the items at the crate root, so users can write `use art::PrimaryColor;` without knowing the internal module structure",
+        "C": "It makes the items visible only inside the crate; external users still need the full paths",
+        "D": "It creates copies of the items, doubling the compiled crate size"
+      },
+      "answer": "B",
+      "explanation": "`pub use` re-exports an item at a new location without changing the internal organization. Users can then write `use art::PrimaryColor;` and `use art::mix;` instead of the deeper paths, and the re-exports are listed on the crate's docs front page. The original paths remain valid."
+    },
+    {
+      "id": "ch14-q07",
+      "section": "14.2 Publishing a Crate to Crates.io",
+      "tag": "Spot the Bug",
+      "difficulty": 2,
+      "prompt": "Running `cargo publish` with this `Cargo.toml` fails with a 400 error from crates.io. Why?",
+      "code": "[package]\nname = \"guessing_game\"\nversion = \"0.1.0\"\nedition = \"2024\"\ndescription = \"A fun game where you guess what number the computer has chosen.\"",
+      "options": {
+        "A": "The `edition` field must be \"2021\" for crates published to crates.io",
+        "B": "The `description` field is not allowed in the `[package]` table",
+        "C": "The manifest is missing a `license` field (an SPDX identifier such as `MIT OR Apache-2.0`) or a `license-file`",
+        "D": "The version must start at \"1.0.0\" for a first publish"
+      },
+      "answer": "C",
+      "explanation": "Crates.io requires a unique `name`, a `version`, a `description`, and a `license` (an SPDX identifier like `MIT OR Apache-2.0`, or `license-file` pointing to custom license text). This manifest has everything except the license, so `cargo publish` is rejected with an error mentioning the missing metadata."
+    },
+    {
+      "id": "ch14-q08",
+      "section": "14.2 Publishing a Crate to Crates.io",
+      "tag": "Misconception",
+      "difficulty": 3,
+      "prompt": "Which of the following statements about publishing and yanking on crates.io are TRUE? (Select all that apply.)",
+      "options": {
+        "A": "A publish is permanent: a published version can never be overwritten, and its code cannot be deleted",
+        "B": "`cargo yank --vers 1.0.1` prevents new projects from depending on that version, but projects with it in `Cargo.lock` keep working",
+        "C": "Yanking a version deletes its code from crates.io, so it is a safe way to remove accidentally uploaded secrets",
+        "D": "To release a fix, you change `version` in `Cargo.toml` following Semantic Versioning rules and run `cargo publish` again",
+        "E": "`cargo publish` succeeds even without a crates.io account, as long as the metadata is complete"
+      },
+      "answer": ["A", "B", "D"],
+      "explanation": "Publishing is permanent — versions cannot be overwritten or deleted (A). Yanking only stops new dependents; existing `Cargo.lock` files still resolve, and a yank can be undone with `--undo` (B). New releases require a semver version bump and another `cargo publish` (D). C is the classic misconception: yank does NOT delete code, so leaked secrets must be revoked. E is false — you need an account and an API token saved via `cargo login`."
+    },
+    {
+      "id": "ch14-q09",
+      "section": "14.3 Cargo Workspaces",
+      "tag": "Concept",
+      "difficulty": 1,
+      "prompt": "In a Cargo workspace containing crates `adder` and `add_one`, where do the `Cargo.lock` file and compiled artifacts live?",
+      "options": {
+        "A": "Each member crate has its own `Cargo.lock` and its own `target` directory",
+        "B": "There is one `Cargo.lock` and one shared `target` directory at the workspace root",
+        "C": "One shared `target` directory, but each member keeps its own `Cargo.lock`",
+        "D": "One `Cargo.lock` at the root, but each member compiles into its own `target` directory"
+      },
+      "answer": "B",
+      "explanation": "A workspace has a single `Cargo.lock` at the top level, guaranteeing all members use the same versions of shared dependencies, and one shared `target` directory at the root so crates and dependencies are not recompiled redundantly for each member."
+    },
+    {
+      "id": "ch14-q10",
+      "section": "14.3 Cargo Workspaces",
+      "tag": "Spot the Bug",
+      "difficulty": 2,
+      "prompt": "In this workspace, `adder/src/main.rs` calls `add_one::add_one(10)` but the build fails with `can't find crate for add_one`. The workspace `Cargo.toml` lists `members = [\"adder\", \"add_one\"]`. What is missing?",
+      "code": "# adder/Cargo.toml\n[package]\nname = \"adder\"\nversion = \"0.1.0\"\nedition = \"2024\"\n\n[dependencies]",
+      "options": {
+        "A": "Workspace membership does not create dependencies; `adder` needs `add_one = { path = \"../add_one\" }` under `[dependencies]`",
+        "B": "`add_one` must be listed before `adder` in the `members` array so it builds first",
+        "C": "The workspace `Cargo.toml` needs a `[dependencies]` section linking the two members",
+        "D": "`adder` must declare `add_one` with a version from crates.io; path dependencies are not allowed inside workspaces"
+      },
+      "answer": "A",
+      "explanation": "Cargo does not assume crates in a workspace depend on each other. Each dependency between members must be declared explicitly as a path dependency, e.g. `add_one = { path = \"../add_one\" }` in `adder/Cargo.toml`. Member order in the `members` array is irrelevant."
+    },
+    {
+      "id": "ch14-q11",
+      "section": "14.3 Cargo Workspaces",
+      "tag": "Behavior",
+      "difficulty": 2,
+      "prompt": "From the root of a workspace with several members, how do you run only the tests of the `add_one` crate?",
+      "options": {
+        "A": "`cargo test add_one` — the first positional argument selects the crate",
+        "B": "`cargo test -p add_one` — the `-p` flag selects a specific package",
+        "C": "`cd add_one && cargo test` is the only way; workspace roots cannot filter tests by crate",
+        "D": "`cargo test --bin add_one`"
+      },
+      "answer": "B",
+      "explanation": "Running `cargo test` at the workspace root runs tests for all members. To test just one, use the `-p`/`--package` flag: `cargo test -p add_one`. (A positional argument to `cargo test` filters by test name, not by package, and `--bin` selects a binary target.) The same flag works for `cargo run -p adder`."
+    },
+    {
+      "id": "ch14-q12",
+      "section": "14.3 Cargo Workspaces",
+      "tag": "Concept",
+      "difficulty": 3,
+      "prompt": "Which of the following statements about Cargo workspaces are TRUE? (Select all that apply.)",
+      "options": {
+        "A": "If one member depends on the external crate `rand`, every other member can `use rand` without declaring it, because dependencies are shared automatically",
+        "B": "Each member must declare `rand` in its own `Cargo.toml` to use it, but the single root `Cargo.lock` ensures compatible members all get the same version",
+        "C": "Crates in a workspace must be published to crates.io together with a single `cargo publish` at the root",
+        "D": "Each workspace member is published separately; you can pick one with `cargo publish -p <crate>`",
+        "E": "The top-level workspace `Cargo.toml` starts with a `[workspace]` section and has no `[package]` section of its own"
+      },
+      "answer": ["B", "D", "E"],
+      "explanation": "The shared root `Cargo.lock` keeps external dependency versions consistent, but each member must still list the dependency in its own `Cargo.toml` (B true, A false). Crates are published to crates.io individually — there is no whole-workspace publish — and `-p` selects which one (D true, C false). The root manifest is a virtual manifest: a `[workspace]` section with `members` (and e.g. `resolver = \"3\"`) but no `[package]` (E true)."
+    },
+    {
+      "id": "ch14-q13",
+      "section": "14.4 Installing Binaries with cargo install",
+      "tag": "Misconception",
+      "difficulty": 1,
+      "prompt": "A colleague runs `cargo install serde` to add the `serde` library to their project. What is the misunderstanding?",
+      "options": {
+        "A": "`cargo install` only works for crates with binary targets and puts executables in `$HOME/.cargo/bin`; library dependencies go in `Cargo.toml` instead",
+        "B": "Nothing — `cargo install` is the standard way to add any dependency to a project",
+        "C": "The command should be `cargo install --lib serde` to install a library crate",
+        "D": "`cargo install` works, but it installs libraries system-wide, which requires administrator rights"
+      },
+      "answer": "A",
+      "explanation": "`cargo install` is for installing binary crates (runnable tools like `ripgrep`, whose executable `rg` ends up in `$HOME/.cargo/bin`, which should be on your `$PATH`). It cannot install library-only crates, and it is not how you add dependencies — those are declared in the project's `Cargo.toml`."
+    },
+    {
+      "id": "ch14-q14",
+      "section": "14.5 Extending Cargo with Custom Commands",
+      "tag": "Concept",
+      "difficulty": 1,
+      "prompt": "You install a tool whose executable is named `cargo-something`. How can it be used to extend Cargo?",
+      "options": {
+        "A": "It must be registered in `Cargo.toml` under `[commands]` before Cargo will recognize it",
+        "B": "If a binary named `cargo-something` is on your `$PATH`, you can run it as the subcommand `cargo something`, and it appears in `cargo --list`",
+        "C": "It can only be invoked directly as `cargo-something`; Cargo never dispatches to external binaries",
+        "D": "It works as a subcommand only if it was compiled as part of the Cargo source tree"
+      },
+      "answer": "B",
+      "explanation": "Cargo is designed to be extended without modification: any binary on `$PATH` named `cargo-something` can be run as if it were a built-in subcommand via `cargo something`. Such custom commands are listed by `cargo --list`, and `cargo install` is a convenient way to get them."
+    }
+  ]
+}

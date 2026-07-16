@@ -1,0 +1,337 @@
+{
+ "chapter": 6,
+ "title": "Enums and Pattern Matching",
+ "link": "https://doc.rust-lang.org/book/ch06-00-enums.html",
+ "questions": [
+  {
+   "id": "ch06-q01",
+   "section": "6.1 Defining an Enum",
+   "tag": "Concept",
+   "difficulty": 1,
+   "prompt": "What does defining an enum like `enum IpAddrKind { V4, V6 }` express in Rust's type system?",
+   "options": {
+    "A": "A value of type `IpAddrKind` is exactly one of a fixed set of possible variants",
+    "B": "A value of type `IpAddrKind` contains both a `V4` and a `V6` field at the same time",
+    "C": "`V4` and `V6` are two independent types with no relationship to each other",
+    "D": "`IpAddrKind` is an alias for an integer that can hold any value"
+   },
+   "answer": "A",
+   "explanation": "An enum says a value is one of a possible set of variants — it can be `V4` or `V6`, but never both at once. Both variants are values of the same type, `IpAddrKind`."
+  },
+  {
+   "id": "ch06-q02",
+   "section": "6.1 Defining an Enum",
+   "tag": "Concept",
+   "difficulty": 1,
+   "prompt": "Given `enum IpAddrKind { V4, V6 }`, how do you create an instance of the `V4` variant?",
+   "options": {
+    "A": "`let four = V4;` — variants are global names",
+    "B": "`let four = IpAddrKind::V4;` — variants are namespaced under the enum with `::`",
+    "C": "`let four = IpAddrKind.V4;` — variants are accessed with a dot",
+    "D": "`let four = new IpAddrKind::V4();` — variants must be constructed with `new`"
+   },
+   "answer": "B",
+   "explanation": "Enum variants are namespaced under the enum's identifier, so you use the double colon: `IpAddrKind::V4`. (Only `Option`'s `Some`/`None` are usable without a prefix, because the prelude imports them.)"
+  },
+  {
+   "id": "ch06-q03",
+   "section": "6.1 Defining an Enum",
+   "tag": "Concept",
+   "difficulty": 2,
+   "prompt": "Which of the following statements about enum variants in Rust are true? (Select all that apply.)",
+   "code": "enum Message {\n    Quit,\n    Move { x: i32, y: i32 },\n    Write(String),\n    ChangeColor(i32, i32, i32),\n}",
+   "options": {
+    "A": "Different variants of the same enum can hold different types and amounts of data",
+    "B": "Every variant of an enum must hold the same type of data",
+    "C": "A variant can have struct-like named fields, as `Move { x: i32, y: i32 }` does",
+    "D": "Variants that hold data must first be defined as separate structs",
+    "E": "You can define methods on an enum using an `impl` block, just like on a struct"
+   },
+   "answer": [
+    "A",
+    "C",
+    "E"
+   ],
+   "explanation": "Variants may carry no data (`Quit`), named fields (`Move`), or tuple-like data of any types (`Write`, `ChangeColor`), and each variant can differ. Enums also support `impl` blocks for methods; no separate struct definitions are required."
+  },
+  {
+   "id": "ch06-q04",
+   "section": "6.1 Defining an Enum",
+   "tag": "Code Output",
+   "difficulty": 2,
+   "prompt": "What does this program print?",
+   "code": "enum Message {\n    Quit,\n    Write(String),\n}\n\nimpl Message {\n    fn describe(&self) -> String {\n        match self {\n            Message::Quit => String::from(\"quit\"),\n            Message::Write(text) => format!(\"write: {text}\"),\n        }\n    }\n}\n\nfn main() {\n    let m = Message::Write(String::from(\"hello\"));\n    println!(\"{}\", m.describe());\n}",
+   "options": {
+    "A": "It prints `write: hello`",
+    "B": "It prints `quit`",
+    "C": "It fails to compile because enums cannot have `impl` blocks",
+    "D": "It fails to compile because `describe` does not handle the `Write` case"
+   },
+   "answer": "A",
+   "explanation": "Enums can have methods defined in `impl` blocks just like structs. `m` is the `Write` variant, so the match binds `text` to the inner `String` and the method returns `write: hello`."
+  },
+  {
+   "id": "ch06-q05",
+   "section": "6.1 Defining an Enum",
+   "tag": "Concept",
+   "difficulty": 2,
+   "prompt": "Why does Rust use `Option<T>` instead of a null value like many other languages?",
+   "options": {
+    "A": "Because `Option<T>` and `T` are different types, so the compiler forces you to handle the absent case before using the value",
+    "B": "Because `Option<T>` is faster at runtime than checking for null",
+    "C": "Because Rust has null, but only inside `unsafe` blocks, and `Option<T>` wraps that mechanism",
+    "D": "Because `Option<T>` automatically converts to `T` whenever a value is present"
+   },
+   "answer": "A",
+   "explanation": "Rust has no null. Since `Option<T>` is a distinct type from `T`, the compiler will not let you use an optional value as if it were definitely present — you must explicitly handle both `Some` and `None`, eliminating the classic null-dereference bug."
+  },
+  {
+   "id": "ch06-q06",
+   "section": "6.1 Defining an Enum",
+   "tag": "Code Output",
+   "difficulty": 2,
+   "prompt": "What is the result of running this program?",
+   "code": "fn main() {\n    let x: i8 = 5;\n    let y: Option<i8> = Some(5);\n    let sum = x + y;\n    println!(\"{sum}\");\n}",
+   "options": {
+    "A": "It prints `10` — `Some(5)` is unwrapped automatically",
+    "B": "It compiles but panics at runtime when adding the `Option`",
+    "C": "It fails to compile: there is no implementation for `i8 + Option<i8>`",
+    "D": "It prints `5` — `None`-like values are treated as zero"
+   },
+   "answer": "C",
+   "explanation": "`Option<i8>` and `i8` are different types, so `x + y` is rejected at compile time (error E0277: cannot add `Option<i8>` to `i8`). You must convert the `Option<i8>` to an `i8` — for example with `match` — before adding."
+  },
+  {
+   "id": "ch06-q07",
+   "section": "6.1 Defining an Enum",
+   "tag": "Spot the Bug",
+   "difficulty": 2,
+   "prompt": "Why does this program fail to compile?",
+   "code": "fn main() {\n    let absent_number = None;\n    println!(\"{absent_number:?}\");\n}",
+   "options": {
+    "A": "`None` cannot be assigned to a variable; it can only appear in `match` arms",
+    "B": "The compiler cannot infer the `T` in `Option<T>` from `None` alone, so a type annotation like `Option<i32>` is required",
+    "C": "`None` is not in scope unless you write `use std::option::Option::None;`",
+    "D": "Variables holding `None` must be declared `mut` so they can later hold `Some`"
+   },
+   "answer": "B",
+   "explanation": "With `Some(5)` the compiler infers `Option<i32>`, but `None` carries no value to infer `T` from, so you must annotate, e.g. `let absent_number: Option<i32> = None;`. `None` itself is in scope via the prelude."
+  },
+  {
+   "id": "ch06-q08",
+   "section": "6.1 Defining an Enum",
+   "tag": "Misconception",
+   "difficulty": 1,
+   "prompt": "A colleague says: \"`Some(5)` has type `i32`, since it just wraps the number 5.\" What is the correct picture?",
+   "options": {
+    "A": "They are right — `Some(5)` and `5` are interchangeable",
+    "B": "`Some(5)` has type `Option<i32>`, a different type from `i32`, so you must extract the inner value before using it as an `i32`",
+    "C": "`Some(5)` has type `Some<i32>`, which coerces to `i32` on demand",
+    "D": "`Some(5)` has no type until it is matched"
+   },
+   "answer": "B",
+   "explanation": "`Some` is a variant of `enum Option<T> { None, Some(T) }`, so `Some(5)` is an `Option<i32>`. The deliberate separation between `Option<T>` and `T` is what forces code to handle the possibly-absent case."
+  },
+  {
+   "id": "ch06-q09",
+   "section": "6.2 The match Control Flow Construct",
+   "tag": "Concept",
+   "difficulty": 1,
+   "prompt": "In a `match` expression, which arm's code runs, and what does the whole `match` evaluate to?",
+   "options": {
+    "A": "Every arm whose pattern matches runs, and the `match` evaluates to the last one",
+    "B": "The first arm whose pattern matches runs, and the `match` evaluates to that arm's expression",
+    "C": "The most specific matching arm runs regardless of order, and the `match` evaluates to `()`",
+    "D": "Arms are tried in random order, so a catch-all must always be present"
+   },
+   "answer": "B",
+   "explanation": "Patterns are compared in order, like coins falling through a sorting machine: the first pattern the value fits wins. The resulting value of the chosen arm's expression becomes the value of the entire `match` expression."
+  },
+  {
+   "id": "ch06-q10",
+   "section": "6.2 The match Control Flow Construct",
+   "tag": "Code Output",
+   "difficulty": 2,
+   "prompt": "What does this program print?",
+   "code": "#[derive(Debug)]\nenum UsState {\n    Alabama,\n    Alaska,\n}\n\nenum Coin {\n    Penny,\n    Quarter(UsState),\n}\n\nfn value_in_cents(coin: Coin) -> u8 {\n    match coin {\n        Coin::Penny => 1,\n        Coin::Quarter(state) => {\n            println!(\"State quarter from {state:?}!\");\n            25\n        }\n    }\n}\n\nfn main() {\n    println!(\"{}\", value_in_cents(Coin::Quarter(UsState::Alaska)));\n}",
+   "options": {
+    "A": "Only `25`",
+    "B": "`State quarter from Alaska!` followed by `25`",
+    "C": "It fails to compile because `state` is not declared anywhere",
+    "D": "`State quarter from UsState!` followed by `25`"
+   },
+   "answer": "B",
+   "explanation": "The pattern `Coin::Quarter(state)` binds the variable `state` to the data inside the variant, here `UsState::Alaska`. The arm prints the debug form of the state and then evaluates to `25`, which `main` prints."
+  },
+  {
+   "id": "ch06-q11",
+   "section": "6.2 The match Control Flow Construct",
+   "tag": "Spot the Bug",
+   "difficulty": 2,
+   "prompt": "What is wrong with this function?",
+   "code": "fn plus_one(x: Option<i32>) -> Option<i32> {\n    match x {\n        Some(i) => Some(i + 1),\n    }\n}",
+   "options": {
+    "A": "Nothing — if `x` is `None`, the match simply returns `None` by default",
+    "B": "It compiles but panics at runtime when called with `None`",
+    "C": "It fails to compile: matches are exhaustive, and the `None` case is not covered",
+    "D": "It fails to compile because `i` shadows the function parameter"
+   },
+   "answer": "C",
+   "explanation": "Rust `match` arms must cover every possible value; here the compiler rejects the code with a `non-exhaustive patterns: None not covered` error. Adding a `None => None` arm (or a catch-all) fixes it — a bug caught at compile time, not runtime."
+  },
+  {
+   "id": "ch06-q12",
+   "section": "6.2 The match Control Flow Construct",
+   "tag": "Code Output",
+   "difficulty": 1,
+   "prompt": "What does this program print?",
+   "code": "fn plus_one(x: Option<i32>) -> Option<i32> {\n    match x {\n        None => None,\n        Some(i) => Some(i + 1),\n    }\n}\n\nfn main() {\n    println!(\"{:?}\", plus_one(Some(5)));\n    println!(\"{:?}\", plus_one(None));\n}",
+   "options": {
+    "A": "`Some(6)` then `None`",
+    "B": "`6` then `0`",
+    "C": "`Some(6)` then a panic on the second call",
+    "D": "`Some(5)` then `None` — `i + 1` modifies a copy that is discarded"
+   },
+   "answer": "A",
+   "explanation": "For `Some(5)` the pattern `Some(i)` binds `i` to `5` and the arm produces `Some(6)`; for `None` the first arm matches and returns `None`. `{:?}` prints the `Option` values in debug form."
+  },
+  {
+   "id": "ch06-q13",
+   "section": "6.2 The match Control Flow Construct",
+   "tag": "Behavior",
+   "difficulty": 3,
+   "prompt": "Which of the following statements about catch-all patterns in `match` are true? (Select all that apply.)",
+   "code": "match dice_roll {\n    3 => add_fancy_hat(),\n    7 => remove_fancy_hat(),\n    other => move_player(other),\n}",
+   "options": {
+    "A": "Using `_` as the final arm makes the match non-exhaustive",
+    "B": "A catch-all arm should be placed last, because patterns are evaluated in order",
+    "C": "A named pattern like `other` matches any remaining value and binds it so the arm can use it",
+    "D": "The `_` pattern matches any remaining value but does not bind it",
+    "E": "Putting an arm after a catch-all is a hard compile error"
+   },
+   "answer": [
+    "B",
+    "C",
+    "D"
+   ],
+   "explanation": "`other` and `_` both satisfy exhaustiveness; the difference is that `other` binds the value while `_` tells Rust you won't use it. Order matters because arms are tried top to bottom — an arm after a catch-all is unreachable, which produces a compiler warning, not an error."
+  },
+  {
+   "id": "ch06-q14",
+   "section": "6.2 The match Control Flow Construct",
+   "tag": "Behavior",
+   "difficulty": 3,
+   "prompt": "What happens when you compile this program?",
+   "code": "fn main() {\n    let opt = Some(String::from(\"hello\"));\n    match opt {\n        Some(s) => println!(\"got: {s}\"),\n        None => println!(\"nothing\"),\n    }\n    println!(\"{opt:?}\");\n}",
+   "options": {
+    "A": "It prints `got: hello` and then `Some(\"hello\")`",
+    "B": "It fails to compile: matching on `opt` by value moves the `String` into `s`, so `opt` is partially moved and cannot be used afterward",
+    "C": "It compiles but panics at runtime when printing the moved value",
+    "D": "It fails to compile because `match` never takes ownership of the value it inspects"
+   },
+   "answer": "B",
+   "explanation": "`String` is not `Copy`, so the pattern `Some(s)` moves the inner `String` out of `opt`, leaving it partially moved; the later use of `opt` is a compile error (E0382). Matching on a reference instead — `match &opt` — borrows the inner value and leaves `opt` usable."
+  },
+  {
+   "id": "ch06-q15",
+   "section": "6.2 The match Control Flow Construct",
+   "tag": "Misconception",
+   "difficulty": 1,
+   "prompt": "In the arm `_ => ()`, a beginner claims `()` is \"an empty function call that does nothing\". What does `()` actually mean here?",
+   "code": "match dice_roll {\n    3 => add_fancy_hat(),\n    7 => remove_fancy_hat(),\n    _ => (),\n}",
+   "options": {
+    "A": "`()` is the unit value; the arm matches every other value and explicitly does nothing",
+    "B": "`()` calls the default handler registered for the enum",
+    "C": "`()` is a compile error — an arm must contain at least one statement",
+    "D": "`()` returns `None`, since a `match` must produce an `Option`"
+   },
+   "answer": "A",
+   "explanation": "`()` is the unit value, the value of the empty tuple type. Using it as an arm's expression says: this pattern matches anything else, and we run no code for it."
+  },
+  {
+   "id": "ch06-q16",
+   "section": "6.2 The match Control Flow Construct",
+   "tag": "Spot the Bug",
+   "difficulty": 3,
+   "prompt": "Why does this program fail to compile?",
+   "code": "fn main() {\n    let x = Some(5);\n    let result = match x {\n        Some(i) => i,\n        None => \"zero\",\n    };\n    println!(\"{result}\");\n}",
+   "options": {
+    "A": "The `None` arm is unreachable because `x` is known to be `Some`",
+    "B": "A `match` used as an expression requires all arms to produce the same type, but one arm yields `i32` and the other `&str`",
+    "C": "String literals are not allowed inside `match` arms",
+    "D": "`result` must be annotated with a type before the `match` can compile"
+   },
+   "answer": "B",
+   "explanation": "Because the whole `match` is an expression assigned to `result`, every arm must evaluate to a single common type. Here the arms produce `i32` and `&str`, so the compiler reports mismatched types (E0308)."
+  },
+  {
+   "id": "ch06-q17",
+   "section": "6.3 Concise Control Flow with if let and let else",
+   "tag": "Concept",
+   "difficulty": 2,
+   "prompt": "Which of the following statements about `if let` are true? (Select all that apply.)",
+   "code": "let config_max = Some(3u8);\nif let Some(max) = config_max {\n    println!(\"The maximum is configured to be {max}\");\n}",
+   "options": {
+    "A": "`if let` is syntactic sugar for a `match` that runs code for one pattern and ignores all other values",
+    "B": "If the pattern does not match, the program panics at runtime",
+    "C": "Using `if let` means giving up the exhaustiveness checking that `match` enforces",
+    "D": "An `else` block attached to `if let` behaves like the `_` catch-all arm of the equivalent `match`",
+    "E": "`if let` must always be followed by an `else` block"
+   },
+   "answer": [
+    "A",
+    "C",
+    "D"
+   ],
+   "explanation": "`if let` handles exactly one pattern and simply skips the block (or runs the optional `else`) when the value doesn't match — no panic, but also no compiler check that every case is handled. The `else` corresponds to the `_ =>` arm of the equivalent `match`."
+  },
+  {
+   "id": "ch06-q18",
+   "section": "6.3 Concise Control Flow with if let and let else",
+   "tag": "Code Output",
+   "difficulty": 2,
+   "prompt": "What does this program print?",
+   "code": "#[derive(Debug)]\nenum UsState {\n    Alaska,\n}\n\nenum Coin {\n    Penny,\n    Quarter(UsState),\n}\n\nfn main() {\n    let coins = vec![Coin::Penny, Coin::Quarter(UsState::Alaska), Coin::Penny];\n    let mut count = 0;\n    for coin in coins {\n        if let Coin::Quarter(state) = coin {\n            println!(\"State quarter from {state:?}!\");\n        } else {\n            count += 1;\n        }\n    }\n    println!(\"count = {count}\");\n}",
+   "options": {
+    "A": "`State quarter from Alaska!` then `count = 2`",
+    "B": "`State quarter from Alaska!` then `count = 3`",
+    "C": "`count = 2` only — `if let` cannot bind `state`",
+    "D": "It fails to compile because `if let` with `else` is not valid syntax"
+   },
+   "answer": "A",
+   "explanation": "The quarter matches the `if let` pattern, binding `state` and printing the message; the two pennies fall into the `else` branch, incrementing `count` to 2. `if let ... else` is exactly like a two-arm `match` with a `_` arm."
+  },
+  {
+   "id": "ch06-q19",
+   "section": "6.3 Concise Control Flow with if let and let else",
+   "tag": "Spot the Bug",
+   "difficulty": 3,
+   "prompt": "What is wrong with this use of `let...else`?",
+   "code": "fn double(x: Option<i32>) -> i32 {\n    let Some(n) = x else {\n        println!(\"no value\");\n    };\n    n * 2\n}",
+   "options": {
+    "A": "Nothing — after printing, `n` defaults to `0` and the function returns `0`",
+    "B": "It fails to compile: the `else` block of `let...else` must diverge (e.g. `return` or `panic!`), because `n` would otherwise be unbound",
+    "C": "It fails to compile because `let...else` only works with the `Result` type",
+    "D": "It compiles but panics at runtime whenever `x` is `None`"
+   },
+   "answer": "B",
+   "explanation": "With `let PATTERN = EXPR else { ... }`, the `else` block runs when the pattern doesn't match, and it must exit the enclosing scope (return, panic, break, etc.) since no binding for `n` exists on that path. Adding `return 0;` after the `println!` would fix it."
+  },
+  {
+   "id": "ch06-q20",
+   "section": "6.3 Concise Control Flow with if let and let else",
+   "tag": "Concept",
+   "difficulty": 2,
+   "prompt": "What is the main purpose of `let...else`, as in the `describe_state_quarter` example?",
+   "code": "fn describe_state_quarter(coin: Coin) -> Option<String> {\n    let Coin::Quarter(state) = coin else {\n        return None;\n    };\n\n    if state.existed_in(1900) {\n        Some(format!(\"{state:?} is pretty old, for America!\"))\n    } else {\n        Some(format!(\"{state:?} is relatively new.\"))\n    }\n}",
+   "options": {
+    "A": "To retry the pattern match repeatedly until it succeeds",
+    "B": "To extract a binding into the surrounding scope on a match, while handling the non-matching case with an early exit — keeping the happy path unindented",
+    "C": "To make the compiler treat the pattern as exhaustive without listing other variants",
+    "D": "To shadow `coin` with a new variable of a different type"
+   },
+   "answer": "B",
+   "explanation": "`let...else` puts the successful binding (`state`) directly in the outer scope and forces the non-matching case into a diverging `else` (here `return None;`). This keeps the main logic on the \"happy path\" without nesting it inside a `match` or `if let` block."
+  }
+ ]
+}

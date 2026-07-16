@@ -1,0 +1,365 @@
+{
+ "chapter": 3,
+ "title": "Common Programming Concepts",
+ "link": "https://doc.rust-lang.org/book/ch03-00-common-programming-concepts.html",
+ "questions": [
+  {
+   "id": "ch03-q01",
+   "section": "3.1 Variables and Mutability",
+   "tag": "Concept",
+   "difficulty": 1,
+   "prompt": "By default, what is the mutability of a variable declared with `let` in Rust?",
+   "options": {
+    "A": "Mutable, unless marked with `const`",
+    "B": "Immutable, unless marked with `mut`",
+    "C": "Mutable inside functions, immutable at module level",
+    "D": "It depends on whether the type implements `Copy`"
+   },
+   "answer": "B",
+   "explanation": "Variables are immutable by default in Rust; you must opt in to mutation by writing `let mut`. This default makes code easier to reason about and is one of Rust's nudges toward safety."
+  },
+  {
+   "id": "ch03-q02",
+   "section": "3.1 Variables and Mutability",
+   "tag": "Spot the Bug",
+   "difficulty": 1,
+   "prompt": "What is wrong with this program?",
+   "code": "fn main() {\n    let x = 5;\n    println!(\"The value of x is: {x}\");\n    x = 6;\n    println!(\"The value of x is: {x}\");\n}",
+   "options": {
+    "A": "Nothing; it prints 5 and then 6",
+    "B": "It compiles but panics at runtime on the reassignment",
+    "C": "It fails to compile: you cannot assign twice to the immutable variable `x`",
+    "D": "It fails to compile because `x` has no type annotation"
+   },
+   "answer": "C",
+   "explanation": "`x` is bound with plain `let`, so it is immutable, and `x = 6` produces error E0384: cannot assign twice to immutable variable. Adding `mut` (`let mut x = 5;`) would fix it."
+  },
+  {
+   "id": "ch03-q03",
+   "section": "3.1 Variables and Mutability",
+   "tag": "Code Output",
+   "difficulty": 2,
+   "prompt": "What does this program print?",
+   "code": "fn main() {\n    let x = 5;\n    let x = x + 1;\n    {\n        let x = x * 2;\n        println!(\"inner: {x}\");\n    }\n    println!(\"outer: {x}\");\n}",
+   "options": {
+    "A": "inner: 12, then outer: 12",
+    "B": "inner: 12, then outer: 6",
+    "C": "inner: 10, then outer: 6",
+    "D": "It fails to compile because `x` is declared twice without `mut`"
+   },
+   "answer": "B",
+   "explanation": "Each `let x` shadows the previous binding, which is allowed even without `mut`. The inner-scope shadow computes 6 * 2 = 12, but it ends with the block, so the outer `x` is still 6."
+  },
+  {
+   "id": "ch03-q04",
+   "section": "3.1 Variables and Mutability",
+   "tag": "Concept",
+   "difficulty": 2,
+   "prompt": "Which of the following statements about `const` in Rust are true? (Select all that apply.)",
+   "options": {
+    "A": "The type of a constant must always be annotated",
+    "B": "You can make a constant mutable by writing `const mut`",
+    "C": "A constant must be set to a constant expression that can be evaluated at compile time",
+    "D": "The naming convention for constants is all uppercase with underscores between words",
+    "E": "Constants can only be declared inside function bodies"
+   },
+   "answer": [
+    "A",
+    "C",
+    "D"
+   ],
+   "explanation": "Constants require a type annotation, must be initialized with a compile-time constant expression, and are conventionally named like `THREE_HOURS_IN_SECONDS`. They are always immutable (`mut` is not allowed) and can be declared in any scope, including the global scope."
+  },
+  {
+   "id": "ch03-q05",
+   "section": "3.1 Variables and Mutability",
+   "tag": "Misconception",
+   "difficulty": 3,
+   "prompt": "The shadowing version `let spaces = \"   \"; let spaces = spaces.len();` compiles, but this version does not. Why?",
+   "code": "fn main() {\n    let mut spaces = \"   \";\n    spaces = spaces.len();\n}",
+   "options": {
+    "A": "`len()` cannot be called on string slices",
+    "B": "Assignment through `mut` must keep the same type, while shadowing with `let` creates a brand-new binding that may have a different type",
+    "C": "`mut` variables cannot be assigned the result of a method call",
+    "D": "Shadowing only works with numbers, so the first version does not actually compile either"
+   },
+   "answer": "B",
+   "explanation": "Mutating a binding cannot change its type, so assigning a `usize` to a `&str` variable is a mismatched-types error (E0308). Shadowing with a new `let` creates a new variable, so it is free to change the type."
+  },
+  {
+   "id": "ch03-q06",
+   "section": "3.2 Data Types",
+   "tag": "Concept",
+   "difficulty": 1,
+   "prompt": "If you write `let x = 42;` with no type annotation and no other constraints, what integer type does Rust use for `x`?",
+   "options": {
+    "A": "`i64`",
+    "B": "`u32`",
+    "C": "`isize`",
+    "D": "`i32`"
+   },
+   "answer": "D",
+   "explanation": "Integer literals default to `i32` when no annotation or inference constraint says otherwise. Floating-point literals similarly default to `f64`."
+  },
+  {
+   "id": "ch03-q07",
+   "section": "3.2 Data Types",
+   "tag": "Behavior",
+   "difficulty": 3,
+   "prompt": "The value 255 is parsed at runtime, so the compiler cannot see the overflow ahead of time. What happens on the line `let y = x + 1;`?",
+   "code": "fn main() {\n    let x: u8 = \"255\".parse().unwrap();\n    let y = x + 1;\n    println!(\"{y}\");\n}",
+   "options": {
+    "A": "In both debug and release builds it panics with an overflow error",
+    "B": "In debug builds it panics; in release builds it wraps via two's complement and prints 0",
+    "C": "In both debug and release builds it wraps and prints 0",
+    "D": "It automatically promotes `y` to `u16` and prints 256"
+   },
+   "answer": "B",
+   "explanation": "Debug builds include integer-overflow checks that panic at runtime, while `--release` builds omit them and perform two's-complement wrapping, so 255 + 1 becomes 0. To handle overflow explicitly, use the `wrapping_*`, `checked_*`, `overflowing_*`, or `saturating_*` methods."
+  },
+  {
+   "id": "ch03-q08",
+   "section": "3.2 Data Types",
+   "tag": "Code Output",
+   "difficulty": 2,
+   "prompt": "What does this program print?",
+   "code": "fn main() {\n    let tup = (500, 6.4, 1);\n    let (_, y, _) = tup;\n    println!(\"{} {}\", tup.0, y);\n}",
+   "options": {
+    "A": "500 6.4",
+    "B": "500 1",
+    "C": "6.4 500",
+    "D": "It fails to compile because a tuple cannot mix integer and float types"
+   },
+   "answer": "A",
+   "explanation": "Tuples can hold mixed types; `tup.0` accesses the first element (500) and destructuring binds `y` to the second element (6.4). So it prints \"500 6.4\"."
+  },
+  {
+   "id": "ch03-q09",
+   "section": "3.2 Data Types",
+   "tag": "Behavior",
+   "difficulty": 2,
+   "prompt": "A program indexes a 5-element array with an index of 10 that was read from user input at runtime. What happens?",
+   "options": {
+    "A": "It reads whatever memory happens to sit past the array (undefined behavior)",
+    "B": "The program panics at runtime with an \"index out of bounds\" error",
+    "C": "The indexing expression evaluates to `None`",
+    "D": "It returns the default value of the element type, such as 0"
+   },
+   "answer": "B",
+   "explanation": "Rust checks array indexing at runtime: if the index is not less than the length, the program panics (e.g., \"index out of bounds: the len is 5 but the index is 10\") instead of allowing invalid memory access. The `Option`-returning behavior belongs to the `get` method, not the `[]` operator."
+  },
+  {
+   "id": "ch03-q10",
+   "section": "3.2 Data Types",
+   "tag": "Spot the Bug",
+   "difficulty": 2,
+   "prompt": "Why does this program fail to compile?",
+   "code": "fn main() {\n    let letter: char = \"z\";\n    println!(\"{letter}\");\n}",
+   "options": {
+    "A": "`char` cannot hold ASCII letters, only Unicode symbols",
+    "B": "The variable name `letter` is a reserved keyword",
+    "C": "`\"z\"` with double quotes is a string literal (`&str`); `char` literals use single quotes, like `'z'`",
+    "D": "A `char` must be initialized with its numeric Unicode code point"
+   },
+   "answer": "C",
+   "explanation": "Double quotes create a string literal of type `&str`, which does not match the annotated type `char`, so the compiler reports mismatched types. `char` literals use single quotes and hold a 4-byte Unicode scalar value."
+  },
+  {
+   "id": "ch03-q11",
+   "section": "3.2 Data Types",
+   "tag": "Concept",
+   "difficulty": 2,
+   "prompt": "Which of the following statements about Rust's compound types are true? (Select all that apply.)",
+   "options": {
+    "A": "Arrays have a fixed length that is part of their type, e.g. `[i32; 5]`",
+    "B": "Every element of an array must have the same type",
+    "C": "A tuple can group values of different types together",
+    "D": "Arrays automatically grow when you add elements to them",
+    "E": "Tuple elements are accessed with square brackets, like `tup[0]`"
+   },
+   "answer": [
+    "A",
+    "B",
+    "C"
+   ],
+   "explanation": "Arrays are fixed-length, homogeneous, stack-allocated sequences whose length is part of the type, while tuples can mix types. Growable collections are `Vec<T>`, not arrays, and tuple elements are accessed with a period and index (`tup.0`), not brackets."
+  },
+  {
+   "id": "ch03-q12",
+   "section": "3.3 Functions",
+   "tag": "Concept",
+   "difficulty": 1,
+   "prompt": "In a Rust function signature such as `fn print_measurement(value: i32, unit: char)`, are the parameter type annotations optional?",
+   "options": {
+    "A": "Yes, the compiler infers parameter types from call sites",
+    "B": "No, every parameter's type must be declared in the signature",
+    "C": "Only the first parameter needs a type; the rest are inferred",
+    "D": "Types are only required when the function is public"
+   },
+   "answer": "B",
+   "explanation": "Rust requires type annotations for every function parameter; this deliberate design choice means the compiler rarely needs annotations elsewhere and can give better error messages. Type inference applies to local `let` bindings, not to function signatures."
+  },
+  {
+   "id": "ch03-q13",
+   "section": "3.3 Functions",
+   "tag": "Code Output",
+   "difficulty": 2,
+   "prompt": "What does this program print?",
+   "code": "fn main() {\n    let y = {\n        let x = 3;\n        x + 1\n    };\n    println!(\"y = {y}\");\n}",
+   "options": {
+    "A": "y = 3",
+    "B": "y = 4",
+    "C": "It fails to compile: a block cannot be used on the right side of `let`",
+    "D": "y = ()"
+   },
+   "answer": "B",
+   "explanation": "A block is an expression whose value is its final expression; `x + 1` has no trailing semicolon, so the block evaluates to 4, which is bound to `y`."
+  },
+  {
+   "id": "ch03-q14",
+   "section": "3.3 Functions",
+   "tag": "Spot the Bug",
+   "difficulty": 2,
+   "prompt": "Why does this function fail to compile?",
+   "code": "fn plus_one(x: i32) -> i32 {\n    x + 1;\n}",
+   "options": {
+    "A": "The function is missing an explicit `return` keyword, which is always required",
+    "B": "The trailing semicolon turns `x + 1` into a statement, so the body evaluates to `()` instead of the declared `i32`",
+    "C": "`x` is immutable, so `x + 1` is not allowed",
+    "D": "The return type must be written as `-> int`, not `-> i32`"
+   },
+   "answer": "B",
+   "explanation": "Adding a semicolon converts the expression into a statement, and statements evaluate to the unit type `()`. The compiler reports mismatched types (expected `i32`, found `()`) and even suggests removing the semicolon."
+  },
+  {
+   "id": "ch03-q15",
+   "section": "3.3 Functions",
+   "tag": "Misconception",
+   "difficulty": 3,
+   "prompt": "Coming from C, a programmer expects `x = y = 6` style code to work and writes `let x = (let y = 6);`. Why does Rust reject this?",
+   "options": {
+    "A": "Parentheses are not allowed around `let` for stylistic reasons only",
+    "B": "`y` must be declared `mut` before it can appear on the right-hand side",
+    "C": "A `let` binding is a statement, not an expression, so it does not evaluate to a value that `x` could be bound to",
+    "D": "It works, but only when both variables have explicit type annotations"
+   },
+   "answer": "C",
+   "explanation": "Statements perform an action but do not return a value; since `let y = 6` is a statement, there is nothing for `x` to bind to, unlike in C where assignment is an expression. This is a core piece of Rust's statement-vs-expression distinction."
+  },
+  {
+   "id": "ch03-q16",
+   "section": "3.3 Functions",
+   "tag": "Code Output",
+   "difficulty": 1,
+   "prompt": "What does this program print?",
+   "code": "fn plus_one(x: i32) -> i32 {\n    x + 1\n}\n\nfn main() {\n    let x = plus_one(5);\n    println!(\"The value of x is: {x}\");\n}",
+   "options": {
+    "A": "The value of x is: 5",
+    "B": "The value of x is: 6",
+    "C": "It fails to compile because there is no `return` statement",
+    "D": "The value of x is: ()"
+   },
+   "answer": "B",
+   "explanation": "The last expression in a function body is its implicit return value, so `plus_one(5)` returns 6. An explicit `return` keyword is only needed for early returns."
+  },
+  {
+   "id": "ch03-q17",
+   "section": "3.4 Comments",
+   "tag": "Concept",
+   "difficulty": 1,
+   "prompt": "What is the idiomatic way to write an ordinary (non-documentation) comment in Rust?",
+   "options": {
+    "A": "Start the comment with `//`; everything until the end of the line is ignored",
+    "B": "Start the comment with `#`, as in Python and shell scripts",
+    "C": "Wrap the comment in `<!--` and `-->`",
+    "D": "Comments are not supported; use `println!` with a note instead"
+   },
+   "answer": "A",
+   "explanation": "Rust's ordinary comments start with two slashes and run to the end of the line; multi-line comments simply repeat `//` on each line. (Rust also has `///` documentation comments, covered later in the book.)"
+  },
+  {
+   "id": "ch03-q18",
+   "section": "3.5 Control Flow",
+   "tag": "Spot the Bug",
+   "difficulty": 1,
+   "prompt": "Why does this program fail to compile?",
+   "code": "fn main() {\n    let number = 3;\n    if number {\n        println!(\"number was three\");\n    }\n}",
+   "options": {
+    "A": "`if` requires parentheses around its condition",
+    "B": "The condition must be a `bool`; Rust will not automatically convert an integer to a boolean",
+    "C": "`number` must be declared `mut` to be used in a condition",
+    "D": "An `if` without an `else` branch is not allowed"
+   },
+   "answer": "B",
+   "explanation": "Unlike languages such as C or JavaScript, Rust never coerces non-boolean values to `bool`, so the compiler reports \"expected `bool`, found integer\". You must write an explicit test like `if number != 0`."
+  },
+  {
+   "id": "ch03-q19",
+   "section": "3.5 Control Flow",
+   "tag": "Code Output",
+   "difficulty": 2,
+   "prompt": "What does this program print?",
+   "code": "fn main() {\n    let mut counter = 0;\n    let result = loop {\n        counter += 1;\n        if counter == 10 {\n            break counter * 2;\n        }\n    };\n    println!(\"The result is {result}\");\n}",
+   "options": {
+    "A": "The result is 10",
+    "B": "The result is 20",
+    "C": "It fails to compile: `break` cannot carry a value",
+    "D": "It loops forever and prints nothing"
+   },
+   "answer": "B",
+   "explanation": "A `loop` is an expression, and `break` can pass a value out of it; when `counter` reaches 10, `break counter * 2` ends the loop with the value 20, which is bound to `result`."
+  },
+  {
+   "id": "ch03-q20",
+   "section": "3.5 Control Flow",
+   "tag": "Code Output",
+   "difficulty": 2,
+   "prompt": "What does this program print?",
+   "code": "fn main() {\n    for number in (1..4).rev() {\n        println!(\"{number}!\");\n    }\n    println!(\"LIFTOFF!!!\");\n}",
+   "options": {
+    "A": "4! 3! 2! 1! LIFTOFF!!!",
+    "B": "1! 2! 3! LIFTOFF!!!",
+    "C": "3! 2! 1! LIFTOFF!!!",
+    "D": "3! 2! 1! 0! LIFTOFF!!!"
+   },
+   "answer": "C",
+   "explanation": "The range `1..4` is end-exclusive, so it yields 1, 2, 3, and `.rev()` reverses that to 3, 2, 1. After the loop finishes, LIFTOFF!!! is printed."
+  },
+  {
+   "id": "ch03-q21",
+   "section": "3.5 Control Flow",
+   "tag": "Code Output",
+   "difficulty": 3,
+   "prompt": "What is the final line this program prints?",
+   "code": "fn main() {\n    let mut count = 0;\n    'counting_up: loop {\n        let mut remaining = 10;\n        loop {\n            if remaining == 9 {\n                break;\n            }\n            if count == 2 {\n                break 'counting_up;\n            }\n            remaining -= 1;\n        }\n        count += 1;\n    }\n    println!(\"End count = {count}\");\n}",
+   "options": {
+    "A": "End count = 0",
+    "B": "End count = 1",
+    "C": "End count = 2",
+    "D": "End count = 3"
+   },
+   "answer": "C",
+   "explanation": "The unlabeled `break` exits only the inner loop, letting `count` increment to 1 and then 2; on the pass where `count == 2`, `break 'counting_up` exits the labeled outer loop before `count += 1` runs. Loop labels let `break` and `continue` target an outer loop instead of the innermost one."
+  },
+  {
+   "id": "ch03-q22",
+   "section": "3.5 Control Flow",
+   "tag": "Behavior",
+   "difficulty": 3,
+   "prompt": "Which of the following statements about Rust control flow are true? (Select all that apply.)",
+   "options": {
+    "A": "`if` is an expression, so it can appear on the right side of a `let` statement",
+    "B": "When `if`/`else` is used as an expression, every arm must evaluate to the same type",
+    "C": "`break` can return a value from a `loop` expression",
+    "D": "`while` loops can also return a value with `break value`, just like `loop`",
+    "E": "In an `if` condition, any non-zero integer is treated as true"
+   },
+   "answer": [
+    "A",
+    "B",
+    "C"
+   ],
+   "explanation": "`if` is an expression whose arms must all have one type (`let x = if cond { 5 } else { \"six\" };` is a compile error), and only the infinite `loop` form can yield a value through `break value`. `while` and `for` cannot break with a value, and conditions must be genuine `bool`s — integers are never coerced."
+  }
+ ]
+}

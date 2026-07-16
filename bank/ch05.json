@@ -1,0 +1,299 @@
+{
+ "chapter": 5,
+ "title": "Using Structs to Structure Related Data",
+ "link": "https://doc.rust-lang.org/book/ch05-00-structs.html",
+ "questions": [
+  {
+   "id": "ch05-q01",
+   "section": "5.1 Defining and Instantiating Structs",
+   "tag": "Concept",
+   "difficulty": 1,
+   "prompt": "When creating an instance of a struct with `StructName { ... }`, which statement is true?",
+   "options": {
+    "A": "Fields must be listed in the same order as in the struct definition",
+    "B": "You must specify a value for every field, but in any order you like",
+    "C": "Fields you omit are automatically zero-initialized",
+    "D": "You can only create instances inside an `impl` block"
+   },
+   "answer": "B",
+   "explanation": "A struct literal must provide a value for every field (unless struct update syntax fills the rest), but the fields do not have to appear in the same order as the definition."
+  },
+  {
+   "id": "ch05-q02",
+   "section": "5.1 Defining and Instantiating Structs",
+   "tag": "Spot the Bug",
+   "difficulty": 1,
+   "prompt": "This program fails to compile. What is the bug?",
+   "code": "struct User {\n    active: bool,\n    email: String,\n}\n\nfn main() {\n    let user1 = User {\n        active: true,\n        email: String::from(\"a@example.com\"),\n    };\n    user1.email = String::from(\"b@example.com\");\n}",
+   "options": {
+    "A": "`user1` is not declared with `mut`, so no field of it can be assigned",
+    "B": "Only the `email` field needs to be marked `mut` in the struct definition",
+    "C": "`String` fields can never be reassigned after construction",
+    "D": "Nothing is wrong; the program compiles and runs fine"
+   },
+   "answer": "A",
+   "explanation": "Rust requires the entire instance to be mutable (`let mut user1 = ...`) to assign to any field. Rust does not allow marking only certain fields as mutable."
+  },
+  {
+   "id": "ch05-q03",
+   "section": "5.1 Defining and Instantiating Structs",
+   "tag": "Concept",
+   "difficulty": 2,
+   "prompt": "Inside `build_user(email: String, username: String)`, when is it valid to write just `email` instead of `email: email` in the `User { ... }` literal?",
+   "options": {
+    "A": "Only when the field type implements `Copy`",
+    "B": "Whenever a variable or parameter in scope has exactly the same name as the field",
+    "C": "Only when the struct derives `Default`",
+    "D": "Never; the `field: value` form is always required"
+   },
+   "answer": "B",
+   "explanation": "Field init shorthand applies when a variable with the same name as the field is in scope, so `email` is shorthand for `email: email`. It has nothing to do with `Copy` or `Default`."
+  },
+  {
+   "id": "ch05-q04",
+   "section": "5.1 Defining and Instantiating Structs",
+   "tag": "Code Output",
+   "difficulty": 3,
+   "prompt": "What happens when you compile and run this program?",
+   "code": "struct User {\n    active: bool,\n    username: String,\n    sign_in_count: u64,\n}\n\nfn main() {\n    let user1 = User {\n        active: true,\n        username: String::from(\"alice\"),\n        sign_in_count: 1,\n    };\n    let user2 = User {\n        active: false,\n        ..user1\n    };\n    println!(\"{}\", user1.username);\n}",
+   "options": {
+    "A": "It prints `alice`, because `..user1` copies the remaining fields",
+    "B": "Compile error: `user1.username` was moved into `user2` by the struct update syntax",
+    "C": "It compiles but panics at runtime with a use-after-move error",
+    "D": "Compile error: `..user1` is not allowed when any field is overridden"
+   },
+   "answer": "B",
+   "explanation": "Struct update syntax uses move semantics like assignment: the non-Copy `String` in `username` is moved into `user2`, so `user1.username` can no longer be used. Move errors are caught at compile time, never at runtime."
+  },
+  {
+   "id": "ch05-q05",
+   "section": "5.1 Defining and Instantiating Structs",
+   "tag": "Behavior",
+   "difficulty": 2,
+   "prompt": "Which statements about struct update syntax (`..other`) are true? (Select all that apply.)",
+   "options": {
+    "A": "`..other` must come last in the struct literal",
+    "B": "Fields whose types implement `Copy` (like `bool` and `u64`) are copied, so they remain usable on the original instance",
+    "C": "`..other` performs a deep clone, so the original instance is always fully usable afterward",
+    "D": "It moves non-Copy fields, behaving like `=` assignment for each filled-in field",
+    "E": "`..other` can appear before explicitly listed fields"
+   },
+   "answer": [
+    "A",
+    "B",
+    "D"
+   ],
+   "explanation": "`..other` must be the last element of the literal and moves or copies each remaining field exactly like assignment: Copy types are copied, non-Copy types like `String` are moved. It never clones."
+  },
+  {
+   "id": "ch05-q06",
+   "section": "5.1 Defining and Instantiating Structs",
+   "tag": "Misconception",
+   "difficulty": 2,
+   "prompt": "Given `struct Color(i32, i32, i32);` and `struct Point(i32, i32, i32);`, can a function `fn show(c: Color)` be called with a `Point` value?",
+   "options": {
+    "A": "Yes, because both are tuple structs with identical field types",
+    "B": "Yes, but only if `Point` derives `Into<Color>`",
+    "C": "No; each tuple struct is its own distinct type even when the field types match",
+    "D": "No, because tuple structs cannot be passed to functions at all"
+   },
+   "answer": "C",
+   "explanation": "Tuple structs give a name to a tuple shape and create a brand-new type; `Color` and `Point` are different types despite having the same `(i32, i32, i32)` layout, so the call is a type error."
+  },
+  {
+   "id": "ch05-q07",
+   "section": "5.1 Defining and Instantiating Structs",
+   "tag": "Concept",
+   "difficulty": 1,
+   "prompt": "What is the primary use of a unit-like struct such as `struct AlwaysEqual;`?",
+   "options": {
+    "A": "To implement traits on a type that has no data to store",
+    "B": "To create a struct whose fields are filled in later at runtime",
+    "C": "To define a compile-time constant with zero value",
+    "D": "To mark a struct as private to the current module"
+   },
+   "answer": "A",
+   "explanation": "Unit-like structs have no fields and are instantiated as just `AlwaysEqual`. They are useful when you need a type to implement a trait on but have no data to carry."
+  },
+  {
+   "id": "ch05-q08",
+   "section": "5.1 Defining and Instantiating Structs",
+   "tag": "Spot the Bug",
+   "difficulty": 3,
+   "prompt": "This struct definition fails to compile. Why?",
+   "code": "struct User {\n    username: &str,\n    active: bool,\n}",
+   "options": {
+    "A": "Struct fields cannot be references under any circumstances",
+    "B": "`&str` fields require a lifetime parameter, e.g. `struct User<'a> { username: &'a str, ... }`",
+    "C": "`&str` must be replaced with `str` because references are implicit in structs",
+    "D": "The `bool` field must come before the reference field"
+   },
+   "answer": "B",
+   "explanation": "Storing a reference in a struct requires a lifetime specifier (error E0106) so the compiler can ensure the referenced data outlives the struct. Using an owned `String` instead avoids the annotation."
+  },
+  {
+   "id": "ch05-q09",
+   "section": "5.2 An Example Program Using Structs",
+   "tag": "Concept",
+   "difficulty": 1,
+   "prompt": "In the rectangles example, the function is defined as `fn area(rectangle: &Rectangle) -> u32`. Why does it take `&Rectangle` instead of `Rectangle`?",
+   "options": {
+    "A": "References are required for all struct parameters",
+    "B": "So `main` keeps ownership of `rect1` and can continue to use it after the call",
+    "C": "Because `u32` cannot be returned from a function that owns its argument",
+    "D": "To make the multiplication faster at runtime"
+   },
+   "answer": "B",
+   "explanation": "Borrowing with `&` lets `area` read the struct's fields without taking ownership, so the caller can keep using the instance afterward. Accessing fields through a reference does not move them."
+  },
+  {
+   "id": "ch05-q10",
+   "section": "5.2 An Example Program Using Structs",
+   "tag": "Code Output",
+   "difficulty": 2,
+   "prompt": "What happens when you compile this program?",
+   "code": "#[derive(Debug)]\nstruct Rectangle {\n    width: u32,\n    height: u32,\n}\n\nfn main() {\n    let rect1 = Rectangle { width: 30, height: 50 };\n    println!(\"{}\", rect1);\n}",
+   "options": {
+    "A": "It prints `Rectangle { width: 30, height: 50 }`",
+    "B": "Compile error: `Rectangle` doesn't implement `std::fmt::Display`, which `{}` requires",
+    "C": "It compiles but panics at runtime because `{}` cannot format structs",
+    "D": "It prints `(30, 50)` using the derived formatter"
+   },
+   "answer": "B",
+   "explanation": "`{}` uses the `Display` trait, which is not implemented automatically for structs and is not provided by `#[derive(Debug)]`. Deriving `Debug` only enables `{:?}` and `{:#?}` formatting."
+  },
+  {
+   "id": "ch05-q11",
+   "section": "5.2 An Example Program Using Structs",
+   "tag": "Concept",
+   "difficulty": 1,
+   "prompt": "What is the difference between printing a struct with `{:?}` and with `{:#?}`?",
+   "options": {
+    "A": "`{:?}` requires `Debug` but `{:#?}` requires `Display`",
+    "B": "Both use the `Debug` trait; `{:?}` prints on one line while `{:#?}` pretty-prints across multiple lines",
+    "C": "`{:#?}` also prints the memory address of the struct",
+    "D": "`{:?}` works on any type without deriving anything"
+   },
+   "answer": "B",
+   "explanation": "Both specifiers use the `Debug` trait (typically enabled via `#[derive(Debug)]`); `{:#?}` produces the pretty, multi-line output that is easier to read for larger structs."
+  },
+  {
+   "id": "ch05-q12",
+   "section": "5.2 An Example Program Using Structs",
+   "tag": "Behavior",
+   "difficulty": 2,
+   "prompt": "Which statements about the `dbg!` macro are true? (Select all that apply.)",
+   "options": {
+    "A": "It prints to standard error, not standard output",
+    "B": "It returns ownership of the expression's value, so it can be used inline like `width: dbg!(30 * scale)`",
+    "C": "Its output includes the source file, line, and column of the call",
+    "D": "It prints to standard output, exactly like `println!`",
+    "E": "It formats values using the `Display` trait"
+   },
+   "answer": [
+    "A",
+    "B",
+    "C"
+   ],
+   "explanation": "`dbg!` prints `[file:line:col] expr = value` to stderr using `Debug` formatting, takes ownership of its argument, and returns that ownership, which is why passing `&rect1` is used to avoid moving a value you still need."
+  },
+  {
+   "id": "ch05-q13",
+   "section": "5.3 Method Syntax",
+   "tag": "Concept",
+   "difficulty": 1,
+   "prompt": "In a method signature inside `impl Rectangle`, what is `&self` shorthand for?",
+   "options": {
+    "A": "`self: &Self`",
+    "B": "`self: Self`",
+    "C": "`self: &mut Self`",
+    "D": "`self: Box<Self>`"
+   },
+   "answer": "A",
+   "explanation": "`&self` is shorthand for `self: &Self`, where `Self` is an alias for the type the `impl` block is for. It borrows the instance immutably; `self` takes ownership and `&mut self` borrows mutably."
+  },
+  {
+   "id": "ch05-q14",
+   "section": "5.3 Method Syntax",
+   "tag": "Code Output",
+   "difficulty": 2,
+   "prompt": "What does this program print?",
+   "code": "struct Rectangle {\n    width: u32,\n    height: u32,\n}\n\nimpl Rectangle {\n    fn width(&self) -> bool {\n        self.width > 0\n    }\n}\n\nfn main() {\n    let rect = Rectangle { width: 10, height: 5 };\n    println!(\"{} {}\", rect.width, rect.width());\n}",
+   "options": {
+    "A": "`10 true`",
+    "B": "Compile error: a method cannot have the same name as a field",
+    "C": "`true true`",
+    "D": "`10 10`"
+   },
+   "answer": "A",
+   "explanation": "A method may share a name with a field: `rect.width` (no parentheses) accesses the field, while `rect.width()` calls the method, which returns `self.width > 0`, i.e. `true`."
+  },
+  {
+   "id": "ch05-q15",
+   "section": "5.3 Method Syntax",
+   "tag": "Misconception",
+   "difficulty": 2,
+   "prompt": "A C++ programmer asks where Rust's `->` operator is for calling methods through a reference. What is the correct answer?",
+   "options": {
+    "A": "Rust uses `->` only for methods that take `&mut self`",
+    "B": "Rust has automatic referencing and dereferencing: `p1.distance(&p2)` and `(&p1).distance(&p2)` are equivalent, so no `->` is needed",
+    "C": "You must always dereference manually with `(*ptr).method()` in Rust",
+    "D": "Rust methods can only be called on owned values, never through references"
+   },
+   "answer": "B",
+   "explanation": "When you call a method, Rust automatically adds `&`, `&mut`, or `*` to the receiver so it matches the method's signature. This works because the receiver type `Self` makes the needed borrow unambiguous."
+  },
+  {
+   "id": "ch05-q16",
+   "section": "5.3 Method Syntax",
+   "tag": "Spot the Bug",
+   "difficulty": 3,
+   "prompt": "This program fails to compile. What is the bug?",
+   "code": "struct Rectangle {\n    width: u32,\n    height: u32,\n}\n\nimpl Rectangle {\n    fn grow(&mut self, amount: u32) {\n        self.width += amount;\n    }\n}\n\nfn main() {\n    let rect = Rectangle { width: 10, height: 5 };\n    rect.grow(5);\n    println!(\"{}\", rect.width);\n}",
+   "options": {
+    "A": "`grow` must take `self` by value to modify fields",
+    "B": "`rect` is not declared `mut`, so the automatic `&mut` borrow required by `grow(&mut self, ...)` is not allowed",
+    "C": "Methods with parameters besides `self` are not allowed",
+    "D": "`+=` cannot be used on struct fields inside methods"
+   },
+   "answer": "B",
+   "explanation": "Calling `rect.grow(5)` auto-borrows the receiver as `&mut rect` to match `&mut self`, but a mutable borrow of an immutable binding is rejected. Declaring `let mut rect = ...` fixes it."
+  },
+  {
+   "id": "ch05-q17",
+   "section": "5.3 Method Syntax",
+   "tag": "Concept",
+   "difficulty": 2,
+   "prompt": "Which statements about associated functions and `impl` blocks are true? (Select all that apply.)",
+   "options": {
+    "A": "A function in an `impl` block without a `self` parameter is an associated function, not a method",
+    "B": "Associated functions are called with `::` syntax, like `Rectangle::square(3)`",
+    "C": "`new` is a built-in keyword that Rust reserves for constructors",
+    "D": "A single type may have multiple separate `impl` blocks",
+    "E": "All methods of a type must live in exactly one `impl` block"
+   },
+   "answer": [
+    "A",
+    "B",
+    "D"
+   ],
+   "explanation": "Functions without a `self` receiver are associated functions (often constructors like `square` or `new`) called via `Type::name(...)`. `new` is just a conventional name, not a keyword, and a type can have as many `impl` blocks as you like."
+  },
+  {
+   "id": "ch05-q18",
+   "section": "5.3 Method Syntax",
+   "tag": "Code Output",
+   "difficulty": 3,
+   "prompt": "What happens when you compile and run this program?",
+   "code": "struct Rectangle {\n    width: u32,\n    height: u32,\n}\n\nimpl Rectangle {\n    fn into_width(self) -> u32 {\n        self.width\n    }\n}\n\nfn main() {\n    let rect = Rectangle { width: 3, height: 4 };\n    let w = rect.into_width();\n    println!(\"{} {}\", w, rect.height);\n}",
+   "options": {
+    "A": "It prints `3 4`",
+    "B": "Compile error: `into_width(self)` takes ownership, so `rect` is moved and `rect.height` cannot be used afterward",
+    "C": "It compiles but panics at runtime when accessing `rect.height`",
+    "D": "It prints `3 0` because `rect` was reset to defaults"
+   },
+   "answer": "B",
+   "explanation": "A method taking plain `self` consumes the instance; after `rect.into_width()`, `rect` has been moved and any later use is a compile-time borrow-of-moved-value error. Taking `self` is deliberate when the caller should not use the old instance again."
+  }
+ ]
+}

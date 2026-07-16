@@ -1,0 +1,354 @@
+{
+  "chapter": 20,
+  "title": "Advanced Features",
+  "link": "https://doc.rust-lang.org/book/ch20-00-advanced-features.html",
+  "questions": [
+    {
+      "id": "ch20-q01",
+      "section": "20.1 Unsafe Rust",
+      "tag": "Concept",
+      "difficulty": 2,
+      "prompt": "Which of the following operations require an `unsafe` block (or an `unsafe fn`)? Select all that apply.",
+      "options": {
+        "A": "Dereferencing a raw pointer such as `*const i32`",
+        "B": "Calling an `unsafe` function or method",
+        "C": "Creating a raw pointer from a reference with `&raw const num`",
+        "D": "Reading or modifying a mutable static variable (`static mut`)",
+        "E": "Accessing a field of a `union`"
+      },
+      "answer": ["A", "B", "D", "E"],
+      "explanation": "The five unsafe superpowers are: dereference raw pointers, call unsafe functions, access or modify mutable statics, implement unsafe traits, and access union fields. Creating a raw pointer (C) is perfectly safe -- only dereferencing it requires `unsafe`."
+    },
+    {
+      "id": "ch20-q02",
+      "section": "20.1 Unsafe Rust",
+      "tag": "Misconception",
+      "difficulty": 1,
+      "prompt": "A colleague claims: \"Inside an `unsafe` block, Rust turns off the borrow checker, so I can create two mutable references to the same value.\" What is true?",
+      "options": {
+        "A": "Correct -- `unsafe` disables all compiler safety checks inside the block",
+        "B": "Incorrect -- `unsafe` does not turn off the borrow checker; references are still fully checked, and only the five extra operations become available",
+        "C": "Correct, but only for references to local variables, not to heap data",
+        "D": "Incorrect -- `unsafe` disables the borrow checker only for `'static` references"
+      },
+      "answer": "B",
+      "explanation": "`unsafe` does not disable the borrow checker or any other safety checks: if you use a reference in unsafe code, it is still checked. The keyword only grants access to the five superpowers that the compiler cannot verify for memory safety. To alias mutable data you would need raw pointers, not references."
+    },
+    {
+      "id": "ch20-q03",
+      "section": "20.1 Unsafe Rust",
+      "tag": "Code Output",
+      "difficulty": 2,
+      "prompt": "What is the result of compiling and running this program?",
+      "code": "fn main() {\n    let mut num = 5;\n\n    let r1 = &raw const num;\n    let r2 = &raw mut num;\n\n    unsafe {\n        *r2 = 10;\n        println!(\"{}\", *r1);\n    }\n}",
+      "options": {
+        "A": "Prints `5`",
+        "B": "Prints `10`",
+        "C": "Compile error: cannot have a `*const` and a `*mut` pointer to `num` at the same time",
+        "D": "Compiles, but dereferencing `r1` is undefined behavior because `r2` exists"
+      },
+      "answer": "B",
+      "explanation": "Creating both raw pointers is safe: raw pointers are exempt from the borrow-checking rules that forbid a simultaneous immutable and mutable borrow. Inside the `unsafe` block, `*r2 = 10` writes through the mutable raw pointer, then `*r1` reads the same memory, printing `10`. Both pointers derive from a valid local, so this is well defined."
+    },
+    {
+      "id": "ch20-q04",
+      "section": "20.1 Unsafe Rust",
+      "tag": "Spot the Bug",
+      "difficulty": 2,
+      "prompt": "Why does this program fail to compile?",
+      "code": "unsafe fn dangerous() {}\n\nfn main() {\n    dangerous();\n}",
+      "options": {
+        "A": "`unsafe fn` may only be defined inside an `unsafe` module",
+        "B": "An `unsafe` function must take at least one raw-pointer parameter",
+        "C": "Calling an `unsafe` function must happen inside an `unsafe` block (or another unsafe context), so `dangerous()` in `main` is rejected",
+        "D": "The body of `dangerous` is empty, and empty unsafe functions are forbidden"
+      },
+      "answer": "C",
+      "explanation": "Calling an unsafe function is one of the five superpowers, so it requires an unsafe context: `unsafe { dangerous(); }`. By calling it inside `unsafe`, you assert that you have read the function's contract and are upholding its safety requirements."
+    },
+    {
+      "id": "ch20-q05",
+      "section": "20.1 Unsafe Rust",
+      "tag": "Behavior",
+      "difficulty": 3,
+      "prompt": "The standard library's `split_at_mut` returns two mutable slices into one slice. Its implementation uses raw pointers and `slice::from_raw_parts_mut` inside `unsafe`, yet the function itself is safe to call. Why is this a valid \"safe abstraction\"?",
+      "code": "fn split_at_mut(values: &mut [i32], mid: usize) -> (&mut [i32], &mut [i32]) {\n    let len = values.len();\n    let ptr = values.as_mut_ptr();\n\n    assert!(mid <= len);\n\n    unsafe {\n        (\n            slice::from_raw_parts_mut(ptr, mid),\n            slice::from_raw_parts_mut(ptr.add(mid), len - mid),\n        )\n    }\n}",
+      "options": {
+        "A": "The borrow checker cannot see that the two returned slices never overlap; the `assert!(mid <= len)` plus the pointer arithmetic guarantee both slices are in bounds and disjoint, so no caller can trigger undefined behavior",
+        "B": "Marking a function safe automatically makes any `unsafe` code inside it sound, as long as it compiles",
+        "C": "`slice::from_raw_parts_mut` performs its own runtime bounds checking, so the `unsafe` block is just a formality",
+        "D": "It is not actually valid -- a purely safe implementation with two indexing expressions would also compile and should be preferred"
+      },
+      "answer": "A",
+      "explanation": "A purely safe implementation fails to compile (E0499) because the borrow checker only sees two mutable borrows of the same slice; it cannot understand that `[..mid]` and `[mid..]` are disjoint. The unsafe implementation is sound because `assert!(mid <= len)` guarantees the raw pointers stay in bounds and the two ranges cannot overlap. Wrapping verified unsafe code in a safe API is exactly how safe abstractions work."
+    },
+    {
+      "id": "ch20-q06",
+      "section": "20.1 Unsafe Rust",
+      "tag": "Concept",
+      "difficulty": 2,
+      "prompt": "Consider this foreign function declaration. Which statement is true?",
+      "code": "unsafe extern \"C\" {\n    fn abs(input: i32) -> i32;\n}",
+      "options": {
+        "A": "`\"C\"` names the application binary interface (ABI) to use, and calling `abs` requires an unsafe context because other languages do not enforce Rust's safety guarantees",
+        "B": "`\"C\"` means the function's source code must be written in C89; C++ functions need `extern \"C++\"` and are safe to call",
+        "C": "Functions declared in `extern` blocks are safe to call because the linker verifies their signatures at build time",
+        "D": "`extern` blocks can only import functions; Rust functions can never be exported for C code to call"
+      },
+      "answer": "A",
+      "explanation": "`extern \"C\"` declares functions using the C ABI. Calling them is unsafe because foreign code does not uphold Rust's guarantees and the compiler cannot check it. The reverse direction also exists: `#[no_mangle] pub extern \"C\" fn ...` exports a Rust function so C code can call it, so D is false."
+    },
+    {
+      "id": "ch20-q07",
+      "section": "20.2 Advanced Traits",
+      "tag": "Concept",
+      "difficulty": 2,
+      "prompt": "`Iterator` is defined with an associated type (`type Item;`) instead of a generic parameter (`trait Iterator<T>`). What key difference motivates that choice?",
+      "options": {
+        "A": "Associated types allow one type to implement the trait many times with different `Item` types",
+        "B": "With an associated type, a type can implement `Iterator` only once, fixing `Item` in that single impl, so callers never need annotations to disambiguate which implementation to use",
+        "C": "Generic parameters on traits are deprecated and will be removed in a future edition",
+        "D": "Associated types are resolved at runtime via vtables, while generic parameters are resolved at compile time"
+      },
+      "answer": "B",
+      "explanation": "With `trait Iterator<T>`, `Counter` could implement both `Iterator<u32>` and `Iterator<String>`, forcing callers to annotate which one they mean on every `next` call. An associated type permits only one `impl Iterator for Counter`, which fixes `type Item = u32` once, so the item type is unambiguous. A is backwards, and both mechanisms are compile-time constructs."
+    },
+    {
+      "id": "ch20-q08",
+      "section": "20.2 Advanced Traits",
+      "tag": "Code Output",
+      "difficulty": 3,
+      "prompt": "What does this program print?",
+      "code": "use std::ops::Add;\n\nstruct Millimeters(u32);\nstruct Meters(u32);\n\nimpl Add<Meters> for Millimeters {\n    type Output = Millimeters;\n\n    fn add(self, other: Meters) -> Millimeters {\n        Millimeters(self.0 + (other.0 * 1000))\n    }\n}\n\nfn main() {\n    let result = Millimeters(500) + Meters(2);\n    println!(\"{}\", result.0);\n}",
+      "options": {
+        "A": "`502`",
+        "B": "`2500`",
+        "C": "Compile error: `Add` can only be implemented with `Rhs = Self`",
+        "D": "`2000500`"
+      },
+      "answer": "B",
+      "explanation": "`Add` is declared as `trait Add<Rhs = Self>`, so `Self` is only the default -- overriding it with `impl Add<Meters> for Millimeters` is exactly the customization the default type parameter enables. The impl converts meters to millimeters: `500 + 2 * 1000 = 2500`."
+    },
+    {
+      "id": "ch20-q09",
+      "section": "20.2 Advanced Traits",
+      "tag": "Code Output",
+      "difficulty": 2,
+      "prompt": "What does this program print?",
+      "code": "trait Pilot {\n    fn fly(&self);\n}\n\ntrait Wizard {\n    fn fly(&self);\n}\n\nstruct Human;\n\nimpl Pilot for Human {\n    fn fly(&self) {\n        print!(\"captain \");\n    }\n}\n\nimpl Wizard for Human {\n    fn fly(&self) {\n        print!(\"up \");\n    }\n}\n\nimpl Human {\n    fn fly(&self) {\n        print!(\"waving \");\n    }\n}\n\nfn main() {\n    let person = Human;\n    Pilot::fly(&person);\n    Wizard::fly(&person);\n    person.fly();\n}",
+      "options": {
+        "A": "`waving waving waving `",
+        "B": "`captain up waving `",
+        "C": "Compile error: `Human` cannot define `fly` when two traits already provide it",
+        "D": "`captain up ` followed by a compile error on `person.fly()` because the call is ambiguous"
+      },
+      "answer": "B",
+      "explanation": "Because `fly` takes `self`, `Trait::fly(&person)` disambiguates by trait, printing `captain ` then `up `. A plain method call `person.fly()` prefers the inherent impl over trait methods, printing `waving `. All three coexist legally; nothing is ambiguous here."
+    },
+    {
+      "id": "ch20-q10",
+      "section": "20.2 Advanced Traits",
+      "tag": "Spot the Bug",
+      "difficulty": 3,
+      "prompt": "This program fails to compile at the `println!` line. What is wrong, and what is the fix?",
+      "code": "trait Animal {\n    fn baby_name() -> String;\n}\n\nstruct Dog;\n\nimpl Dog {\n    fn baby_name() -> String {\n        String::from(\"Spot\")\n    }\n}\n\nimpl Animal for Dog {\n    fn baby_name() -> String {\n        String::from(\"puppy\")\n    }\n}\n\nfn main() {\n    println!(\"A baby dog is called a {}\", Animal::baby_name());\n}",
+      "options": {
+        "A": "`baby_name` has no `self` parameter, so Rust cannot tell which implementor of `Animal` is meant; use fully qualified syntax: `<Dog as Animal>::baby_name()`",
+        "B": "A type may not have both an inherent function and a trait function with the same name; rename one of them",
+        "C": "Associated functions in traits cannot return `String`; return `&'static str` instead",
+        "D": "`Animal::baby_name()` works, but only after adding `use Animal;` inside `main`"
+      },
+      "answer": "A",
+      "explanation": "Associated functions without a `self` receiver give the compiler no way to infer the implementing type -- other types could also implement `Animal`. Fully qualified syntax `<Dog as Animal>::baby_name()` names both the type and the trait, and prints `puppy`. (`Dog::baby_name()` would call the inherent function and print `Spot`.)"
+    },
+    {
+      "id": "ch20-q11",
+      "section": "20.2 Advanced Traits",
+      "tag": "Spot the Bug",
+      "difficulty": 2,
+      "prompt": "Why does this code fail to compile?",
+      "code": "use std::fmt;\n\ntrait OutlinePrint: fmt::Display {\n    fn outline_print(&self) {\n        let output = self.to_string();\n        println!(\"* {output} *\");\n    }\n}\n\nstruct Point {\n    x: i32,\n    y: i32,\n}\n\nimpl OutlinePrint for Point {}",
+      "options": {
+        "A": "A trait cannot have a default method body that calls `to_string`",
+        "B": "`OutlinePrint` declares `fmt::Display` as a supertrait, but `Point` does not implement `Display`, so the `impl OutlinePrint for Point` is rejected",
+        "C": "`impl OutlinePrint for Point {}` is empty, and empty impl blocks are not allowed",
+        "D": "Supertrait syntax requires `where Self: fmt::Display` instead of a colon"
+      },
+      "answer": "B",
+      "explanation": "`trait OutlinePrint: fmt::Display` means every implementor must also implement `Display`; that supertrait bound is what lets the default body call `self.to_string()`. Since `Point` lacks a `Display` impl, the compiler reports that the trait bound `Point: std::fmt::Display` is not satisfied. Adding `impl fmt::Display for Point` fixes it. Empty impl blocks are fine, and the colon syntax is correct."
+    },
+    {
+      "id": "ch20-q12",
+      "section": "20.2 Advanced Traits",
+      "tag": "Concept",
+      "difficulty": 2,
+      "prompt": "You want `Display` output for `Vec<String>`, but both `Display` and `Vec<String>` are defined outside your crate, so the orphan rule blocks `impl Display for Vec<String>`. How does the newtype pattern solve this?",
+      "code": "struct Wrapper(Vec<String>);\n\nimpl fmt::Display for Wrapper {\n    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {\n        write!(f, \"[{}]\", self.0.join(\", \"))\n    }\n}",
+      "options": {
+        "A": "`Wrapper` is a local type, so implementing the external trait `Display` on it satisfies the orphan rule; the inner vector is reached via `self.0`, and the wrapper adds no runtime overhead",
+        "B": "The newtype tells the compiler to treat `Vec<String>` as if it were declared in the current crate, so the orphan rule no longer applies to `Vec<String>` itself",
+        "C": "It works, but each access to the inner `Vec` goes through an extra heap indirection at runtime",
+        "D": "`Wrapper` automatically inherits every method of `Vec<String>`, including `push` and `len`"
+      },
+      "answer": "A",
+      "explanation": "The orphan rule requires the trait or the type to be local; `Wrapper` is a local tuple struct, so the impl is allowed. Newtypes are zero-cost -- the wrapper is elided at compile time. The downside is that `Wrapper` does NOT automatically expose `Vec`'s methods (D is false); you must delegate manually or implement `Deref`."
+    },
+    {
+      "id": "ch20-q13",
+      "section": "20.3 Advanced Types",
+      "tag": "Misconception",
+      "difficulty": 1,
+      "prompt": "Given `type Kilometers = i32;`, a developer assumes the compiler will now reject `fn add_miles(m: i32)` being called with a `Kilometers` value, catching unit mix-ups. What is true?",
+      "options": {
+        "A": "Correct -- a type alias creates a distinct new type, exactly like a tuple struct",
+        "B": "Incorrect -- a type alias is only a synonym: `Kilometers` and `i32` are the same type and fully interchangeable, so no unit confusion is caught; a newtype like `struct Kilometers(i32)` would be needed for that",
+        "C": "Correct, but only when the alias is declared `pub`",
+        "D": "Incorrect -- aliases do create new types, but the coercion rules silently convert between them"
+      },
+      "answer": "B",
+      "explanation": "`type` creates a synonym, not a new type. Values of type `Kilometers` are treated identically to `i32` everywhere, so mixing them passes type checking. Aliases exist to reduce repetition of long types (e.g. `type Thunk = Box<dyn Fn() + Send + 'static>`), not to add type safety. For safety you want the newtype pattern."
+    },
+    {
+      "id": "ch20-q14",
+      "section": "20.3 Advanced Types",
+      "tag": "Code Output",
+      "difficulty": 1,
+      "prompt": "What does this program print?",
+      "code": "fn main() {\n    type Kilometers = i32;\n\n    let x: i32 = 5;\n    let y: Kilometers = 5;\n\n    println!(\"x + y = {}\", x + y);\n}",
+      "options": {
+        "A": "`x + y = 10`",
+        "B": "Compile error: cannot add `i32` to `Kilometers`",
+        "C": "Compile error: type aliases may not be declared inside a function",
+        "D": "`x + y = 55`"
+      },
+      "answer": "A",
+      "explanation": "Because `Kilometers` is an alias, `y` really has type `i32`, so `x + y` is ordinary `i32` addition and prints `x + y = 10`. Type aliases can be declared inside functions."
+    },
+    {
+      "id": "ch20-q15",
+      "section": "20.3 Advanced Types",
+      "tag": "Concept",
+      "difficulty": 3,
+      "prompt": "Which statements about the never type `!` and dynamically sized types (DSTs) are true? Select all that apply.",
+      "options": {
+        "A": "An expression of type `!` can be coerced into any other type, which is why one `match` arm can be `continue` while another produces a `u32`",
+        "B": "`continue`, `panic!`, and a `loop` with no `break` all have type `!`",
+        "C": "`str` (the type itself, not `&str`) has a size known at compile time",
+        "D": "`&str` is a \"fat pointer\": it stores the address of the string data plus its length",
+        "E": "Writing `fn generic<T: ?Sized>(t: &T)` allows `T` to be a DST, but the parameter must then sit behind some pointer type such as `&T`"
+      },
+      "answer": ["A", "B", "D", "E"],
+      "explanation": "`!` has no values, so it can never actually produce one -- the compiler lets it coerce into whatever type the context demands, which is why `Err(_) => continue` type-checks alongside `Ok(num) => num`. `str` alone is a DST (its length varies per value), so C is false: you must use it behind a pointer like `&str` or `Box<str>`. `&str` stores address + length, and `?Sized` relaxes the implicit `Sized` bound while requiring indirection."
+    },
+    {
+      "id": "ch20-q16",
+      "section": "20.3 Advanced Types",
+      "tag": "Spot the Bug",
+      "difficulty": 2,
+      "prompt": "Why does this code fail to compile?",
+      "code": "fn main() {\n    let s1: str = \"Hello there!\";\n    let s2: str = \"How's it going?\";\n}",
+      "options": {
+        "A": "String literals have type `String`, so the annotation should be `String`",
+        "B": "`str` is a dynamically sized type: its size is not known at compile time, so a bare local variable cannot have type `str`; use `&str`, which is a fat pointer with a known size",
+        "C": "Two `str` variables cannot exist in the same scope because they would alias the same string table",
+        "D": "The code compiles; `str` and `&str` are interchangeable"
+      },
+      "answer": "B",
+      "explanation": "Every value of a given type must occupy the same amount of memory, but `\"Hello there!\"` and \"How's it going?\" would need 12 and 15 bytes respectively, so `str` cannot be stored directly. The golden rule for DSTs: always put them behind a pointer -- `&str`, `Box<str>`, `Rc<str>`, etc. String literals have type `&'static str`, not `String`."
+    },
+    {
+      "id": "ch20-q17",
+      "section": "20.4 Advanced Functions & Closures",
+      "tag": "Concept",
+      "difficulty": 2,
+      "prompt": "Given `fn do_twice(f: fn(i32) -> i32, arg: i32) -> i32` and `fn add_one(x: i32) -> i32 { x + 1 }`, which statement about the function pointer type `fn` is true?",
+      "options": {
+        "A": "`fn` is a trait, so `do_twice` uses dynamic dispatch to call `f`",
+        "B": "`fn(i32) -> i32` is a concrete type that implements all three closure traits (`Fn`, `FnMut`, `FnOnce`), so a function pointer can always be passed where a closure trait bound is expected -- but a capturing closure cannot be passed as `fn`",
+        "C": "Closures and function pointers are the same type, so `do_twice` accepts any closure, including capturing ones",
+        "D": "Function pointers only implement `FnOnce`, so `do_twice` could call `f` at most once"
+      },
+      "answer": "B",
+      "explanation": "`fn` (lowercase) is a concrete type, not a trait. Function pointers implement `Fn`, `FnMut`, and `FnOnce`, so APIs with generic closure bounds also accept plain functions (e.g. `map(ToString::to_string)`). The reverse is limited: only non-capturing closures coerce to `fn`. That is why accepting `impl Fn(i32) -> i32` is usually preferred unless you need `fn` for C interop."
+    },
+    {
+      "id": "ch20-q18",
+      "section": "20.4 Advanced Functions & Closures",
+      "tag": "Spot the Bug",
+      "difficulty": 3,
+      "prompt": "This function fails to compile. What is the problem?",
+      "code": "fn make_adder(a: i32) -> fn(i32) -> i32 {\n    move |x| x + a\n}",
+      "options": {
+        "A": "The closure captures `a` from its environment, so it cannot coerce to a plain function pointer; return `impl Fn(i32) -> i32` (or `Box<dyn Fn(i32) -> i32>` when multiple call sites must share one type) instead",
+        "B": "`move` is illegal in a return position; deleting `move` makes it compile",
+        "C": "Closures can never be returned from functions in Rust",
+        "D": "The return type must be spelled `Fn(i32) -> i32` with a capital F"
+      },
+      "answer": "A",
+      "explanation": "Each closure has its own anonymous type; only closures that capture nothing can coerce to a `fn` pointer, and this one captures `a`. Returning `impl Fn(i32) -> i32` works for one closure per function; if you need to return closures from several functions and store them together (e.g. in a `Vec`), each `impl Trait` is a distinct opaque type, so use `Box<dyn Fn(i32) -> i32>`. Bare `Fn(...)` is a trait and cannot be a return type by itself."
+    },
+    {
+      "id": "ch20-q19",
+      "section": "20.5 Macros",
+      "tag": "Code Output",
+      "difficulty": 3,
+      "prompt": "What does this program print?",
+      "code": "macro_rules! my_vec {\n    ( $( $x:expr ),* ) => {\n        {\n            let mut temp_vec = Vec::new();\n            $(\n                temp_vec.push($x);\n            )*\n            temp_vec\n        }\n    };\n}\n\nfn main() {\n    let v = my_vec![1, 2, 3];\n    println!(\"{}\", v.iter().sum::<i32>());\n}",
+      "options": {
+        "A": "`6`",
+        "B": "`123`",
+        "C": "Compile error: `$x` can only match a single expression, not a comma-separated list",
+        "D": "`3`, because only the last match of `$x` is kept"
+      },
+      "answer": "A",
+      "explanation": "`$( $x:expr ),*` matches zero or more comma-separated expressions; here `$x` matches `1`, `2`, and `3` in turn. The `$( ... )*` in the body repeats `temp_vec.push($x);` once per match, so the call expands to a block that pushes 1, 2, 3 and evaluates to the vector. The sum is 6."
+    },
+    {
+      "id": "ch20-q20",
+      "section": "20.5 Macros",
+      "tag": "Concept",
+      "difficulty": 2,
+      "prompt": "Which of the following are real differences between macros and functions in Rust? Select all that apply.",
+      "options": {
+        "A": "A macro can accept a variable number of arguments (e.g. `println!` with one or many), while a function signature fixes the number and types of parameters",
+        "B": "Macros are expanded before the compiler interprets the meaning of the code, so a macro can generate items such as a trait implementation on a given type; a function cannot, because it is called at runtime",
+        "C": "Macros must be defined or brought into scope before they are called in a file",
+        "D": "Functions can be defined anywhere and called anywhere in the same scope, without ordering constraints",
+        "E": "Macro definitions are generally simpler to read and maintain than equivalent function definitions"
+      },
+      "answer": ["A", "B", "C", "D"],
+      "explanation": "Macros are a form of metaprogramming: they expand into code at compile time, which lets them take variable argument counts and generate items like trait impls. Unlike functions, macros must be in scope before the call site in the file. The trade-off is the opposite of E: macro definitions are more complex and harder to read and maintain than functions."
+    },
+    {
+      "id": "ch20-q21",
+      "section": "20.5 Macros",
+      "tag": "Concept",
+      "difficulty": 1,
+      "prompt": "What are the three kinds of procedural macros in Rust?",
+      "options": {
+        "A": "Custom `derive` macros, attribute-like macros, and function-like macros",
+        "B": "Declarative macros, hygienic macros, and recursive macros",
+        "C": "Inline macros, module macros, and crate macros",
+        "D": "`macro_rules!` macros, `#[derive]` macros, and inline assembly macros"
+      },
+      "answer": "A",
+      "explanation": "Procedural macros come in three kinds: custom derive (used as `#[derive(HelloMacro)]` on structs and enums), attribute-like (creating new attributes such as `#[route(GET, \"/\")]`, usable on more item kinds), and function-like (called like `sql!(SELECT * FROM posts)`). Declarative `macro_rules!` macros are a separate, non-procedural category."
+    },
+    {
+      "id": "ch20-q22",
+      "section": "20.5 Macros",
+      "tag": "Behavior",
+      "difficulty": 3,
+      "prompt": "A crate defines a custom derive macro as shown. What happens when a user writes `#[derive(HelloMacro)] struct Pancakes;`?",
+      "code": "#[proc_macro_derive(HelloMacro)]\npub fn hello_macro_derive(input: TokenStream) -> TokenStream {\n    let ast = syn::parse(input).unwrap();\n    impl_hello_macro(&ast)\n}",
+      "options": {
+        "A": "At runtime, the first call to `Pancakes::hello_macro()` invokes `hello_macro_derive` reflectively to build the implementation",
+        "B": "At compile time, the compiler passes the tokens of the `Pancakes` definition to `hello_macro_derive`; the function parses them (typically with `syn`), generates code (typically with `quote!`), and the returned `TokenStream` is added to the user's crate as the trait implementation",
+        "C": "The compiler copies the source text of `impl_hello_macro` into the user's crate verbatim, without running any code",
+        "D": "It fails unless `hello_macro_derive` is defined in the same crate as `struct Pancakes`, because of the orphan rule"
+      },
+      "answer": "B",
+      "explanation": "Procedural macros are functions from `TokenStream` to `TokenStream` that the compiler runs during compilation. For a derive macro, the input is the annotated item's tokens; `syn::parse` turns them into a `DeriveInput` syntax tree, and `quote!` builds the generated impl, which the compiler appends to the user's code. Derive macros must live in their own crate with `proc-macro = true` -- typically a separate crate from the user's code, so D is wrong, and nothing happens at runtime."
+    }
+  ]
+}

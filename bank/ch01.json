@@ -1,0 +1,169 @@
+{
+ "chapter": 1,
+ "title": "Getting Started",
+ "link": "https://doc.rust-lang.org/book/ch01-00-getting-started.html",
+ "questions": [
+  {
+   "id": "ch01-q01",
+   "section": "1.1 Installation",
+   "tag": "Concept",
+   "difficulty": 1,
+   "prompt": "What is `rustup`?",
+   "options": {
+    "A": "The Rust compiler that turns `.rs` files into executables",
+    "B": "A command-line tool for managing Rust versions and associated tools",
+    "C": "Rust's package manager for downloading third-party crates",
+    "D": "A code formatter that enforces the standard Rust style"
+   },
+   "answer": "B",
+   "explanation": "`rustup` is the installer and toolchain manager: it installs Rust and lets you update it with `rustup update` or remove it with `rustup self uninstall`. The compiler is `rustc`, the package manager is Cargo, and the formatter is `rustfmt`."
+  },
+  {
+   "id": "ch01-q02",
+   "section": "1.1 Installation",
+   "tag": "Behavior",
+   "difficulty": 1,
+   "prompt": "After installing Rust, which command verifies that the compiler is installed correctly and prints its version?",
+   "options": {
+    "A": "rustc --version",
+    "B": "rust --version",
+    "C": "rustup verify",
+    "D": "cargo --install-check"
+   },
+   "answer": "A",
+   "explanation": "The book verifies the installation with `rustc --version`, which prints the version, commit hash, and commit date of the latest stable release. There is no `rust` binary or `rustup verify` command."
+  },
+  {
+   "id": "ch01-q03",
+   "section": "1.1 Installation",
+   "tag": "Misconception",
+   "difficulty": 2,
+   "prompt": "You get \"linker not found\" errors when compiling a fresh Rust installation on macOS or Linux. According to the book, what is the fix?",
+   "options": {
+    "A": "Reinstall Rust, because the download was corrupted",
+    "B": "Install a C compiler, which typically ships with the linker Rust needs",
+    "C": "Run `rustup doc` to download the missing linker component",
+    "D": "Switch from `rustc` to Cargo, which bundles its own linker"
+   },
+   "answer": "B",
+   "explanation": "Rust needs a linker to join its compiled outputs into one file, and it does not ship one. Installing a C compiler (e.g. `xcode-select --install` on macOS, `build-essential` on Ubuntu) provides a linker; Cargo does not bundle its own."
+  },
+  {
+   "id": "ch01-q04",
+   "section": "1.2 Hello, World!",
+   "tag": "Concept",
+   "difficulty": 1,
+   "prompt": "In the Hello, World! program, what does the `!` in `println!` signify?",
+   "code": "fn main() {\n    println!(\"Hello, world!\");\n}",
+   "options": {
+    "A": "It marks the call as one that can never fail",
+    "B": "It calls a macro instead of a normal function",
+    "C": "It forces the output to flush immediately to the terminal",
+    "D": "It indicates the call returns no value"
+   },
+   "answer": "B",
+   "explanation": "The `!` means `println!` is a macro, not a function; macros generate code and don't always follow the same rules as functions. A plain function would be called as `println` without the `!`."
+  },
+  {
+   "id": "ch01-q05",
+   "section": "1.2 Hello, World!",
+   "tag": "Behavior",
+   "difficulty": 2,
+   "prompt": "You run `rustc main.rs` on Linux and it succeeds, but nothing prints to the screen. Why?",
+   "options": {
+    "A": "`rustc` only checks the code; you must use Cargo to produce a binary",
+    "B": "Compiling and running are separate steps: `rustc` only produces an executable, which you then run with `./main`",
+    "C": "The program printed to a log file because `println!` doesn't write to the terminal",
+    "D": "The binary was placed in `target/debug/`, so it must be run from there"
+   },
+   "answer": "B",
+   "explanation": "Rust is an ahead-of-time compiled language: `rustc main.rs` outputs an executable (`main` on Linux/macOS, `main.exe` on Windows) without running it. `target/debug/` is where Cargo, not `rustc`, puts binaries."
+  },
+  {
+   "id": "ch01-q06",
+   "section": "1.2 Hello, World!",
+   "tag": "Spot the Bug",
+   "difficulty": 2,
+   "prompt": "This program fails to compile. What is the problem?",
+   "code": "fn main() {\n    println(\"Hello, world!\");\n}",
+   "options": {
+    "A": "`main` must declare a return type before its body",
+    "B": "String literals must use single quotes in Rust",
+    "C": "`println` is missing the `!` — the macro is named `println!`, and no function `println` is in scope",
+    "D": "The call is missing a format argument such as `{}`"
+   },
+   "answer": "C",
+   "explanation": "Printing to the screen in this program uses the `println!` macro; writing `println` without `!` makes the compiler look for an ordinary function of that name, which doesn't exist in scope, so compilation fails."
+  },
+  {
+   "id": "ch01-q07",
+   "section": "1.3 Hello, Cargo!",
+   "tag": "Behavior",
+   "difficulty": 1,
+   "prompt": "What does `cargo new hello_cargo` create?",
+   "options": {
+    "A": "Only an empty `Cargo.toml` file in the current directory",
+    "B": "A `hello_cargo` directory containing `Cargo.toml`, a `src` directory with `main.rs`, and a new Git repository",
+    "C": "A compiled `hello_cargo` executable in `target/debug/`",
+    "D": "A `hello_cargo` directory with `main.rs` at its top level and a `Cargo.lock` file"
+   },
+   "answer": "B",
+   "explanation": "`cargo new` generates the project directory with a `Cargo.toml` manifest, `src/main.rs` containing a Hello, World! program, and initializes a Git repo (with `.gitignore`) by default. `Cargo.lock` and `target/` only appear after the first `cargo build`."
+  },
+  {
+   "id": "ch01-q08",
+   "section": "1.3 Hello, Cargo!",
+   "tag": "Concept",
+   "difficulty": 2,
+   "prompt": "Which statements about Cargo commands are true? (Select all that apply.)",
+   "options": {
+    "A": "`cargo check` verifies the code compiles without producing an executable",
+    "B": "`cargo run` always recompiles the project, even if the source hasn't changed",
+    "C": "`cargo build` places the resulting binary in `target/debug/` by default",
+    "D": "`cargo build` produces an optimized release binary by default",
+    "E": "`cargo run` compiles the code if needed and then runs the resulting executable in one command"
+   },
+   "answer": [
+    "A",
+    "C",
+    "E"
+   ],
+   "explanation": "`cargo check` skips producing a binary, making it faster for iterating; the default profile is debug, so `cargo build` outputs to `target/debug/`. `cargo run` builds only when files have changed — if nothing changed it just runs the existing binary — and optimized builds require `cargo build --release`."
+  },
+  {
+   "id": "ch01-q09",
+   "section": "1.3 Hello, Cargo!",
+   "tag": "Misconception",
+   "difficulty": 3,
+   "prompt": "A teammate says: \"Before benchmarking, just run `cargo build` and time the binary in `target/debug/`.\" Why is this advice wrong?",
+   "options": {
+    "A": "Benchmarks must be run with `cargo check`, which produces faster code",
+    "B": "Debug builds compile without optimizations; benchmarks should use `cargo build --release` and the binary in `target/release/`",
+    "C": "`target/debug/` binaries cannot be executed directly; they can only be launched via `cargo run`",
+    "D": "The debug binary panics when run outside of Cargo, invalidating any timing"
+   },
+   "answer": "B",
+   "explanation": "The book notes that `cargo build --release` compiles with optimizations into `target/release/`, and that you should benchmark the release build because the debug profile trades runtime speed for faster compilation. Debug binaries are ordinary executables and run fine directly."
+  },
+  {
+   "id": "ch01-q10",
+   "section": "1.3 Hello, Cargo!",
+   "tag": "Concept",
+   "difficulty": 3,
+   "prompt": "Which statements about a project's `Cargo.toml` and `Cargo.lock` files are true? (Select all that apply.)",
+   "code": "[package]\nname = \"hello_cargo\"\nversion = \"0.1.0\"\nedition = \"2024\"\n\n[dependencies]",
+   "options": {
+    "A": "`Cargo.toml` is written in the TOML format",
+    "B": "The `[dependencies]` section lists the crates the project depends on",
+    "C": "`Cargo.lock` is created by `cargo new` alongside `Cargo.toml`",
+    "D": "You should hand-edit `Cargo.lock` to pin dependency versions",
+    "E": "The `[package]` section must list every source file so Cargo knows what to compile"
+   },
+   "answer": [
+    "A",
+    "B"
+   ],
+   "explanation": "`Cargo.toml` uses TOML, with `[package]` configuring the package and `[dependencies]` listing crates. `Cargo.lock` first appears when you run `cargo build` and is managed by Cargo — you never need to edit it manually — and Cargo finds source files by convention in `src/` rather than from a file list."
+  }
+ ]
+}

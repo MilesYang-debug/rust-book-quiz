@@ -1,0 +1,301 @@
+{
+ "chapter": 9,
+ "title": "Error Handling",
+ "link": "https://doc.rust-lang.org/book/ch09-00-error-handling.html",
+ "questions": [
+  {
+   "id": "ch09-q01",
+   "section": "9.1 Unrecoverable Errors with panic!",
+   "tag": "Concept",
+   "difficulty": 1,
+   "prompt": "By default, what happens when a Rust program calls the `panic!` macro?",
+   "options": {
+    "A": "The program prints a failure message, unwinds the stack cleaning up each frame's data, and then quits",
+    "B": "The program immediately aborts without any cleanup, leaving the OS to reclaim all memory",
+    "C": "The current function returns an `Err` value to its caller so the error can be handled",
+    "D": "The program continues running but logs the message to stderr"
+   },
+   "answer": "A",
+   "explanation": "By default a panic prints a failure message, unwinds the stack (walking back up and cleaning up data from each function), and quits. Aborting without cleanup only happens if you opt in with `panic = 'abort'`."
+  },
+  {
+   "id": "ch09-q02",
+   "section": "9.1 Unrecoverable Errors with panic!",
+   "tag": "Behavior",
+   "difficulty": 2,
+   "prompt": "What is the effect of adding `panic = 'abort'` under `[profile.release]` in `Cargo.toml`?",
+   "options": {
+    "A": "Panics in release builds are converted into `Result::Err` values automatically",
+    "B": "On panic, the program ends immediately without unwinding, memory cleanup is left to the OS, and the resulting binary can be smaller",
+    "C": "The compiler rejects any code path that could panic in release mode",
+    "D": "Backtraces are printed automatically on every panic in release builds"
+   },
+   "answer": "B",
+   "explanation": "`panic = 'abort'` switches from unwinding to immediately aborting the process: no stack cleanup runs, the OS reclaims memory, and the binary shrinks because the unwinding machinery can be omitted."
+  },
+  {
+   "id": "ch09-q03",
+   "section": "9.1 Unrecoverable Errors with panic!",
+   "tag": "Code Output",
+   "difficulty": 1,
+   "prompt": "What happens when this program is compiled and run?",
+   "code": "fn main() {\n    let v = vec![1, 2, 3];\n    v[99];\n}",
+   "options": {
+    "A": "Compile error: the compiler detects the out-of-bounds index",
+    "B": "It reads whatever memory happens to be at that location (a buffer overread), which is undefined behavior",
+    "C": "It compiles, then panics at runtime with an \"index out of bounds\" message",
+    "D": "It compiles and runs fine because the indexed value is never used"
+   },
+   "answer": "C",
+   "explanation": "Indexing a `Vec` past its end compiles but panics at runtime (\"index out of bounds: the len is 3 but the index is 99\"). Rust panics here precisely to prevent the C-style buffer overread in option B."
+  },
+  {
+   "id": "ch09-q04",
+   "section": "9.1 Unrecoverable Errors with panic!",
+   "tag": "Behavior",
+   "difficulty": 2,
+   "prompt": "Which of the following statements about panics and backtraces are true? (Select all that apply.)",
+   "options": {
+    "A": "Setting the `RUST_BACKTRACE=1` environment variable makes Rust print a backtrace when a panic occurs",
+    "B": "Getting file and line information in a backtrace requires debug symbols, which are enabled by default when building without `--release`",
+    "C": "`RUST_BACKTRACE` is a key you set in `Cargo.toml`, not an environment variable",
+    "D": "A full backtrace is printed by default on every panic, with no configuration needed",
+    "E": "To find the source of a panic, read the backtrace from the top down until you reach the first frame that mentions code you wrote"
+   },
+   "answer": [
+    "A",
+    "B",
+    "E"
+   ],
+   "explanation": "Backtraces are opt-in via the `RUST_BACKTRACE` environment variable (not `Cargo.toml`), need debug symbols for useful file/line info, and are read top-down to the first frame in your own code. By default only the panic message and a note about `RUST_BACKTRACE` are printed."
+  },
+  {
+   "id": "ch09-q05",
+   "section": "9.2 Recoverable Errors with Result",
+   "tag": "Concept",
+   "difficulty": 1,
+   "prompt": "Which of the following correctly describes the `Result<T, E>` enum?",
+   "options": {
+    "A": "It has variants `Ok(T)` for success and `Err(E)` for failure, where `T` and `E` are generic type parameters",
+    "B": "It has variants `Some(T)` and `None`, where `None` represents an error",
+    "C": "It has variants `Ok(T)` and `Panic(E)`, where `Panic` immediately aborts the program",
+    "D": "It is a struct with a boolean `success` field and a payload field"
+   },
+   "answer": "A",
+   "explanation": "`Result<T, E>` is an enum with exactly two variants: `Ok(T)` holding the success value and `Err(E)` holding the error value. `Some`/`None` belong to `Option<T>`."
+  },
+  {
+   "id": "ch09-q06",
+   "section": "9.2 Recoverable Errors with Result",
+   "tag": "Code Output",
+   "difficulty": 1,
+   "prompt": "Assuming `hello.txt` does not exist, what happens when this program runs?",
+   "code": "use std::fs::File;\n\nfn main() {\n    let greeting_file = File::open(\"hello.txt\").unwrap();\n}",
+   "options": {
+    "A": "Compile error: the `Result` returned by `File::open` must be handled with `match`",
+    "B": "It compiles, then panics at runtime with a message that includes the `Err` value from `File::open`",
+    "C": "`greeting_file` is bound to `None` and the program continues",
+    "D": "`main` returns an `Err` value and the process exits with a nonzero code"
+   },
+   "answer": "B",
+   "explanation": "`unwrap` returns the value inside `Ok`, but if the `Result` is `Err` it calls `panic!` with a default message showing the error. There is no compile error, and `main` here returns `()`, not a `Result`."
+  },
+  {
+   "id": "ch09-q07",
+   "section": "9.2 Recoverable Errors with Result",
+   "tag": "Behavior",
+   "difficulty": 2,
+   "prompt": "Suppose `hello.txt` does not exist and the current directory is writable. What does this program do?",
+   "code": "use std::fs::File;\nuse std::io::ErrorKind;\n\nfn main() {\n    let greeting_file = match File::open(\"hello.txt\") {\n        Ok(file) => file,\n        Err(error) => match error.kind() {\n            ErrorKind::NotFound => match File::create(\"hello.txt\") {\n                Ok(fc) => fc,\n                Err(e) => panic!(\"Problem creating the file: {e:?}\"),\n            },\n            _ => panic!(\"Problem opening the file: {error:?}\"),\n        },\n    };\n}",
+   "options": {
+    "A": "It panics with \"Problem opening the file\" because `File::open` failed",
+    "B": "It matches `ErrorKind::NotFound`, creates `hello.txt`, and binds the new file handle to `greeting_file`",
+    "C": "Compile error: you cannot nest a `match` inside another `match` arm",
+    "D": "It panics with \"Problem creating the file\" because the original open failed"
+   },
+   "answer": "B",
+   "explanation": "`io::Error` exposes `kind()` returning an `io::ErrorKind`; a missing file yields `ErrorKind::NotFound`, so the inner `match` creates the file and binds its handle. The catch-all `_` arm only runs for other error kinds, such as permission errors."
+  },
+  {
+   "id": "ch09-q08",
+   "section": "9.2 Recoverable Errors with Result",
+   "tag": "Misconception",
+   "difficulty": 2,
+   "prompt": "Why do most Rustaceans prefer `expect` over `unwrap` in production-quality code?",
+   "options": {
+    "A": "`expect` returns a `Result` instead of panicking, so the error remains recoverable",
+    "B": "`expect` lets you supply a message explaining why the operation should succeed, giving better context when it panics",
+    "C": "`expect` is faster because it skips the runtime check that `unwrap` performs",
+    "D": "`unwrap` is deprecated and will be removed in a future edition"
+   },
+   "answer": "B",
+   "explanation": "Both `unwrap` and `expect` panic on `Err`; the difference is that `expect` uses your message as the panic text, conveying your assumption and making debugging easier. Neither returns a `Result`, and `unwrap` is not deprecated."
+  },
+  {
+   "id": "ch09-q09",
+   "section": "9.2 Recoverable Errors with Result",
+   "tag": "Concept",
+   "difficulty": 2,
+   "prompt": "In this manual error-propagation pattern, what does the arm `Err(e) => return Err(e)` accomplish?",
+   "code": "use std::fs::File;\nuse std::io::{self, Read};\n\nfn read_username_from_file() -> Result<String, io::Error> {\n    let username_file_result = File::open(\"hello.txt\");\n    let mut username_file = match username_file_result {\n        Ok(file) => file,\n        Err(e) => return Err(e),\n    };\n    let mut username = String::new();\n    match username_file.read_to_string(&mut username) {\n        Ok(_) => Ok(username),\n        Err(e) => Err(e),\n    }\n}",
+   "options": {
+    "A": "It ends the whole function early, passing the error value back to the caller so the caller decides how to handle it",
+    "B": "It panics with the error `e` because errors in `match` arms are unrecoverable",
+    "C": "It retries `File::open` once before giving up",
+    "D": "It converts the `io::Error` into a `String` so it can be printed"
+   },
+   "answer": "A",
+   "explanation": "`return Err(e)` early-returns from `read_username_from_file`, propagating the error to the calling code. This is exactly the boilerplate the `?` operator condenses."
+  },
+  {
+   "id": "ch09-q10",
+   "section": "9.2 Recoverable Errors with Result",
+   "tag": "Behavior",
+   "difficulty": 2,
+   "prompt": "Which of the following statements about the `?` operator are true? (Select all that apply.)",
+   "options": {
+    "A": "Applied to an `Err(e)` value, it returns early from the enclosing function, converting the error to the function's error type via the `From` trait",
+    "B": "Applied to an `Ok(v)` value, the expression evaluates to `v` and execution continues",
+    "C": "It can be used in any function, regardless of the function's return type",
+    "D": "It automatically converts between `Result` and `Option` so you can mix them freely in the same function",
+    "E": "In a function returning `Option`, `?` applied to a `None` value returns `None` early"
+   },
+   "answer": [
+    "A",
+    "B",
+    "E"
+   ],
+   "explanation": "`?` unwraps `Ok`/`Some` or early-returns `Err`/`None`, calling `From::from` on errors to convert them to the declared error type. It only works in functions whose return type is compatible (Result, Option, or another `FromResidual` type), and it never converts Result to Option or vice versa — you need `ok()` or `ok_or()` for that."
+  },
+  {
+   "id": "ch09-q11",
+   "section": "9.2 Recoverable Errors with Result",
+   "tag": "Spot the Bug",
+   "difficulty": 2,
+   "prompt": "This program fails to compile. What is the bug?",
+   "code": "use std::fs::File;\n\nfn main() {\n    let greeting_file = File::open(\"hello.txt\")?;\n}",
+   "options": {
+    "A": "`File::open` does not return a `Result`, so `?` cannot be applied to it",
+    "B": "`?` is used in a `main` that returns `()`; `?` only works in functions returning `Result`, `Option`, or another `FromResidual` type",
+    "C": "The file name must be a `String`, not a string literal",
+    "D": "Nothing is wrong at compile time; it panics at runtime if the file is missing"
+   },
+   "answer": "B",
+   "explanation": "The `?` operator early-returns an error, so the enclosing function's return type must support it; a `main` returning `()` does not, producing error E0277. Changing `main` to return `Result<(), Box<dyn Error>>` fixes it."
+  },
+  {
+   "id": "ch09-q12",
+   "section": "9.2 Recoverable Errors with Result",
+   "tag": "Spot the Bug",
+   "difficulty": 3,
+   "prompt": "This function fails to compile. Why?",
+   "code": "use std::fs::File;\n\nfn open_config() -> Result<File, String> {\n    let file = File::open(\"config.txt\")?;\n    Ok(file)\n}",
+   "options": {
+    "A": "`?` cannot convert the `std::io::Error` from `File::open` into `String`, because `String` has no `From<std::io::Error>` implementation",
+    "B": "`?` cannot be used on the result of `File::open` because `File` is not `Copy`",
+    "C": "The function must return `Result<File, std::io::Error>`; the error type of a `Result` returned with `?` can never differ from the original",
+    "D": "`Ok(file)` moves `file` out of the function, which is not allowed after using `?`"
+   },
+   "answer": "A",
+   "explanation": "`?` calls `From::from` to convert the error into the function's declared error type; since there is no `impl From<std::io::Error> for String`, the conversion fails to compile. The error type may differ from the original as long as a suitable `From` impl exists, so C is too strong."
+  },
+  {
+   "id": "ch09-q13",
+   "section": "9.2 Recoverable Errors with Result",
+   "tag": "Code Output",
+   "difficulty": 3,
+   "prompt": "Assuming `no-such-file.txt` does not exist, what happens when this program runs?",
+   "code": "use std::error::Error;\nuse std::fs::File;\n\nfn main() -> Result<(), Box<dyn Error>> {\n    let _greeting_file = File::open(\"no-such-file.txt\")?;\n    println!(\"opened\");\n    Ok(())\n}",
+   "options": {
+    "A": "Compile error: `?` cannot convert an `std::io::Error` into `Box<dyn Error>`",
+    "B": "It prints \"opened\" and exits with code 0 because `Ok(())` is always reached",
+    "C": "It panics at the `?` operator with an \"unwrap on Err\" message",
+    "D": "\"opened\" is never printed; `main` returns the error and the process exits with a nonzero exit code"
+   },
+   "answer": "D",
+   "explanation": "`Box<dyn Error>` accepts any error type via `From`, so `?` propagates the `io::Error` out of `main` before the `println!` runs. When `main` returns `Err`, the program exits with a nonzero code (returning `Ok(())` would exit with 0); `?` propagates rather than panics."
+  },
+  {
+   "id": "ch09-q14",
+   "section": "9.2 Recoverable Errors with Result",
+   "tag": "Code Output",
+   "difficulty": 3,
+   "prompt": "What does this program print?",
+   "code": "fn last_char_of_first_line(text: &str) -> Option<char> {\n    text.lines().next()?.chars().last()\n}\n\nfn main() {\n    println!(\"{:?}\", last_char_of_first_line(\"hello\\nworld\"));\n    println!(\"{:?}\", last_char_of_first_line(\"\"));\n}",
+   "options": {
+    "A": "Some('o') then None",
+    "B": "Some('d') then None",
+    "C": "Compile error: `?` cannot be used on an `Option` value",
+    "D": "Some('o') then a panic, because calling `?` on `None` panics"
+   },
+   "answer": "A",
+   "explanation": "The first line of \"hello\\nworld\" is \"hello\", whose last char is 'o'. For the empty string, `lines().next()` is `None`, so `?` makes the function return `None` early — `?` on `Option` propagates `None`; it never panics."
+  },
+  {
+   "id": "ch09-q15",
+   "section": "9.3 To panic! or Not to panic!",
+   "tag": "Concept",
+   "difficulty": 1,
+   "prompt": "According to the book, what is the good default choice for a library function whose failure is an expected possibility (e.g., a parser given malformed data)?",
+   "options": {
+    "A": "Call `panic!` so the bug is caught immediately",
+    "B": "Return a `Result`, letting the calling code decide whether to recover or to treat the error as unrecoverable",
+    "C": "Call `unwrap` internally and document the panic",
+    "D": "Return a sentinel value such as `-1` or an empty string"
+   },
+   "answer": "B",
+   "explanation": "Returning `Result` is the good default because it preserves the caller's options: callers can recover, propagate, or still choose to panic. Panicking makes the decision on the caller's behalf and is unrecoverable."
+  },
+  {
+   "id": "ch09-q16",
+   "section": "9.3 To panic! or Not to panic!",
+   "tag": "Concept",
+   "difficulty": 2,
+   "prompt": "In which situations does the book consider it appropriate to call `unwrap` or `expect`? (Select all that apply.)",
+   "options": {
+    "A": "In examples and prototype code, where robust error handling would obscure the point",
+    "B": "In tests, where a panic is exactly how the test should fail",
+    "C": "When your own logic guarantees the value is `Ok`, but the compiler cannot see it — e.g., `\"127.0.0.1\".parse::<IpAddr>().expect(...)` on a hardcoded valid string",
+    "D": "In library code that parses arbitrary user-supplied input",
+    "E": "Whenever proper error handling would take more than a few extra lines of code"
+   },
+   "answer": [
+    "A",
+    "B",
+    "C"
+   ],
+   "explanation": "Examples/prototypes, tests, and cases where you have logic ensuring the `Result` is `Ok` (like a hardcoded valid IP) justify `unwrap`/`expect`; the `expect` message should document the assumption. Expected failures such as malformed user input should be surfaced as `Result`, and mere convenience is not a justification."
+  },
+  {
+   "id": "ch09-q17",
+   "section": "9.3 To panic! or Not to panic!",
+   "tag": "Spot the Bug",
+   "difficulty": 2,
+   "prompt": "This validation type is meant to guarantee that every `Guess` holds a value between 1 and 100, but it fails to do so. What is the bug?",
+   "code": "pub struct Guess {\n    pub value: i32,\n}\n\nimpl Guess {\n    pub fn new(value: i32) -> Guess {\n        if value < 1 || value > 100 {\n            panic!(\"Guess value must be between 1 and 100, got {value}.\");\n        }\n        Guess { value }\n    }\n}",
+   "options": {
+    "A": "`new` should return `Result<Guess, String>` — panicking in a constructor never compiles",
+    "B": "The `value` field is `pub`, so code outside the module can construct `Guess { value: 500 }` or overwrite the field, bypassing the validation in `new`",
+    "C": "The range check is wrong: it should be `value <= 1 || value >= 100`",
+    "D": "`panic!` cannot use the `{value}` inline-capture syntax in its format string"
+   },
+   "answer": "B",
+   "explanation": "The invariant only holds if the field is private, forcing all outside code through `Guess::new`; a `pub` field lets callers construct or mutate a `Guess` directly with an out-of-range value. The fix is a private field plus a public getter like `pub fn value(&self) -> i32`."
+  },
+  {
+   "id": "ch09-q18",
+   "section": "9.3 To panic! or Not to panic!",
+   "tag": "Misconception",
+   "difficulty": 3,
+   "prompt": "A colleague says: \"`Guess::new` panicking on an out-of-range value is bad design — every fallible constructor must return `Result` instead.\" Per the book's guidelines, why is panicking acceptable here?",
+   "options": {
+    "A": "Because panics are cheaper than allocating an `Err` value",
+    "B": "Because `Result` cannot be returned from associated functions like `new`",
+    "C": "Passing an out-of-range value violates the function's contract and indicates a bug in the calling code, which should be fixed during development rather than handled at runtime",
+    "D": "Because the standard library never returns `Result` from constructors, and libraries should match it"
+   },
+   "answer": "C",
+   "explanation": "The book's guideline is to panic when a contract is violated, because that signals a caller-side bug that should be fixed, not an expected condition to recover from; such panic conditions should be documented in the API. Functions elsewhere can then accept `Guess` and rely on the 1..=100 invariant without rechecking."
+  }
+ ]
+}

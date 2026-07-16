@@ -1,0 +1,462 @@
+{
+ "chapter": 4,
+ "title": "Understanding Ownership",
+ "link": "https://doc.rust-lang.org/book/ch04-00-understanding-ownership.html",
+ "questions": [
+  {
+   "id": "ch04-q01",
+   "section": "4.1 What Is Ownership?",
+   "tag": "Concept",
+   "difficulty": 1,
+   "prompt": "Which of the following correctly states Rust's three ownership rules?",
+   "options": {
+    "A": "Each value has an owner; there can be multiple owners at a time; values are freed by the garbage collector.",
+    "B": "Each value has an owner; there can only be one owner at a time; when the owner goes out of scope, the value is dropped.",
+    "C": "Each variable has a reference count; values are dropped when the count reaches zero; ownership can be shared freely.",
+    "D": "Each value lives on the heap; the programmer must call `free` manually; the compiler warns about leaks."
+   },
+   "answer": "B",
+   "explanation": "The three ownership rules are: each value has an owner, there is exactly one owner at a time, and the value is dropped when its owner goes out of scope. There is no garbage collector or manual free."
+  },
+  {
+   "id": "ch04-q02",
+   "section": "4.1 What Is Ownership?",
+   "tag": "Code Output",
+   "difficulty": 2,
+   "prompt": "What happens when this code is compiled and run?",
+   "code": "let s1 = String::from(\"hello\");\nlet s2 = s1;\nprintln!(\"{s1}, world!\");",
+   "options": {
+    "A": "It prints \"hello, world!\" because `s2` is a shallow copy and both variables stay valid.",
+    "B": "It compiles but panics at runtime with a use-after-free error.",
+    "C": "It fails to compile with error E0382: borrow of moved value `s1`.",
+    "D": "It prints an empty string because `s1` was reset when it was copied."
+   },
+   "answer": "C",
+   "explanation": "`String` does not implement `Copy`, so `let s2 = s1;` moves the value and invalidates `s1`. Using `s1` afterward is a compile-time error (E0382), which is how Rust prevents a double free."
+  },
+  {
+   "id": "ch04-q03",
+   "section": "4.1 What Is Ownership?",
+   "tag": "Code Output",
+   "difficulty": 1,
+   "prompt": "What happens when this code is compiled and run?",
+   "code": "let x = 5;\nlet y = x;\nprintln!(\"x = {x}, y = {y}\");",
+   "options": {
+    "A": "Compile error: `x` was moved into `y` and can no longer be used.",
+    "B": "It prints \"x = 5, y = 5\" because `i32` implements `Copy`, so `x` remains valid.",
+    "C": "It prints \"x = 5, y = 5\" but only because the compiler silently calls `clone`.",
+    "D": "Runtime panic: two variables cannot refer to the same stack value."
+   },
+   "answer": "B",
+   "explanation": "Integers are simple, fixed-size stack values that implement the `Copy` trait, so assignment copies the bits and the original variable stays valid. No move occurs and no `clone` is needed."
+  },
+  {
+   "id": "ch04-q04",
+   "section": "4.1 What Is Ownership?",
+   "tag": "Concept",
+   "difficulty": 1,
+   "prompt": "What does calling `s1.clone()` on a `String` do?",
+   "options": {
+    "A": "It copies only the stack data (pointer, length, capacity), so both strings share the same heap buffer.",
+    "B": "It creates a second reference to `s1` that is tracked by a reference counter.",
+    "C": "It performs a deep copy: the heap data is duplicated, giving two independent owners.",
+    "D": "It moves the value and marks `s1` as invalid, exactly like plain assignment."
+   },
+   "answer": "C",
+   "explanation": "`clone` explicitly duplicates the heap data, so `s1` and the clone each own their own buffer and both remain valid. It is explicit precisely because it may be expensive."
+  },
+  {
+   "id": "ch04-q05",
+   "section": "4.1 What Is Ownership?",
+   "tag": "Spot the Bug",
+   "difficulty": 2,
+   "prompt": "This code does not compile. What is the bug, and what is the most idiomatic fix?",
+   "code": "fn main() {\n    let s = String::from(\"hello\");\n    takes_ownership(s);\n    println!(\"{s}\");\n}\n\nfn takes_ownership(some_string: String) {\n    println!(\"{some_string}\");\n}",
+   "options": {
+    "A": "`s` was moved into `takes_ownership`, so the final `println!` uses a moved value; pass a reference (`&s`) and take `&String`/`&str` instead.",
+    "B": "`takes_ownership` forgot to return, causing a memory leak; add `return some_string;`.",
+    "C": "The code compiles fine; passing to a function never affects ownership.",
+    "D": "`println!` cannot print a `String` directly; call `s.as_str()` first."
+   },
+   "answer": "A",
+   "explanation": "Passing a non-`Copy` value to a function moves ownership into the parameter, so `s` is invalid afterward. Borrowing with a reference lets `main` keep ownership; returning the value back would also work but is clunkier."
+  },
+  {
+   "id": "ch04-q06",
+   "section": "4.1 What Is Ownership?",
+   "tag": "Code Output",
+   "difficulty": 2,
+   "prompt": "What happens when this code is compiled and run?",
+   "code": "fn main() {\n    let s1 = String::from(\"hello\");\n    let s2 = takes_and_gives_back(s1);\n    println!(\"{s2}\");\n}\n\nfn takes_and_gives_back(a_string: String) -> String {\n    a_string\n}",
+   "options": {
+    "A": "Compile error: a function cannot return a value it received as a parameter.",
+    "B": "Runtime panic: `a_string` is dropped at the end of the function before it can be returned.",
+    "C": "Compile error: `s1` is used after being moved into the function.",
+    "D": "It prints \"hello\": ownership moves into the function and is moved back out through the return value."
+   },
+   "answer": "D",
+   "explanation": "Returning a value moves ownership to the caller, so the `String` is not dropped inside the function; it now belongs to `s2`. Only `s1` is invalidated, and it is never used again."
+  },
+  {
+   "id": "ch04-q07",
+   "section": "4.1 What Is Ownership?",
+   "tag": "Misconception",
+   "difficulty": 2,
+   "prompt": "A developer coming from Java writes `let s2 = s1;` with a `String` and expects both variables to point at the same data and stay usable. What actually happens in Rust?",
+   "options": {
+    "A": "Rust behaves like Java: both variables alias the same heap object and a garbage collector cleans it up later.",
+    "B": "Rust performs a move: the pointer/length/capacity are copied, `s1` is invalidated at compile time, and only `s2` will be dropped.",
+    "C": "Rust performs an automatic deep copy, so both variables own separate heap buffers.",
+    "D": "Both stay valid, but using `s1` afterward causes a runtime double-free error."
+   },
+   "answer": "B",
+   "explanation": "Assignment of a non-`Copy` type copies only the stack metadata and invalidates the source — a move. Invalidating `s1` is exactly what lets Rust free the memory once (when `s2` goes out of scope) without a garbage collector."
+  },
+  {
+   "id": "ch04-q08",
+   "section": "4.1 What Is Ownership?",
+   "tag": "Concept",
+   "difficulty": 2,
+   "prompt": "For `let s = String::from(\"hello\");`, where do the parts of the `String` live?",
+   "options": {
+    "A": "Everything, including the character data, lives on the stack because `s` is a local variable.",
+    "B": "Everything lives on the heap; the stack holds nothing for `s`.",
+    "C": "The pointer, length, and capacity live on the stack; the character contents live on the heap.",
+    "D": "The contents live in the read-only data section of the binary, like a string literal."
+   },
+   "answer": "C",
+   "explanation": "A `String` is a stack value of three parts — pointer, length, capacity — pointing at a growable heap buffer holding the contents. String literals, by contrast, are baked into the binary."
+  },
+  {
+   "id": "ch04-q09",
+   "section": "4.1 What Is Ownership?",
+   "tag": "Behavior",
+   "difficulty": 3,
+   "prompt": "In this code, when is the memory holding \"hello\" freed?",
+   "code": "let mut s = String::from(\"hello\");\ns = String::from(\"ahoy\");\nprintln!(\"{s}, world!\");",
+   "options": {
+    "A": "At the end of the enclosing scope, when `s` is dropped.",
+    "B": "Immediately at the reassignment: Rust drops the old value \"hello\" as soon as `s` is bound to the new `String`.",
+    "C": "Never — reassignment leaks the old buffer unless you call `drop` manually.",
+    "D": "At the next call to `println!`, when the allocator runs a cleanup pass."
+   },
+   "answer": "B",
+   "explanation": "When you assign a new value to an existing owner, Rust calls `drop` on the old value immediately; only the new value \"ahoy\" survives to the end of the scope. There is no deferred cleanup pass."
+  },
+  {
+   "id": "ch04-q10",
+   "section": "4.1 What Is Ownership?",
+   "tag": "Concept",
+   "difficulty": 2,
+   "prompt": "Which of these types implement the `Copy` trait, so that assignment leaves the original variable valid? (Select all that apply.)",
+   "options": {
+    "A": "`i32`",
+    "B": "`bool`",
+    "C": "`String`",
+    "D": "`(i32, bool)`",
+    "E": "`Vec<i32>`"
+   },
+   "answer": [
+    "A",
+    "B",
+    "D"
+   ],
+   "explanation": "Simple fixed-size stack types like integers, `bool`, floats, `char`, and tuples made only of `Copy` types implement `Copy`. `String` and `Vec` manage heap memory (they implement `Drop`), so they cannot be `Copy` and are moved instead."
+  },
+  {
+   "id": "ch04-q11",
+   "section": "4.1 What Is Ownership?",
+   "tag": "Code Output",
+   "difficulty": 3,
+   "prompt": "What happens when this code is compiled and run?",
+   "code": "fn main() {\n    let s = String::from(\"hello\");\n    {\n        let t = s;\n        println!(\"{t}\");\n    }\n    println!(\"{s}\");\n}",
+   "options": {
+    "A": "It prints \"hello\" twice: `s` becomes valid again once `t` goes out of scope.",
+    "B": "It prints \"hello\" once, then panics at runtime on the second `println!`.",
+    "C": "It fails to compile: `s` was moved into `t`, and a move is permanent even after `t`'s scope ends.",
+    "D": "It fails to compile because you cannot move a value into an inner scope."
+   },
+   "answer": "C",
+   "explanation": "The move into `t` permanently invalidates `s`; when the inner scope ends, the `String` is dropped by `t`, not returned to `s`. The second `println!` is a compile-time borrow-of-moved-value error."
+  },
+  {
+   "id": "ch04-q12",
+   "section": "4.2 References and Borrowing",
+   "tag": "Concept",
+   "difficulty": 1,
+   "prompt": "What does creating a reference with `&s1` and passing it to a function accomplish?",
+   "options": {
+    "A": "It transfers ownership to the function, which must return it back.",
+    "B": "It lets the function refer to the value without taking ownership, so the value is not dropped when the reference goes out of scope.",
+    "C": "It makes a cheap copy of the heap data for the function to use.",
+    "D": "It increments a runtime reference count that keeps the value alive."
+   },
+   "answer": "B",
+   "explanation": "Passing `&s1` borrows the value: the function can read it, but ownership stays with the caller, so nothing is dropped when the reference's scope ends. This avoids moving values into and back out of every function."
+  },
+  {
+   "id": "ch04-q13",
+   "section": "4.2 References and Borrowing",
+   "tag": "Spot the Bug",
+   "difficulty": 2,
+   "prompt": "This code fails to compile. What is wrong, and what changes fix it?",
+   "code": "fn main() {\n    let s = String::from(\"hello\");\n    change(&s);\n}\n\nfn change(some_string: &String) {\n    some_string.push_str(\", world\");\n}",
+   "options": {
+    "A": "`push_str` does not exist on `String`; use the `+` operator instead.",
+    "B": "References cannot be passed across function boundaries; pass `s` by value.",
+    "C": "References are immutable by default; declare `let mut s`, pass `&mut s`, and take `some_string: &mut String`.",
+    "D": "The code compiles; the mutation just silently does nothing through a shared reference."
+   },
+   "answer": "C",
+   "explanation": "You cannot mutate through an immutable reference. The fix needs all three pieces: a mutable owner (`let mut s`), a mutable borrow at the call site (`&mut s`), and a `&mut String` parameter."
+  },
+  {
+   "id": "ch04-q14",
+   "section": "4.2 References and Borrowing",
+   "tag": "Code Output",
+   "difficulty": 2,
+   "prompt": "What happens when this code is compiled and run?",
+   "code": "let mut s = String::from(\"hello\");\nlet r1 = &mut s;\nlet r2 = &mut s;\nprintln!(\"{r1}, {r2}\");",
+   "options": {
+    "A": "It prints \"hello, hello\": both mutable references read the same value.",
+    "B": "It fails to compile with E0499: cannot borrow `s` as mutable more than once at a time.",
+    "C": "It compiles but the behavior is undefined because of the aliasing pointers.",
+    "D": "It panics at runtime when the second mutable borrow is created."
+   },
+   "answer": "B",
+   "explanation": "Rust allows at most one active mutable reference to a value; since `r1` is still used in the `println!`, creating `r2` is a compile-time error. This restriction rules out data races at compile time."
+  },
+  {
+   "id": "ch04-q15",
+   "section": "4.2 References and Borrowing",
+   "tag": "Code Output",
+   "difficulty": 3,
+   "prompt": "What happens when this code is compiled and run?",
+   "code": "let mut s = String::from(\"hello\");\nlet r1 = &s;\nlet r2 = &s;\nprintln!(\"{r1} and {r2}\");\nlet r3 = &mut s;\nr3.push_str(\" world\");\nprintln!(\"{r3}\");",
+   "options": {
+    "A": "Compile error: `r1` and `r2` are immutable borrows still in scope when `r3` is created.",
+    "B": "Compile error: you can never mix `&` and `&mut` borrows of the same variable in one function.",
+    "C": "It compiles and prints \"hello and hello\" then \"hello world\": the immutable borrows end at their last use, so the mutable borrow is allowed.",
+    "D": "It compiles but panics at runtime because `r3` invalidates `r1` and `r2`."
+   },
+   "answer": "C",
+   "explanation": "A reference's borrow lasts only until its last use (non-lexical lifetimes), not to the end of the scope. `r1` and `r2` are last used in the first `println!`, so `&mut s` afterward is perfectly legal."
+  },
+  {
+   "id": "ch04-q16",
+   "section": "4.2 References and Borrowing",
+   "tag": "Spot the Bug",
+   "difficulty": 3,
+   "prompt": "This code fails to compile with E0502. Which exact detail makes it an error, given that non-lexical lifetimes exist?",
+   "code": "let mut s = String::from(\"hello\");\nlet r1 = &s;\nlet r3 = &mut s;\nprintln!(\"{r1}, {r3}\");",
+   "options": {
+    "A": "Creating `&mut s` after any `&s` is always an error, no matter how the references are used.",
+    "B": "`r1` is used in the `println!` after `r3` is created, so the immutable borrow is still live at the point of the mutable borrow.",
+    "C": "`println!` can only take one reference argument at a time.",
+    "D": "`r3` must be declared `mut` itself, as in `let mut r3 = &mut s;`."
+   },
+   "answer": "B",
+   "explanation": "With NLL the immutable borrow would end at its last use — but here `r1`'s last use is after `&mut s` is created, so both borrows are simultaneously live, violating the one-`&mut`-XOR-many-`&` rule. Deleting `r1` from the `println!` would make it compile."
+  },
+  {
+   "id": "ch04-q17",
+   "section": "4.2 References and Borrowing",
+   "tag": "Concept",
+   "difficulty": 1,
+   "prompt": "Which statement correctly summarizes Rust's rules of references?",
+   "options": {
+    "A": "At any given time you can have either one mutable reference or any number of immutable references, and references must always be valid.",
+    "B": "You can have at most one reference of any kind to a value at a time.",
+    "C": "You can have unlimited mutable references as long as only one thread is running.",
+    "D": "You can mix any number of mutable and immutable references as long as you do not write through two of them on the same line."
+   },
+   "answer": "A",
+   "explanation": "The two rules: one mutable reference XOR any number of immutable references at a time, and references must always point to valid data. Together they prevent data races and dangling pointers at compile time."
+  },
+  {
+   "id": "ch04-q18",
+   "section": "4.2 References and Borrowing",
+   "tag": "Spot the Bug",
+   "difficulty": 2,
+   "prompt": "Why does this function fail to compile, and what is the fix?",
+   "code": "fn dangle() -> &String {\n    let s = String::from(\"hello\");\n    &s\n}",
+   "options": {
+    "A": "`String::from` cannot be used inside a function that returns a reference.",
+    "B": "It compiles, but calling it returns a null reference at runtime.",
+    "C": "It returns a reference to `s`, which is dropped when the function ends — a dangling reference; fix it by returning the owned `String` (`s`) directly.",
+    "D": "The return type should be `&str` instead of `&String`; that alone makes it compile."
+   },
+   "answer": "C",
+   "explanation": "`s` is dropped at the end of `dangle`, so the returned reference would point to freed memory; the compiler rejects it (\"there is no value for it to be borrowed from\"). Returning the `String` itself moves ownership out, so nothing dangles. Changing to `&str` would not help — the local is still dropped."
+  },
+  {
+   "id": "ch04-q19",
+   "section": "4.2 References and Borrowing",
+   "tag": "Behavior",
+   "difficulty": 3,
+   "prompt": "Which of the following statements about Rust's borrowing rules are true? (Select all that apply.)",
+   "options": {
+    "A": "You may hold any number of simultaneous immutable references to a value.",
+    "B": "You may hold one mutable and one immutable reference at the same time, as long as both are used afterwards.",
+    "C": "A reference's borrow ends at the reference's last use, not necessarily at the end of its lexical scope.",
+    "D": "Violating the borrowing rules causes a panic the first time the offending reference is dereferenced at runtime.",
+    "E": "You may create a mutable reference after earlier immutable references have already had their last use."
+   },
+   "answer": [
+    "A",
+    "C",
+    "E"
+   ],
+   "explanation": "Many readers are fine (A); borrows end at last use under NLL (C), which is exactly why E is allowed. Mixing a live `&mut` with a live `&` is forbidden (B), and all of this is enforced at compile time, never as a runtime panic (D)."
+  },
+  {
+   "id": "ch04-q20",
+   "section": "4.2 References and Borrowing",
+   "tag": "Behavior",
+   "difficulty": 2,
+   "prompt": "Does this code compile, and why?",
+   "code": "let mut s = String::from(\"hello\");\n{\n    let r1 = &mut s;\n    r1.push_str(\" world\");\n}\nlet r2 = &mut s;\nr2.push_str(\"!\");\nprintln!(\"{r2}\");",
+   "options": {
+    "A": "No: once a value has been mutably borrowed, it can never be mutably borrowed again.",
+    "B": "Yes: `r1` goes out of scope before `r2` is created, so the two mutable borrows are sequential, not simultaneous — it prints \"hello world!\".",
+    "C": "No: `s` must be re-declared `mut` before each new mutable borrow.",
+    "D": "Yes, but only because the inner block copies `s` rather than borrowing it."
+   },
+   "answer": "B",
+   "explanation": "The one-mutable-reference rule forbids simultaneous mutable borrows, not repeated ones. `r1` ends with the inner scope, so `r2` is the only live mutable reference when it is created."
+  },
+  {
+   "id": "ch04-q21",
+   "section": "4.2 References and Borrowing",
+   "tag": "Misconception",
+   "difficulty": 3,
+   "prompt": "\"Rust's one-mutable-reference rule must be enforced with runtime locks, which slows programs down.\" What is actually true?",
+   "options": {
+    "A": "Correct: every `&mut` acquires a hidden mutex at runtime.",
+    "B": "Partially correct: the rule is checked at runtime, but only in debug builds.",
+    "C": "Wrong: the rule is enforced entirely by the borrow checker at compile time, preventing data races with zero runtime cost.",
+    "D": "Wrong: the rule is merely a lint; ignoring the warning gives undefined behavior."
+   },
+   "answer": "C",
+   "explanation": "The borrow checker statically proves that no value has a writer aliased with other readers or writers, so compiled code needs no locks or counters for this guarantee. Data races become compile errors, not runtime failures."
+  },
+  {
+   "id": "ch04-q22",
+   "section": "4.3 The Slice Type",
+   "tag": "Concept",
+   "difficulty": 1,
+   "prompt": "What is the type of `s` in `let s = \"Hello, world!\";`, and where does the data live?",
+   "options": {
+    "A": "`String` — the text is allocated on the heap at startup.",
+    "B": "`&str` — a string slice pointing at data stored directly in the compiled binary, which is why literals are immutable.",
+    "C": "`char` array — each character is stored separately on the stack.",
+    "D": "`&String` — a reference to a global `String` created by the compiler."
+   },
+   "answer": "B",
+   "explanation": "String literals are `&str`: slices pointing at bytes baked into the binary. That storage is read-only, which is exactly why literals cannot be mutated."
+  },
+  {
+   "id": "ch04-q23",
+   "section": "4.3 The Slice Type",
+   "tag": "Code Output",
+   "difficulty": 3,
+   "prompt": "Given `fn first_word(s: &str) -> &str` that returns a slice of the input, what happens here?",
+   "code": "fn main() {\n    let mut s = String::from(\"hello world\");\n    let word = first_word(&s);\n    s.clear();\n    println!(\"the first word is: {word}\");\n}",
+   "options": {
+    "A": "It prints \"the first word is: hello\" because `word` was computed before `clear`.",
+    "B": "It prints an empty first word because `word` re-reads `s` lazily.",
+    "C": "It panics at runtime: `word` points into a buffer that `clear` emptied.",
+    "D": "It fails to compile with E0502: `clear` needs a mutable borrow of `s`, but `word` is an immutable borrow of `s` that is still used in the `println!`."
+   },
+   "answer": "D",
+   "explanation": "The returned slice borrows from `s`, and `clear` requires `&mut self`. Since `word` is used after the `clear` call, the immutable borrow is still live at the mutation point — a compile error, which is exactly the bug class slices are designed to catch."
+  },
+  {
+   "id": "ch04-q24",
+   "section": "4.3 The Slice Type",
+   "tag": "Concept",
+   "difficulty": 1,
+   "prompt": "For `let s = String::from(\"hello\");`, which expression is equivalent to `&s[..]`?",
+   "options": {
+    "A": "`&s[0..s.len()]`",
+    "B": "`&s[1..s.len()]`",
+    "C": "`s.clone()`",
+    "D": "`&s[0..0]`"
+   },
+   "answer": "A",
+   "explanation": "In range slice syntax, omitting the start defaults it to 0 and omitting the end defaults it to the length, so `&s[..]` is a slice of the entire string — the same as `&s[0..s.len()]`."
+  },
+  {
+   "id": "ch04-q25",
+   "section": "4.3 The Slice Type",
+   "tag": "Spot the Bug",
+   "difficulty": 2,
+   "prompt": "This program compiles and runs without errors. What is the bug the book warns about?",
+   "code": "fn first_word(s: &String) -> usize {\n    let bytes = s.as_bytes();\n    for (i, &item) in bytes.iter().enumerate() {\n        if item == b' ' {\n            return i;\n        }\n    }\n    s.len()\n}\n\nfn main() {\n    let mut s = String::from(\"hello world\");\n    let word = first_word(&s);\n    s.clear();\n}",
+   "options": {
+    "A": "`first_word` reads past the end of the string when there is no space.",
+    "B": "`word` is a plain `usize` detached from `s`: after `s.clear()` it still holds 5, an index that no longer means anything, and the compiler cannot catch the desynchronization.",
+    "C": "`s.clear()` fails to compile because `word` still borrows `s`.",
+    "D": "Iterating with `as_bytes` breaks on any non-ASCII input, causing a panic."
+   },
+   "answer": "B",
+   "explanation": "Because the returned index carries no connection to the `String`, nothing stops the data from changing underneath it — a silent logic bug. Returning a `&str` slice instead ties the result to the data, turning this into a compile error (E0502)."
+  },
+  {
+   "id": "ch04-q26",
+   "section": "4.3 The Slice Type",
+   "tag": "Behavior",
+   "difficulty": 2,
+   "prompt": "Given `fn first_word(s: &str) -> &str` and `let my_string = String::from(\"hello world\");`, which calls compile? (Select all that apply.)",
+   "options": {
+    "A": "`first_word(&my_string)` — a `&String` argument",
+    "B": "`first_word(my_string)` — passing the `String` by value",
+    "C": "`first_word(\"hello world\")` — a string literal",
+    "D": "`first_word(&my_string[0..6])` — a slice of the `String`",
+    "E": "`first_word(5)` — an integer index"
+   },
+   "answer": [
+    "A",
+    "C",
+    "D"
+   ],
+   "explanation": "Taking `&str` as the parameter type is the flexible choice: it accepts slices, literals (which are already `&str`), and `&String` via deref coercion. Passing an owned `String` by value or an integer is a type mismatch."
+  },
+  {
+   "id": "ch04-q27",
+   "section": "4.3 The Slice Type",
+   "tag": "Code Output",
+   "difficulty": 2,
+   "prompt": "What does this code print, and what is the type of `slice`?",
+   "code": "let a = [1, 2, 3, 4, 5];\nlet slice = &a[1..3];\nprintln!(\"{:?}\", slice);",
+   "options": {
+    "A": "It prints \"[2, 3]\"; `slice` has type `&[i32]`.",
+    "B": "It prints \"[1, 2, 3]\"; `slice` has type `&[i32; 3]`.",
+    "C": "It prints \"[2, 3, 4]\"; ranges in Rust are inclusive of the end index.",
+    "D": "Compile error: slices only work on `String`, not arrays."
+   },
+   "answer": "A",
+   "explanation": "Slices work on arrays too: `&a[1..3]` covers indices 1 and 2 (the end is exclusive), giving `[2, 3]` with type `&[i32]` — a pointer plus a length, just like a string slice."
+  },
+  {
+   "id": "ch04-q28",
+   "section": "4.3 The Slice Type",
+   "tag": "Concept",
+   "difficulty": 3,
+   "prompt": "Which of the following statements about slices are true? (Select all that apply.)",
+   "options": {
+    "A": "A string slice `&str` stores a pointer to the starting byte and a length; it does not own the data.",
+    "B": "A string slice owns its data and frees it when the slice goes out of scope.",
+    "C": "String literals such as `\"hello\"` have type `&str`.",
+    "D": "Slicing a `String` in the middle of a multibyte UTF-8 character compiles, but the program will exit with an error at runtime.",
+    "E": "A slice of an `[i32; 5]` array has type `&[i32; 5]`."
+   },
+   "answer": [
+    "A",
+    "C",
+    "D"
+   ],
+   "explanation": "A slice is a borrowed view (pointer + length), never an owner, and literals are `&str` into the binary. String slice boundaries are checked at runtime, so slicing mid-character panics; an array slice erases the length from the type, giving `&[i32]`, not `&[i32; 5]`."
+  }
+ ]
+}

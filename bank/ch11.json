@@ -1,0 +1,288 @@
+{
+  "chapter": 11,
+  "title": "Writing Automated Tests",
+  "link": "https://doc.rust-lang.org/book/ch11-00-testing.html",
+  "questions": [
+    {
+      "id": "ch11-q01",
+      "section": "11.1 How to Write Tests",
+      "tag": "Concept",
+      "difficulty": 1,
+      "prompt": "How does the Rust test runner know which functions in a crate are tests?",
+      "options": {
+        "A": "It runs every function defined in a file named `test.rs`",
+        "B": "It runs every function annotated with the `#[test]` attribute",
+        "C": "It runs every function whose name starts with `test_`",
+        "D": "It runs every `pub` function inside a module named `tests`"
+      },
+      "answer": "B",
+      "explanation": "A test in Rust is any function annotated with the `#[test]` attribute. When you run `cargo test`, Cargo builds a test runner binary that runs each annotated function and reports whether it passes or fails; names and file locations are just conventions."
+    },
+    {
+      "id": "ch11-q02",
+      "section": "11.1 How to Write Tests",
+      "tag": "Code Output",
+      "difficulty": 2,
+      "prompt": "What happens when this test runs under `cargo test`?",
+      "code": "pub fn add_two(a: u64) -> u64 {\n    a + 3\n}\n\n#[cfg(test)]\nmod tests {\n    use super::*;\n\n    #[test]\n    fn it_adds_two() {\n        let result = add_two(2);\n        assert_eq!(result, 4);\n    }\n}",
+      "options": {
+        "A": "The test passes",
+        "B": "The test fails, printing `assertion \\`left == right\\` failed` with `left: 5` and `right: 4`",
+        "C": "The test fails, printing `left: 4` and `right: 5` because the expected value is always shown as `left`",
+        "D": "The code does not compile because `assert_eq!` cannot compare a variable to a literal"
+      },
+      "answer": "B",
+      "explanation": "`add_two(2)` returns `5` because of the `a + 3` bug, so `assert_eq!` panics. The failure output labels the first argument `left` (here `result`, which is `5`) and the second `right` (here `4`), printing both with `Debug` formatting."
+    },
+    {
+      "id": "ch11-q03",
+      "section": "11.1 How to Write Tests",
+      "tag": "Misconception",
+      "difficulty": 1,
+      "prompt": "A teammate insists that `assert_eq!` must be called as `assert_eq!(expected, actual)` or the comparison will be wrong. What is the actual convention in Rust?",
+      "options": {
+        "A": "They are right: the first argument must be the expected value or the test misbehaves",
+        "B": "The order is reversed: the actual value must come first or the macro panics",
+        "C": "The order does not affect the result; Rust just labels the two arguments `left` and `right` in the failure message",
+        "D": "The order only matters for `assert_ne!`, not `assert_eq!`"
+      },
+      "answer": "C",
+      "explanation": "Unlike some languages that call the arguments `expected` and `actual`, Rust names them `left` and `right`, and the order in which we specify the value we expect versus the value the code produces doesn't change whether the assertion passes. It only changes which side each value is printed on in a failure message."
+    },
+    {
+      "id": "ch11-q04",
+      "section": "11.1 How to Write Tests",
+      "tag": "Code Output",
+      "difficulty": 2,
+      "prompt": "When this test runs, what does the failure output contain?",
+      "code": "pub fn greeting(_name: &str) -> String {\n    String::from(\"Hello!\")\n}\n\n#[test]\nfn greeting_contains_name() {\n    let result = greeting(\"Carol\");\n    assert!(\n        result.contains(\"Carol\"),\n        \"Greeting did not contain name, value was `{result}`\"\n    );\n}",
+      "options": {
+        "A": "Only the generic message `assertion failed: result.contains(\"Carol\")`",
+        "B": "The custom message `Greeting did not contain name, value was `Hello!``",
+        "C": "Nothing; the test passes because `greeting` returns a non-empty string",
+        "D": "It does not compile: `assert!` accepts exactly one argument"
+      },
+      "answer": "B",
+      "explanation": "Arguments after the condition are passed along to `format!`, so the panic message is the custom string with `{result}` interpolated to `Hello!`. Custom messages replace the generic `assertion failed` text and make failures easier to debug."
+    },
+    {
+      "id": "ch11-q05",
+      "section": "11.1 How to Write Tests",
+      "tag": "Code Output",
+      "difficulty": 3,
+      "prompt": "The two panic messages in `Guess::new` were accidentally swapped. What is the result of running this test?",
+      "code": "pub struct Guess {\n    value: i32,\n}\n\nimpl Guess {\n    pub fn new(value: i32) -> Guess {\n        if value < 1 {\n            panic!(\"Guess value must be less than or equal to 100, got {value}.\");\n        } else if value > 100 {\n            panic!(\"Guess value must be greater than or equal to 1, got {value}.\");\n        }\n        Guess { value }\n    }\n}\n\n#[test]\n#[should_panic(expected = \"less than or equal to 100\")]\nfn greater_than_100() {\n    Guess::new(200);\n}",
+      "options": {
+        "A": "The test passes because the code panicked, and that is all `#[should_panic]` requires",
+        "B": "The test fails with a note that the panic message did not contain the expected string",
+        "C": "The code does not compile because `should_panic` does not accept an `expected` parameter",
+        "D": "The test is reported as ignored because the panic message did not match"
+      },
+      "answer": "B",
+      "explanation": "With `expected = \"...\"`, the test passes only if the panic message contains that substring. `Guess::new(200)` panics with `\"...greater than or equal to 1...\"`, which does not contain `\"less than or equal to 100\"`, so the harness fails the test and reports that the panic did not contain the expected string."
+    },
+    {
+      "id": "ch11-q06",
+      "section": "11.1 How to Write Tests",
+      "tag": "Spot the Bug",
+      "difficulty": 3,
+      "prompt": "This test is rejected by the compiler. Why?",
+      "code": "#[test]\n#[should_panic]\nfn returns_err() -> Result<(), String> {\n    Err(String::from(\"boom\"))\n}",
+      "options": {
+        "A": "Nothing is wrong; returning `Err` counts as a panic, so the test passes",
+        "B": "`#[should_panic]` cannot be used on a test that returns `Result<T, E>`; the two are incompatible",
+        "C": "Test functions are never allowed to have a return type",
+        "D": "`Err` values must be created with the `?` operator inside tests"
+      },
+      "answer": "B",
+      "explanation": "You can't use the `#[should_panic]` annotation on tests that use `Result<T, E>`. Returning `Err` is a failure signal, not a panic, so the combination is meaningless and rejected. To assert that an operation returns an `Err`, use `assert!(value.is_err())` instead."
+    },
+    {
+      "id": "ch11-q07",
+      "section": "11.1 How to Write Tests",
+      "tag": "Concept",
+      "difficulty": 2,
+      "prompt": "Which of the following are true about test functions that return `Result<(), String>`? (Select all that apply.)",
+      "options": {
+        "A": "They can use the `?` operator to fail the test early if a fallible operation returns `Err`",
+        "B": "They pass when they return `Ok(())` and fail when they return an `Err`",
+        "C": "They can additionally be annotated with `#[should_panic]` to check panics",
+        "D": "To assert that an operation returns `Err`, you should use `assert!(value.is_err())` rather than `?`",
+        "E": "Returning an `Err` causes the test to be reported as ignored rather than failed"
+      },
+      "answer": ["A", "B", "D"],
+      "explanation": "`Result`-returning tests pass on `Ok(())`, fail on `Err`, and conveniently allow `?` in the body. They cannot be combined with `#[should_panic]`, and an `Err` is a failure, not an ignore; to check that something errors, assert `is_err()` instead of propagating with `?`."
+    },
+    {
+      "id": "ch11-q08",
+      "section": "11.1 How to Write Tests",
+      "tag": "Spot the Bug",
+      "difficulty": 2,
+      "prompt": "This test module fails to compile. What is the fix?",
+      "code": "struct Point {\n    x: i32,\n    y: i32,\n}\n\n#[cfg(test)]\nmod tests {\n    use super::*;\n\n    #[test]\n    fn points_equal() {\n        assert_eq!(Point { x: 1, y: 2 }, Point { x: 1, y: 2 });\n    }\n}",
+      "options": {
+        "A": "Add `#[derive(PartialEq, Debug)]` to `Point`, since `assert_eq!` needs to compare and print the values",
+        "B": "Replace `assert_eq!` with `assert!`, because `assert_eq!` only works on primitive types",
+        "C": "Mark `Point` and its fields `pub`, because tests cannot see private structs",
+        "D": "Move the test out of the `#[cfg(test)]` module, which blocks trait resolution"
+      },
+      "answer": "A",
+      "explanation": "`assert_eq!` requires the compared values to implement `PartialEq` (for `==`) and `Debug` (to print `left`/`right` on failure). Both are derivable, so adding `#[derive(PartialEq, Debug)]` fixes the build. Visibility is not the issue: the child `tests` module can access private items."
+    },
+    {
+      "id": "ch11-q09",
+      "section": "11.2 Controlling How Tests Are Run",
+      "tag": "Concept",
+      "difficulty": 1,
+      "prompt": "In the command `cargo test -- --test-threads=1`, what is the role of the bare `--`?",
+      "options": {
+        "A": "It marks the end of the command so the shell does not interpret the remaining flags",
+        "B": "It separates arguments meant for `cargo test` itself from arguments passed to the compiled test binary",
+        "C": "It tells Cargo to rebuild the tests from scratch before running them",
+        "D": "It is required before every flag when running tests on Windows"
+      },
+      "answer": "B",
+      "explanation": "Arguments before `--` go to `cargo test`, and arguments after `--` go to the resulting test binary. That is why `cargo test --help` and `cargo test -- --help` show two different sets of options."
+    },
+    {
+      "id": "ch11-q10",
+      "section": "11.2 Controlling How Tests Are Run",
+      "tag": "Spot the Bug",
+      "difficulty": 2,
+      "prompt": "These two tests each pass alone but fail intermittently when running `cargo test`. What is the root cause?",
+      "code": "use std::fs;\n\n#[test]\nfn writes_config_a() {\n    fs::write(\"test-output.txt\", \"a\").unwrap();\n    let contents = fs::read_to_string(\"test-output.txt\").unwrap();\n    assert_eq!(contents, \"a\");\n}\n\n#[test]\nfn writes_config_b() {\n    fs::write(\"test-output.txt\", \"b\").unwrap();\n    let contents = fs::read_to_string(\"test-output.txt\").unwrap();\n    assert_eq!(contents, \"b\");\n}",
+      "options": {
+        "A": "`fs::write` is asynchronous, so the file may not exist when `read_to_string` runs",
+        "B": "Tests run in parallel by default, so both tests race on the same file; run them with `cargo test -- --test-threads=1` or use distinct files",
+        "C": "`cargo test` runs each test twice, and the second run sees stale data",
+        "D": "`assert_eq!` compares `String` to `&str`, which fails nondeterministically"
+      },
+      "answer": "B",
+      "explanation": "By default the test harness runs tests in parallel on multiple threads, so tests must not depend on shared mutable state such as a common file. Either make each test use its own file or serialize execution with `cargo test -- --test-threads=1`."
+    },
+    {
+      "id": "ch11-q11",
+      "section": "11.2 Controlling How Tests Are Run",
+      "tag": "Code Output",
+      "difficulty": 2,
+      "prompt": "Running `cargo test` (with no extra flags) on this code, which `println!` output appears in the terminal?",
+      "code": "fn prints_and_returns_10(a: i32) -> i32 {\n    println!(\"I got the value {a}\");\n    10\n}\n\n#[test]\nfn this_test_will_pass() {\n    let value = prints_and_returns_10(4);\n    assert_eq!(value, 10);\n}\n\n#[test]\nfn this_test_will_fail() {\n    let value = prints_and_returns_10(8);\n    assert_eq!(value, 5);\n}",
+      "options": {
+        "A": "Both `I got the value 4` and `I got the value 8`",
+        "B": "Only `I got the value 4`, from the passing test",
+        "C": "Only `I got the value 8`, shown in the failing test's output",
+        "D": "Neither line; `println!` never works inside tests"
+      },
+      "answer": "C",
+      "explanation": "The harness captures standard output of passing tests, so `I got the value 4` is swallowed, while output from the failing test is shown along with the failure message. To also see output from passing tests, run `cargo test -- --show-output`."
+    },
+    {
+      "id": "ch11-q12",
+      "section": "11.2 Controlling How Tests Are Run",
+      "tag": "Behavior",
+      "difficulty": 1,
+      "prompt": "A crate has tests named `add_two_and_two`, `add_three_and_two`, and `one_hundred`. What does `cargo test add` do?",
+      "options": {
+        "A": "Runs only a test named exactly `add`, and errors because none exists",
+        "B": "Runs `add_two_and_two` and `add_three_and_two`; `one_hundred` is reported as filtered out",
+        "C": "Runs all three tests, because the filter only affects display order",
+        "D": "Runs nothing until you also pass `--filter` after `--`"
+      },
+      "answer": "B",
+      "explanation": "The first positional argument to `cargo test` is a filter: any test whose full name (including its module path) contains the substring runs. `one_hundred` doesn't match, so it is counted under `filtered out`; only one filter value can be passed this way."
+    },
+    {
+      "id": "ch11-q13",
+      "section": "11.2 Controlling How Tests Are Run",
+      "tag": "Behavior",
+      "difficulty": 2,
+      "prompt": "Which statements about `#[ignore]` are true? (Select all that apply.)",
+      "options": {
+        "A": "`cargo test` skips tests annotated with `#[ignore]` and lists them as ignored in the summary",
+        "B": "`cargo test -- --ignored` runs only the ignored tests",
+        "C": "`cargo test -- --include-ignored` runs all tests, whether ignored or not",
+        "D": "`#[ignore]` excludes the test function from compilation entirely",
+        "E": "Ignored tests are counted as failures in the final summary"
+      },
+      "answer": ["A", "B", "C"],
+      "explanation": "`#[ignore]` marks expensive tests to be skipped by default; they still compile and appear as `ignored` (not failed) in the summary. `-- --ignored` runs only those tests, and `-- --include-ignored` runs everything."
+    },
+    {
+      "id": "ch11-q14",
+      "section": "11.3 Test Organization",
+      "tag": "Concept",
+      "difficulty": 1,
+      "prompt": "Why are unit test modules in `src/` conventionally annotated with `#[cfg(test)]`?",
+      "options": {
+        "A": "It tells the compiler to build the module only when running `cargo test`, keeping test code out of `cargo build` artifacts",
+        "B": "It grants the module access to private functions in the parent module",
+        "C": "It is required for the `#[test]` attribute to be recognized at all",
+        "D": "It makes the tests run in a separate process for isolation"
+      },
+      "answer": "A",
+      "explanation": "`#[cfg(test)]` is a conditional-compilation flag: the annotated module is compiled only for `cargo test`, which saves compile time and keeps test code and helpers out of the normal build. Private access comes from being a child module, not from `#[cfg(test)]`."
+    },
+    {
+      "id": "ch11-q15",
+      "section": "11.3 Test Organization",
+      "tag": "Misconception",
+      "difficulty": 2,
+      "prompt": "A colleague claims that private functions in Rust can never be unit tested. Is that correct?",
+      "options": {
+        "A": "Yes; tests can only ever exercise a crate's public API",
+        "B": "No; the `tests` module is a child of the module under test, so `use super::*;` brings private functions into scope for testing",
+        "C": "No, but only if the private function is temporarily marked `pub(crate)` during testing",
+        "D": "Yes, unless the function is annotated with `#[test_visible]`"
+      },
+      "answer": "B",
+      "explanation": "Rust's privacy rules let child modules use items from their ancestor modules. Because the unit test module lives in the same file as the code and typically starts with `use super::*;`, it can call private functions directly. Only integration tests in `tests/` are restricted to the public API."
+    },
+    {
+      "id": "ch11-q16",
+      "section": "11.3 Test Organization",
+      "tag": "Concept",
+      "difficulty": 3,
+      "prompt": "Which statements about integration tests in the `tests/` directory are true? (Select all that apply.)",
+      "options": {
+        "A": "Each file directly under `tests/` is compiled as its own separate crate",
+        "B": "Each test file must bring the library into scope, e.g. `use adder::add_two;`",
+        "C": "Code in `tests/` must be wrapped in a `#[cfg(test)]` module to be compiled as tests",
+        "D": "Integration tests can only call the library's public API, like any external user",
+        "E": "Files in `tests/` are also compiled during a plain `cargo build`"
+      },
+      "answer": ["A", "B", "D"],
+      "explanation": "Cargo compiles every top-level file in `tests/` as an independent crate, so each one must `use` the library and can only reach its public API. No `#[cfg(test)]` is needed there because Cargo compiles the `tests/` directory only when you run `cargo test`, never during `cargo build`."
+    },
+    {
+      "id": "ch11-q17",
+      "section": "11.3 Test Organization",
+      "tag": "Spot the Bug",
+      "difficulty": 2,
+      "prompt": "A shared helper was placed in `tests/common.rs`. The tests compile and pass, but `cargo test` output now shows an unwanted section `Running tests/common.rs` with `running 0 tests`. What is the idiomatic fix?",
+      "code": "// tests/common.rs\npub fn setup() {\n    // shared setup code\n}\n\n// tests/integration_test.rs\nuse adder::add_two;\n\nmod common;\n\n#[test]\nfn it_adds_two() {\n    common::setup();\n    assert_eq!(add_two(2), 4);\n}",
+      "options": {
+        "A": "Move the helper to `tests/common/mod.rs`; files in subdirectories of `tests/` are not compiled as separate test crates",
+        "B": "Add `#[cfg(test)]` at the top of `tests/common.rs` so Cargo stops treating it as a test",
+        "C": "Rename it to `tests/_common.rs`; a leading underscore hides files from the test runner",
+        "D": "Add an empty `#[test]` function to `common.rs` so the section is no longer empty"
+      },
+      "answer": "A",
+      "explanation": "Every top-level file in `tests/` becomes its own integration test crate, so `common.rs` shows up as a `running 0 tests` section. The older naming convention `tests/common/mod.rs` avoids this: subdirectory files aren't compiled as separate crates, and test files still reach the helpers via `mod common;`."
+    },
+    {
+      "id": "ch11-q18",
+      "section": "11.3 Test Organization",
+      "tag": "Concept",
+      "difficulty": 3,
+      "prompt": "A project contains only `src/main.rs`. An integration test `tests/cli.rs` with `use myapp::run;` fails to compile because the crate cannot be found. Why, and what is the standard remedy?",
+      "options": {
+        "A": "Binary crates don't expose functions for other crates to `use`; move the logic into `src/lib.rs` and have `src/main.rs` call it, then test the library",
+        "B": "The `tests/` directory only works for workspaces; add a `[workspace]` table to `Cargo.toml`",
+        "C": "Integration tests must import binaries with `use main::run;` instead of the package name",
+        "D": "Add `myapp` as a dev-dependency of itself in `Cargo.toml`"
+      },
+      "answer": "A",
+      "explanation": "Only library crates expose items that other crates can `use`; a binary crate's `src/main.rs` cannot be imported by integration tests. The standard structure is a thin `src/main.rs` that calls logic living in `src/lib.rs`, so integration tests can exercise the library with `use`, and the small remaining binary code doesn't need such tests."
+    }
+  ]
+}

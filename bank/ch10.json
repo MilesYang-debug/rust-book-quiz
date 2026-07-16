@@ -1,0 +1,462 @@
+{
+ "chapter": 10,
+ "title": "Generic Types, Traits, and Lifetimes",
+ "link": "https://doc.rust-lang.org/book/ch10-00-generics.html",
+ "questions": [
+  {
+   "id": "ch10-q01",
+   "section": "10.1 Generic Data Types",
+   "tag": "Concept",
+   "difficulty": 1,
+   "prompt": "In the signature `fn largest<T>(list: &[T]) -> &T`, what does the `<T>` after the function name do?",
+   "options": {
+    "A": "It declares a generic type parameter named `T` so the rest of the signature can use it",
+    "B": "It imports the type `T` from the standard library",
+    "C": "It tells the compiler to accept only types whose name is exactly `T`",
+    "D": "It marks the function as unsafe to call with more than one type"
+   },
+   "answer": "A",
+   "explanation": "Angle brackets after the function name declare generic type parameters. The declaration must appear before `T` can be used in the parameter list and return type."
+  },
+  {
+   "id": "ch10-q02",
+   "section": "10.1 Generic Data Types",
+   "tag": "Code Output",
+   "difficulty": 1,
+   "prompt": "What happens when you compile and run this program?",
+   "code": "struct Point<T> {\n    x: T,\n    y: T,\n}\n\nfn main() {\n    let wont_work = Point { x: 5, y: 4.0 };\n}",
+   "options": {
+    "A": "It compiles; `x` is inferred as `i32` and `y` as `f64`",
+    "B": "Compile error: `x` and `y` must have the same type `T`, but an integer and a float were given",
+    "C": "It compiles; the integer `5` is automatically converted to `5.0`",
+    "D": "Runtime panic due to a type mismatch when constructing the struct"
+   },
+   "answer": "B",
+   "explanation": "`Point<T>` uses a single generic parameter for both fields, so `x` and `y` must be the same concrete type. Using `5` fixes `T` as an integer, so `4.0` causes a mismatched-types compile error."
+  },
+  {
+   "id": "ch10-q03",
+   "section": "10.1 Generic Data Types",
+   "tag": "Concept",
+   "difficulty": 1,
+   "prompt": "How can you define a `Point` struct so that `Point { x: 5, y: 4.0 }` compiles?",
+   "options": {
+    "A": "struct Point<T> { x: T, y: T } — a single parameter already allows different field types",
+    "B": "struct Point<T, U> { x: T, y: U } — use two generic parameters, one per field",
+    "C": "struct Point { x: auto, y: auto } — use the `auto` keyword for inference",
+    "D": "It is impossible; struct fields can never have different generic types"
+   },
+   "answer": "B",
+   "explanation": "Declaring multiple generic parameters, `Point<T, U>`, lets each field take its own concrete type, so `x: 5` (integer) and `y: 4.0` (float) are both allowed."
+  },
+  {
+   "id": "ch10-q04",
+   "section": "10.1 Generic Data Types",
+   "tag": "Concept",
+   "difficulty": 2,
+   "prompt": "Why must you write `impl<T> Point<T>` (with `<T>` right after `impl`) when defining methods on the generic struct `Point<T>`?",
+   "options": {
+    "A": "It restricts the methods to the concrete type named `T` only",
+    "B": "It declares `T` as a generic parameter so the compiler knows `Point<T>` is a generic type, not a concrete one",
+    "C": "It is optional style; `impl Point<T>` alone means exactly the same thing",
+    "D": "It makes the methods generic over lifetimes as well as types"
+   },
+   "answer": "B",
+   "explanation": "Declaring `T` just after `impl` tells Rust that the `T` in `Point<T>` is a generic parameter being implemented over, rather than a concrete type. Without it, `impl Point<T>` would refer to a (nonexistent) concrete type named `T`."
+  },
+  {
+   "id": "ch10-q05",
+   "section": "10.1 Generic Data Types",
+   "tag": "Behavior",
+   "difficulty": 2,
+   "prompt": "What happens when you compile this program?",
+   "code": "struct Point<T> {\n    x: T,\n    y: T,\n}\n\nimpl Point<f32> {\n    fn distance_from_origin(&self) -> f32 {\n        (self.x.powi(2) + self.y.powi(2)).sqrt()\n    }\n}\n\nfn main() {\n    let p = Point { x: 5, y: 10 };\n    println!(\"{}\", p.distance_from_origin());\n}",
+   "options": {
+    "A": "It compiles and prints the distance, converting the integers to floats",
+    "B": "Compile error: `distance_from_origin` exists only on `Point<f32>`, and `p` is a `Point<i32>`",
+    "C": "Runtime panic because `powi` is not defined for integers",
+    "D": "Compile error: an `impl` block may not name a concrete type like `f32`"
+   },
+   "answer": "B",
+   "explanation": "An `impl Point<f32>` block defines methods only for that concrete instantiation. `p` is inferred as `Point<i32>`, which has no `distance_from_origin` method, so the call is a compile error."
+  },
+  {
+   "id": "ch10-q06",
+   "section": "10.1 Generic Data Types",
+   "tag": "Misconception",
+   "difficulty": 1,
+   "prompt": "A colleague claims: \"Using generics makes Rust programs slower at runtime than writing duplicate concrete functions.\" Why is this wrong?",
+   "options": {
+    "A": "Rust performs monomorphization: at compile time it generates specialized code for each concrete type, so generics have zero runtime cost",
+    "B": "It is actually correct: generics are resolved through vtables at runtime",
+    "C": "Generics are faster because the compiler skips type checking for generic code",
+    "D": "Generics are interpreted at runtime, but the JIT makes them as fast as concrete code"
+   },
+   "answer": "A",
+   "explanation": "The compiler monomorphizes generic code, producing a concrete version per type used (e.g., `Option<i32>` and `Option<f64>` become separate specialized definitions), so performance matches hand-written concrete code."
+  },
+  {
+   "id": "ch10-q07",
+   "section": "10.1 Generic Data Types",
+   "tag": "Spot the Bug",
+   "difficulty": 2,
+   "prompt": "This function fails to compile. What is the bug?",
+   "code": "fn largest<T>(list: &[T]) -> &T {\n    let mut largest = &list[0];\n    for item in list {\n        if item > largest {\n            largest = item;\n        }\n    }\n    largest\n}",
+   "options": {
+    "A": "The `>` comparison requires `T` to implement `PartialOrd`, so the signature needs the bound `T: std::cmp::PartialOrd`",
+    "B": "`&list[0]` is a dangling reference because `list` is borrowed",
+    "C": "You cannot return `&T` from a generic function; it must return `T` by value",
+    "D": "The loop variable `item` shadows `largest`, causing an infinite loop"
+   },
+   "answer": "A",
+   "explanation": "Not every possible `T` supports `>`. Comparison with `>` is defined by the `PartialOrd` trait, so the function must constrain `T` with `fn largest<T: PartialOrd>(list: &[T]) -> &T`."
+  },
+  {
+   "id": "ch10-q08",
+   "section": "10.1 Generic Data Types",
+   "tag": "Code Output",
+   "difficulty": 3,
+   "prompt": "What does this program print?",
+   "code": "struct Point<X1, Y1> {\n    x: X1,\n    y: Y1,\n}\n\nimpl<X1, Y1> Point<X1, Y1> {\n    fn mixup<X2, Y2>(self, other: Point<X2, Y2>) -> Point<X1, Y2> {\n        Point {\n            x: self.x,\n            y: other.y,\n        }\n    }\n}\n\nfn main() {\n    let p1 = Point { x: 5, y: 10.4 };\n    let p2 = Point { x: \"Hello\", y: 'c' };\n    let p3 = p1.mixup(p2);\n    println!(\"p3.x = {}, p3.y = {}\", p3.x, p3.y);\n}",
+   "options": {
+    "A": "p3.x = 5, p3.y = c",
+    "B": "p3.x = Hello, p3.y = 10.4",
+    "C": "Compile error: `mixup` cannot mix two different `Point` instantiations",
+    "D": "p3.x = 5, p3.y = 10.4"
+   },
+   "answer": "A",
+   "explanation": "`mixup` returns `Point<X1, Y2>`: `x` comes from `self` (`p1.x = 5`) and `y` from `other` (`p2.y = 'c'`). Method-level generics `X2, Y2` are independent of the struct's `X1, Y1`, so mixing instantiations is fine."
+  },
+  {
+   "id": "ch10-q09",
+   "section": "10.1 Generic Data Types",
+   "tag": "Concept",
+   "difficulty": 2,
+   "prompt": "Which of the following statements about Rust generics are TRUE? (Select all that apply.)",
+   "options": {
+    "A": "Generic code is turned into specialized concrete code for each type used, via monomorphization at compile time",
+    "B": "Generic functions always use dynamic dispatch through a vtable at runtime",
+    "C": "Enum variants can hold generic types, as in `Option<T>`'s `Some(T)` and `Result<T, E>`'s `Ok(T)` and `Err(E)`",
+    "D": "A generic parameter declared after `fn` in a method signature belongs to that method only, not to the struct's `impl` block",
+    "E": "In `struct Point<T> { x: T, y: T }`, the fields `x` and `y` may hold two different concrete types in one instance"
+   },
+   "answer": [
+    "A",
+    "C",
+    "D"
+   ],
+   "explanation": "Monomorphization gives generics zero runtime cost (so B is false), enums like `Option<T>` are generic, and generics after `fn` are method-local. A single `T` forces both fields of `Point<T>` to be the same type (so E is false)."
+  },
+  {
+   "id": "ch10-q10",
+   "section": "10.2 Traits: Defining Shared Behavior",
+   "tag": "Concept",
+   "difficulty": 1,
+   "prompt": "What is a trait in Rust?",
+   "options": {
+    "A": "A collection of method signatures (optionally with default bodies) that defines behavior a type can implement and share",
+    "B": "A concrete class that other types inherit fields and methods from",
+    "C": "A compile-time macro that generates struct definitions",
+    "D": "A runtime table mapping type names to their memory layouts"
+   },
+   "answer": "A",
+   "explanation": "A trait like `pub trait Summary { fn summarize(&self) -> String; }` groups method signatures describing shared behavior; types then provide implementations with `impl Summary for Type`."
+  },
+  {
+   "id": "ch10-q11",
+   "section": "10.2 Traits: Defining Shared Behavior",
+   "tag": "Spot the Bug",
+   "difficulty": 2,
+   "prompt": "In your own crate (which defines neither `Display` nor `Vec`), this code fails to compile. Why?",
+   "code": "use std::fmt;\n\nimpl fmt::Display for Vec<String> {\n    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {\n        write!(f, \"{} items\", self.len())\n    }\n}",
+   "options": {
+    "A": "The orphan rule: you can only implement a trait for a type if at least one of the trait or the type is local to your crate — here both are external",
+    "B": "`Display` cannot be implemented for container types like `Vec`",
+    "C": "The `fmt` method has the wrong signature for `Display`",
+    "D": "You must write `impl<T> fmt::Display for Vec<T>` to cover all element types first"
+   },
+   "answer": "A",
+   "explanation": "Both `Display` and `Vec<String>` are defined outside your crate, so coherence (the orphan rule) forbids the impl. This prevents two crates from providing conflicting implementations for the same type."
+  },
+  {
+   "id": "ch10-q12",
+   "section": "10.2 Traits: Defining Shared Behavior",
+   "tag": "Code Output",
+   "difficulty": 2,
+   "prompt": "What does this program print?",
+   "code": "pub trait Summary {\n    fn summarize_author(&self) -> String;\n\n    fn summarize(&self) -> String {\n        format!(\"(Read more from {}...)\", self.summarize_author())\n    }\n}\n\npub struct SocialPost {\n    pub username: String,\n    pub content: String,\n}\n\nimpl Summary for SocialPost {\n    fn summarize_author(&self) -> String {\n        format!(\"@{}\", self.username)\n    }\n}\n\nfn main() {\n    let post = SocialPost {\n        username: String::from(\"horse_ebooks\"),\n        content: String::from(\"of course, as you probably already know, people\"),\n    };\n    println!(\"{}\", post.summarize());\n}",
+   "options": {
+    "A": "(Read more from @horse_ebooks...)",
+    "B": "Compile error: `SocialPost` does not implement `summarize`",
+    "C": "@horse_ebooks: of course, as you probably already know, people",
+    "D": "(Read more from horse_ebooks...)"
+   },
+   "answer": "A",
+   "explanation": "The default `summarize` implementation calls the required method `summarize_author`, which the impl provides. Implementing only the required method is enough; the default fills in the rest."
+  },
+  {
+   "id": "ch10-q13",
+   "section": "10.2 Traits: Defining Shared Behavior",
+   "tag": "Concept",
+   "difficulty": 1,
+   "prompt": "The parameter syntax `pub fn notify(item: &impl Summary)` is syntax sugar for which longer form?",
+   "options": {
+    "A": "pub fn notify<T: Summary>(item: &T)",
+    "B": "pub fn notify(item: &dyn Summary)",
+    "C": "pub fn notify(item: &Summary)",
+    "D": "pub fn notify<T>(item: &T) — the bound is inferred automatically"
+   },
+   "answer": "A",
+   "explanation": "`impl Trait` in argument position is shorthand for a generic type parameter with a trait bound: `<T: Summary>(item: &T)`. It still uses static dispatch, unlike `&dyn Summary`."
+  },
+  {
+   "id": "ch10-q14",
+   "section": "10.2 Traits: Defining Shared Behavior",
+   "tag": "Behavior",
+   "difficulty": 3,
+   "prompt": "What is the key difference between these two signatures?",
+   "code": "pub fn notify_a(item1: &impl Summary, item2: &impl Summary) { /* ... */ }\n\npub fn notify_b<T: Summary>(item1: &T, item2: &T) { /* ... */ }",
+   "options": {
+    "A": "`notify_a` allows `item1` and `item2` to be two different concrete types; `notify_b` forces both to be the same concrete type",
+    "B": "They are fully equivalent in every call",
+    "C": "`notify_a` uses dynamic dispatch while `notify_b` uses static dispatch",
+    "D": "`notify_b` forces both arguments to be the same value, not just the same type"
+   },
+   "answer": "A",
+   "explanation": "Each `impl Summary` introduces its own independent generic parameter, so `notify_a` accepts, say, a `NewsArticle` and a `SocialPost` together. A single named `T` requires both arguments to have the same concrete type."
+  },
+  {
+   "id": "ch10-q15",
+   "section": "10.2 Traits: Defining Shared Behavior",
+   "tag": "Concept",
+   "difficulty": 2,
+   "prompt": "Which of these are valid ways to require that a parameter's type implements BOTH `Summary` and `Display`? (Select all that apply.)",
+   "options": {
+    "A": "pub fn notify(item: &(impl Summary + Display))",
+    "B": "pub fn notify<T: Summary + Display>(item: &T)",
+    "C": "pub fn notify<T>(item: &T) where T: Summary + Display",
+    "D": "pub fn notify(item: &impl Summary && Display)",
+    "E": "pub fn notify<T: Summary, Display>(item: &T)"
+   },
+   "answer": [
+    "A",
+    "B",
+    "C"
+   ],
+   "explanation": "Multiple trait bounds are combined with `+`, either inline on `impl Trait`, on a generic parameter, or in a `where` clause. `&&` is not bound syntax, and a bare `Display` after a comma declares a second type parameter, not a bound."
+  },
+  {
+   "id": "ch10-q16",
+   "section": "10.2 Traits: Defining Shared Behavior",
+   "tag": "Spot the Bug",
+   "difficulty": 3,
+   "prompt": "Assuming both `NewsArticle` and `SocialPost` implement `Summary`, why does this fail to compile?",
+   "code": "fn returns_summarizable(switch: bool) -> impl Summary {\n    if switch {\n        NewsArticle {\n            headline: String::from(\"Penguins win!\"),\n            location: String::from(\"Pittsburgh\"),\n            author: String::from(\"Iceburgh\"),\n            content: String::from(\"...\"),\n        }\n    } else {\n        SocialPost {\n            username: String::from(\"horse_ebooks\"),\n            content: String::from(\"of course\"),\n            reply: false,\n            repost: false,\n        }\n    }\n}",
+   "options": {
+    "A": "Returning `impl Summary` requires a single concrete return type, but the two branches return different types; a trait object like `Box<dyn Summary>` would be needed",
+    "B": "`impl Trait` is only allowed in parameter position, never as a return type",
+    "C": "The `if` and `else` branches must return references, not owned values",
+    "D": "`Summary` must also implement `Sized` before it can be returned"
+   },
+   "answer": "A",
+   "explanation": "`-> impl Summary` means the function returns one specific concrete type that the compiler infers; branches returning `NewsArticle` versus `SocialPost` violate that. Heterogeneous returns require trait objects such as `Box<dyn Summary>`."
+  },
+  {
+   "id": "ch10-q17",
+   "section": "10.2 Traits: Defining Shared Behavior",
+   "tag": "Behavior",
+   "difficulty": 2,
+   "prompt": "Given the definitions below, what happens if you call `pair.cmp_display()` where `pair` is a `Pair<Vec<i32>>` (and `Vec<i32>` does not implement `Display`)?",
+   "code": "use std::fmt::Display;\n\nstruct Pair<T> {\n    x: T,\n    y: T,\n}\n\nimpl<T> Pair<T> {\n    fn new(x: T, y: T) -> Self {\n        Self { x, y }\n    }\n}\n\nimpl<T: Display + PartialOrd> Pair<T> {\n    fn cmp_display(&self) {\n        if self.x >= self.y {\n            println!(\"The largest member is x = {}\", self.x);\n        } else {\n            println!(\"The largest member is y = {}\", self.y);\n        }\n    }\n}",
+   "options": {
+    "A": "Compile error: `cmp_display` is only defined when `T: Display + PartialOrd`, so it does not exist for `Pair<Vec<i32>>`",
+    "B": "It compiles but panics at runtime when trying to format the vector",
+    "C": "It compiles and prints the vector using `Debug` formatting as a fallback",
+    "D": "Compile error: you cannot have two `impl` blocks for the same struct"
+   },
+   "answer": "A",
+   "explanation": "Trait bounds on an `impl` block conditionally implement methods: `cmp_display` exists only for `Pair<T>` where `T: Display + PartialOrd`. For other `T`, the method simply is not defined, which is a compile-time error, not a runtime one."
+  },
+  {
+   "id": "ch10-q18",
+   "section": "10.2 Traits: Defining Shared Behavior",
+   "tag": "Concept",
+   "difficulty": 3,
+   "prompt": "Why can you call `3.to_string()` even though the integer types never explicitly implement `ToString`?",
+   "options": {
+    "A": "The standard library has a blanket implementation `impl<T: Display> ToString for T`, so every `Display` type gets `to_string` automatically",
+    "B": "`to_string` is a compiler built-in available on every type",
+    "C": "Integers implement `ToString` directly via `#[derive(ToString)]` in the standard library",
+    "D": "The compiler auto-derives `ToString` for any type used with the `{}` format specifier"
+   },
+   "answer": "A",
+   "explanation": "A blanket implementation implements a trait for every type satisfying a bound. Because integers implement `Display`, the stdlib's `impl<T: Display> ToString for T` gives them `to_string` for free."
+  },
+  {
+   "id": "ch10-q19",
+   "section": "10.2 Traits: Defining Shared Behavior",
+   "tag": "Misconception",
+   "difficulty": 2,
+   "prompt": "Which of the following statements about traits are TRUE? (Select all that apply.)",
+   "options": {
+    "A": "To call a trait method on a value, the trait must be in scope (e.g., `use aggregator::Summary;`)",
+    "B": "An overriding implementation of a method can call that same method's default implementation",
+    "C": "A default method body may call other methods of the same trait, including ones with no default that implementors must provide",
+    "D": "You may implement an external trait for an external type as long as you add a `#[orphan]` attribute",
+    "E": "Writing `impl Summary for NewsArticle {}` with an empty block makes `NewsArticle` use the trait's default implementations"
+   },
+   "answer": [
+    "A",
+    "C",
+    "E"
+   ],
+   "explanation": "Traits must be in scope to call their methods, defaults can call required methods, and an empty impl block opts into all defaults. It is not possible to call the default implementation from an overriding implementation, and there is no attribute that bypasses the orphan rule."
+  },
+  {
+   "id": "ch10-q20",
+   "section": "10.3 Validating References with Lifetimes",
+   "tag": "Code Output",
+   "difficulty": 1,
+   "prompt": "What happens when you compile this program?",
+   "code": "fn main() {\n    let r;\n    {\n        let x = 5;\n        r = &x;\n    }\n    println!(\"r: {r}\");\n}",
+   "options": {
+    "A": "It prints `r: 5` because the value 5 is copied into `r`",
+    "B": "Compile error: `x` does not live long enough — `r` would be a dangling reference after the inner scope ends",
+    "C": "Runtime panic when `println!` dereferences freed memory",
+    "D": "It prints an unspecified garbage value"
+   },
+   "answer": "B",
+   "explanation": "`x` is dropped at the end of the inner scope, but `r` (which borrows `x`) is used afterward. The borrow checker compares the two lifetimes and rejects the program at compile time (error E0597); Rust never lets this reach runtime."
+  },
+  {
+   "id": "ch10-q21",
+   "section": "10.3 Validating References with Lifetimes",
+   "tag": "Spot the Bug",
+   "difficulty": 2,
+   "prompt": "This function fails with \"missing lifetime specifier\". Why can't the compiler accept it as written?",
+   "code": "fn longest(x: &str, y: &str) -> &str {\n    if x.len() > y.len() {\n        x\n    } else {\n        y\n    }\n}",
+   "options": {
+    "A": "The compiler cannot tell whether the returned reference borrows from `x` or `y`, so it needs a generic lifetime like `fn longest<'a>(x: &'a str, y: &'a str) -> &'a str`",
+    "B": "Functions can never return string slices; the return type must be `String`",
+    "C": "The elision rules always fail for `&str` parameters, even with a single parameter",
+    "D": "The bug is the comparison: `len()` cannot be called on borrowed strings"
+   },
+   "answer": "A",
+   "explanation": "With two reference parameters and no `&self`, the elision rules cannot determine the output lifetime, and the return could refer to either input. Annotating all three with `'a` expresses the required relationship."
+  },
+  {
+   "id": "ch10-q22",
+   "section": "10.3 Validating References with Lifetimes",
+   "tag": "Concept",
+   "difficulty": 2,
+   "prompt": "In `fn longest<'a>(x: &'a str, y: &'a str) -> &'a str`, what does the lifetime `'a` actually mean for callers?",
+   "options": {
+    "A": "The returned reference is valid for the smaller (overlapping) region of the lifetimes of `x` and `y`",
+    "B": "Both arguments are forced to live exactly as long as each other, or the call will not compile",
+    "C": "The annotation extends the lifetimes of `x` and `y` until the return value is dropped",
+    "D": "The returned reference always has the `'static` lifetime"
+   },
+   "answer": "A",
+   "explanation": "Lifetime annotations describe relationships; they never change how long values live. The concrete lifetime substituted for `'a` is the part where both inputs are valid — i.e., the shorter of the two — and the result is usable only within it."
+  },
+  {
+   "id": "ch10-q23",
+   "section": "10.3 Validating References with Lifetimes",
+   "tag": "Code Output",
+   "difficulty": 3,
+   "prompt": "What happens when you compile this program?",
+   "code": "fn longest<'a>(x: &'a str, y: &'a str) -> &'a str {\n    if x.len() > y.len() { x } else { y }\n}\n\nfn main() {\n    let string1 = String::from(\"long string is long\");\n    let result;\n    {\n        let string2 = String::from(\"xyz\");\n        result = longest(string1.as_str(), string2.as_str());\n    }\n    println!(\"The longest string is {result}\");\n}",
+   "options": {
+    "A": "It prints `The longest string is long string is long` because `result` actually points into `string1`, which is still alive",
+    "B": "Compile error: `string2` does not live long enough, because `'a` becomes the shorter lifetime and `result` is used after the inner scope",
+    "C": "Runtime panic when `println!` reads the freed `string2`",
+    "D": "Compile error: `result` must be initialized when it is declared"
+   },
+   "answer": "B",
+   "explanation": "The signature ties the return to the shorter of the two input lifetimes ('a = the overlap). Even though the returned reference would in fact point to `string1`, the compiler reasons from the signature, so using `result` after `string2` is dropped is rejected."
+  },
+  {
+   "id": "ch10-q24",
+   "section": "10.3 Validating References with Lifetimes",
+   "tag": "Behavior",
+   "difficulty": 3,
+   "prompt": "The function `fn first_word(s: &str) -> &str` compiles without any lifetime annotations, while `fn longest(x: &str, y: &str) -> &str` does not. Which elision rule explains why `first_word` is accepted?",
+   "options": {
+    "A": "Rule 2: with exactly one input lifetime parameter, that lifetime is assigned to all output lifetimes, so the signature becomes `fn first_word<'a>(s: &'a str) -> &'a str`",
+    "B": "Rule 1: every reference parameter gets its own lifetime, which also covers the return type automatically for any number of parameters",
+    "C": "Rule 3: the lifetime of `&self` is assigned to the output — this applies to all free functions",
+    "D": "String slices are always `'static`, so `first_word` needs no lifetime relationship"
+   },
+   "answer": "A",
+   "explanation": "After rule 1 gives `s` a lifetime `'a`, rule 2 (exactly one input lifetime) assigns `'a` to the output. `longest` has two distinct input lifetimes and no `&self`, so no rule determines its output lifetime and annotations are required."
+  },
+  {
+   "id": "ch10-q25",
+   "section": "10.3 Validating References with Lifetimes",
+   "tag": "Spot the Bug",
+   "difficulty": 3,
+   "prompt": "This implementation of `longest` fails to compile. What is the fundamental problem?",
+   "code": "fn longest<'a>(x: &str, y: &str) -> &'a str {\n    let result = String::from(\"really long string\");\n    result.as_str()\n}",
+   "options": {
+    "A": "It returns a reference to `result`, a local `String` that is dropped when the function ends — no lifetime annotation can fix that; return an owned `String` instead",
+    "B": "`'a` must also be applied to `x` and `y` for the code to compile; adding those annotations fixes it",
+    "C": "`as_str()` is not allowed inside functions with lifetime parameters",
+    "D": "It compiles fine but leaks the `String` at runtime"
+   },
+   "answer": "A",
+   "explanation": "The value `result` is owned by the function and dropped at its end, so any returned reference to it would dangle (error E0515). Lifetime syntax cannot extend a value's life; the fix is to return the owned `String` and move it out."
+  },
+  {
+   "id": "ch10-q26",
+   "section": "10.3 Validating References with Lifetimes",
+   "tag": "Concept",
+   "difficulty": 2,
+   "prompt": "Why does this struct definition require the lifetime parameter `'a`?",
+   "code": "struct ImportantExcerpt<'a> {\n    part: &'a str,\n}",
+   "options": {
+    "A": "Any struct field that is a reference needs a lifetime annotation, so the compiler can ensure an `ImportantExcerpt` never outlives the data `part` refers to",
+    "B": "All structs in Rust require a lifetime parameter, whether or not they hold references",
+    "C": "`'a` makes the struct heap-allocated so the reference stays valid",
+    "D": "It is only a documentation convention; the compiler ignores lifetime parameters on structs"
+   },
+   "answer": "A",
+   "explanation": "Structs can hold references, but each reference field needs a declared lifetime so the borrow checker can enforce that the struct instance does not outlive the borrowed data."
+  },
+  {
+   "id": "ch10-q27",
+   "section": "10.3 Validating References with Lifetimes",
+   "tag": "Concept",
+   "difficulty": 3,
+   "prompt": "Which of the following statements about lifetimes and the elision rules are TRUE? (Select all that apply.)",
+   "options": {
+    "A": "Elision rule 1: the compiler assigns a separate lifetime parameter to each parameter that is a reference",
+    "B": "Elision rule 2: if there is exactly one input lifetime parameter, it is assigned to all output lifetime parameters",
+    "C": "Lifetime annotations extend how long the referenced values actually live",
+    "D": "Elision rule 3: in a method with `&self` or `&mut self`, the lifetime of `self` is assigned to all output lifetime parameters",
+    "E": "Annotating a reference with `'static` is the recommended first fix for most lifetime errors"
+   },
+   "answer": [
+    "A",
+    "B",
+    "D"
+   ],
+   "explanation": "A, B, and D restate the three elision rules. Annotations only describe relationships for the borrow checker — they never change actual lifetimes — and `'static` should be used only when data genuinely lives for the whole program, not as a blanket fix."
+  },
+  {
+   "id": "ch10-q28",
+   "section": "10.3 Validating References with Lifetimes",
+   "tag": "Code Output",
+   "difficulty": 2,
+   "prompt": "What does this program (combining generics, trait bounds, and lifetimes) print?",
+   "code": "use std::fmt::Display;\n\nfn longest_with_an_announcement<'a, T>(\n    x: &'a str,\n    y: &'a str,\n    ann: T,\n) -> &'a str\nwhere\n    T: Display,\n{\n    println!(\"Announcement! {ann}\");\n    if x.len() > y.len() { x } else { y }\n}\n\nfn main() {\n    let s1 = String::from(\"abcd\");\n    let s2 = \"xyz\";\n    let result = longest_with_an_announcement(s1.as_str(), s2, \"Today!\");\n    println!(\"The longest string is {result}\");\n}",
+   "options": {
+    "A": "Announcement! Today! — then — The longest string is abcd",
+    "B": "Compile error: lifetime parameters and type parameters cannot be declared in the same angle-bracket list",
+    "C": "Announcement! Today! — then — The longest string is xyz",
+    "D": "Compile error: `T` needs a lifetime annotation as well"
+   },
+   "answer": "A",
+   "explanation": "Lifetime and type parameters share one generic list (`<'a, T>`), and `where T: Display` lets `ann` be printed. `\"abcd\"` (length 4) is longer than `\"xyz\"` (length 3), so the annotated-lifetime reference to `s1` is returned."
+  }
+ ]
+}

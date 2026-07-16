@@ -1,0 +1,292 @@
+{
+  "chapter": 19,
+  "title": "Patterns and Matching",
+  "link": "https://doc.rust-lang.org/book/ch19-00-patterns.html",
+  "questions": [
+    {
+      "id": "ch19-q01",
+      "section": "19.1 All the Places Patterns Can Be Used",
+      "tag": "Concept",
+      "difficulty": 1,
+      "prompt": "Which of the following are places where patterns can be used in Rust? Select all that apply.",
+      "options": {
+        "A": "The arms of a `match` expression",
+        "B": "`while let` conditional loops",
+        "C": "Function parameters, e.g. `fn print_coordinates(&(x, y): &(i32, i32))`",
+        "D": "The loop variable of a `for` loop, e.g. `for (index, value) in v.iter().enumerate()`",
+        "E": "The operands of arithmetic operators like `+`"
+      },
+      "answer": ["A", "B", "C", "D"],
+      "explanation": "Patterns appear in `match` arms, `if let` and `while let` expressions, `for` loop bindings, `let` statements, and function or closure parameters (which can destructure tuples directly). Operands of arithmetic operators are ordinary expressions, not pattern positions."
+    },
+    {
+      "id": "ch19-q02",
+      "section": "19.1 All the Places Patterns Can Be Used",
+      "tag": "Misconception",
+      "difficulty": 1,
+      "prompt": "Consider the statement `let x = 5;`. Which statement about `let` and patterns is true?",
+      "options": {
+        "A": "`let` statements do not involve patterns; only `match` expressions use patterns",
+        "B": "Every `let` statement has the form `let PATTERN = EXPRESSION;` — in `let x = 5;` the name `x` is itself an irrefutable pattern that binds the whole value",
+        "C": "Patterns in `let` only work with tuples, like `let (a, b) = (1, 2);`",
+        "D": "`let x = 5;` uses a pattern only if you add an explicit type annotation"
+      },
+      "answer": "B",
+      "explanation": "A plain variable name is a pattern that matches anything and binds the entire value to that name. That is why destructuring like `let (x, y, z) = (1, 2, 3);` works: it is the same `let PATTERN = EXPRESSION;` form. Function parameters are patterns in exactly the same way."
+    },
+    {
+      "id": "ch19-q03",
+      "section": "19.1 All the Places Patterns Can Be Used",
+      "tag": "Code Output",
+      "difficulty": 2,
+      "prompt": "What does this program print?",
+      "code": "fn main() {\n    let favorite_color: Option<&str> = None;\n    let is_tuesday = false;\n    let age: Result<u8, _> = \"34\".parse();\n\n    if let Some(color) = favorite_color {\n        println!(\"Using your favorite color, {color}\");\n    } else if is_tuesday {\n        println!(\"Tuesday is green day!\");\n    } else if let Ok(age) = age {\n        if age > 30 {\n            println!(\"Using purple\");\n        } else {\n            println!(\"Using orange\");\n        }\n    } else {\n        println!(\"Using blue\");\n    }\n}",
+      "options": {
+        "A": "Tuesday is green day!",
+        "B": "Using purple",
+        "C": "Using orange",
+        "D": "Using blue"
+      },
+      "answer": "B",
+      "explanation": "The chain mixes `if let`, `else if`, and `else if let` with plain boolean conditions. `favorite_color` is `None` (first branch skipped), `is_tuesday` is false (second skipped), and `\"34\".parse()` yields `Ok(34)`, so the shadowed `age` is `34`, which is greater than 30 — printing `Using purple`. Note the compiler does not check `if let` chains for exhaustiveness."
+    },
+    {
+      "id": "ch19-q04",
+      "section": "19.1 All the Places Patterns Can Be Used",
+      "tag": "Code Output",
+      "difficulty": 2,
+      "prompt": "What does this loop print?",
+      "code": "fn main() {\n    let mut stack = vec![1, 2, 3];\n    while let Some(top) = stack.pop() {\n        println!(\"{top}\");\n    }\n}",
+      "options": {
+        "A": "`1`, `2`, `3` (each on its own line)",
+        "B": "`3`, `2`, `1` (each on its own line)",
+        "C": "It loops forever because the pattern always matches",
+        "D": "Compile error: `while let` cannot use the refutable pattern `Some(top)`"
+      },
+      "answer": "B",
+      "explanation": "`while let` runs as long as the pattern keeps matching. `pop` removes elements from the end of the vector, returning `Some(3)`, `Some(2)`, `Some(1)`, and finally `None`, which fails to match `Some(top)` and ends the loop. Refutable patterns are exactly what `while let` is for."
+    },
+    {
+      "id": "ch19-q05",
+      "section": "19.1 All the Places Patterns Can Be Used",
+      "tag": "Code Output",
+      "difficulty": 1,
+      "prompt": "What is the first line this program prints?",
+      "code": "fn main() {\n    let v = vec!['a', 'b', 'c'];\n    for (index, value) in v.iter().enumerate() {\n        println!(\"{value} is at index {index}\");\n    }\n}",
+      "options": {
+        "A": "a is at index 0",
+        "B": "0 is at index a",
+        "C": "a is at index 1",
+        "D": "Compile error: a `for` loop variable cannot destructure a tuple"
+      },
+      "answer": "A",
+      "explanation": "The position after `for` is a pattern. `enumerate` produces tuples `(index, item)`, so the pattern `(index, value)` destructures each tuple: the first item is `(0, 'a')`, printing `a is at index 0`."
+    },
+    {
+      "id": "ch19-q06",
+      "section": "19.2 Refutability: Whether a Pattern Might Fail to Match",
+      "tag": "Concept",
+      "difficulty": 1,
+      "prompt": "Patterns are either refutable (can fail to match, like `Some(x)`) or irrefutable (match anything, like `x`). Which constructs accept only irrefutable patterns?",
+      "options": {
+        "A": "`match` arms, `if let`, and `while let`",
+        "B": "`let` statements, function parameters, and `for` loops",
+        "C": "Only `match` expressions",
+        "D": "Only closure parameters"
+      },
+      "answer": "B",
+      "explanation": "`let` statements, function parameters, and `for` loops can't do anything meaningful when a pattern fails to match, so they require irrefutable patterns. `if let`, `while let`, and `let...else` are designed to handle possible match failure, so they accept refutable patterns."
+    },
+    {
+      "id": "ch19-q07",
+      "section": "19.2 Refutability: Whether a Pattern Might Fail to Match",
+      "tag": "Spot the Bug",
+      "difficulty": 2,
+      "prompt": "This program does not compile. What is the bug?",
+      "code": "fn main() {\n    let some_option_value: Option<i32> = None;\n    let Some(x) = some_option_value;\n    println!(\"{x}\");\n}",
+      "options": {
+        "A": "`Some(x)` needs an explicit type annotation to compile",
+        "B": "`let` requires an irrefutable pattern, but `Some(x)` is refutable — it doesn't cover `None` (error E0005); use `let...else` or `if let` instead",
+        "C": "You cannot destructure an `Option` with a pattern; you must call `.unwrap()`",
+        "D": "It compiles fine but panics at runtime because the value is `None`"
+      },
+      "answer": "B",
+      "explanation": "The compiler rejects this with `error[E0005]: refutable pattern in local binding` because `let` has nowhere to go if the value is `None`. Fix it with `let Some(x) = some_option_value else { return; };` or `if let Some(x) = some_option_value { ... }`, both of which handle the non-matching case."
+    },
+    {
+      "id": "ch19-q08",
+      "section": "19.2 Refutability: Whether a Pattern Might Fail to Match",
+      "tag": "Behavior",
+      "difficulty": 2,
+      "prompt": "What happens when you compile and run this program?",
+      "code": "fn main() {\n    if let x = 5 {\n        println!(\"{x}\");\n    }\n}",
+      "options": {
+        "A": "Compile error: `if let` requires a refutable pattern",
+        "B": "It compiles and prints `5`, but the compiler emits a warning that the `if let` pattern is irrefutable",
+        "C": "It compiles and runs silently with no warning",
+        "D": "It panics at runtime"
+      },
+      "answer": "B",
+      "explanation": "Giving `if let` (or `let...else`) a pattern that always matches, like a plain variable name `x`, is accepted but pointless — the conditional adds nothing — so the compiler warns about an irrefutable pattern. The block still runs and prints `5`."
+    },
+    {
+      "id": "ch19-q09",
+      "section": "19.3 Pattern Syntax",
+      "tag": "Code Output",
+      "difficulty": 2,
+      "prompt": "What does this program print?",
+      "code": "fn main() {\n    let x = Some(5);\n    let y = 10;\n\n    match x {\n        Some(50) => println!(\"Got 50\"),\n        Some(y) => println!(\"Matched, y = {y}\"),\n        _ => println!(\"Default case, x = {x:?}\"),\n    }\n\n    println!(\"at the end: x = {x:?}, y = {y}\");\n}",
+      "options": {
+        "A": "`Matched, y = 10` then `at the end: x = Some(5), y = 10`",
+        "B": "`Matched, y = 5` then `at the end: x = Some(5), y = 10`",
+        "C": "`Matched, y = 5` then `at the end: x = Some(5), y = 5`",
+        "D": "`Default case, x = Some(5)` then `at the end: x = Some(5), y = 10`"
+      },
+      "answer": "B",
+      "explanation": "Named variables in patterns are new bindings. `Some(y)` in the second arm does NOT compare against the outer `y = 10`; it introduces a fresh `y` that shadows it and binds whatever is inside the `Some` — here `5`. The shadow ends with the arm, so the final line still sees the outer `y = 10`."
+    },
+    {
+      "id": "ch19-q10",
+      "section": "19.3 Pattern Syntax",
+      "tag": "Misconception",
+      "difficulty": 3,
+      "prompt": "An outer variable `y` already exists, and a `match` arm uses the pattern `Some(y)`. Which statements are true? Select all that apply.",
+      "options": {
+        "A": "The pattern introduces a brand-new variable `y` that shadows the outer `y` inside the arm",
+        "B": "The new `y` binds the value found inside the `Some`, regardless of the outer `y`'s value",
+        "C": "To test the inner value against the outer `y`, you can use a match guard such as `Some(n) if n == y`",
+        "D": "The shadowing ends when the match arm's scope ends; the outer `y` is unchanged afterwards",
+        "E": "`Some(y)` only matches when the value equals `Some(10)` if the outer `y` is `10`"
+      },
+      "answer": ["A", "B", "C", "D"],
+      "explanation": "Inside patterns, a bare name always creates a new binding — it never compares against an existing variable, so E is the classic misconception. Because a guard's `if` expression is not a pattern, it can refer to the outer `y`, which is how you compare against it: `Some(n) if n == y`."
+    },
+    {
+      "id": "ch19-q11",
+      "section": "19.3 Pattern Syntax",
+      "tag": "Code Output",
+      "difficulty": 1,
+      "prompt": "What does this program print?",
+      "code": "fn main() {\n    let x = 5;\n    match x {\n        1 | 2 => println!(\"one or two\"),\n        3..=5 => println!(\"three through five\"),\n        _ => println!(\"anything\"),\n    }\n}",
+      "options": {
+        "A": "one or two",
+        "B": "three through five",
+        "C": "anything",
+        "D": "Compile error: ranges are not allowed in patterns"
+      },
+      "answer": "B",
+      "explanation": "`|` is the or operator in patterns (`1 | 2` matches either literal), and `3..=5` is an inclusive range pattern that matches 3, 4, or 5. Range patterns also work with `char`, e.g. `'a'..='j'`. Since `x` is 5, the second arm matches."
+    },
+    {
+      "id": "ch19-q12",
+      "section": "19.3 Pattern Syntax",
+      "tag": "Code Output",
+      "difficulty": 2,
+      "prompt": "What does this program print?",
+      "code": "struct Point {\n    x: i32,\n    y: i32,\n}\n\nfn main() {\n    let p = Point { x: 0, y: 7 };\n    match p {\n        Point { x, y: 0 } => println!(\"On the x axis at {x}\"),\n        Point { x: 0, y } => println!(\"On the y axis at {y}\"),\n        Point { x, y } => println!(\"On neither axis: ({x}, {y})\"),\n    }\n}",
+      "options": {
+        "A": "On the x axis at 0",
+        "B": "On the y axis at 7",
+        "C": "On neither axis: (0, 7)",
+        "D": "Compile error: a struct pattern cannot mix shorthand fields and literal values"
+      },
+      "answer": "B",
+      "explanation": "Struct patterns can mix shorthand bindings (`x` creates a variable from field `x`) with literal tests (`y: 0` requires the field to equal 0). The first arm needs `y == 0`, which fails since `y` is 7. The second arm needs `x == 0`, which succeeds and binds `y = 7`. Arms are tried in order."
+    },
+    {
+      "id": "ch19-q13",
+      "section": "19.3 Pattern Syntax",
+      "tag": "Spot the Bug",
+      "difficulty": 3,
+      "prompt": "What is wrong with this code?",
+      "code": "fn main() {\n    let numbers = (2, 4, 8, 16, 32);\n    match numbers {\n        (.., second, ..) => println!(\"Some numbers: {second}\"),\n    }\n}",
+      "options": {
+        "A": "Nothing — it compiles and prints `Some numbers: 4`",
+        "B": "Compile error: `..` can only be used once per tuple pattern — using it on both sides of `second` is ambiguous about how many values to skip",
+        "C": "Compile error: tuples cannot be matched with `..` at all",
+        "D": "It compiles and prints `Some numbers: 8` because `second` grabs the middle element"
+      },
+      "answer": "B",
+      "explanation": "`..` ignores 'the rest' of the values, but Rust must be able to tell unambiguously which values it covers. `(first, .., last)` is fine because `..` appears once, but `(.., second, ..)` is rejected with an error that `..` can only be used once per tuple pattern."
+    },
+    {
+      "id": "ch19-q14",
+      "section": "19.3 Pattern Syntax",
+      "tag": "Spot the Bug",
+      "difficulty": 3,
+      "prompt": "This program fails to compile. Why?",
+      "code": "fn main() {\n    let s = Some(String::from(\"Hello!\"));\n\n    if let Some(_s) = s {\n        println!(\"found a string\");\n    }\n\n    println!(\"{s:?}\");\n}",
+      "options": {
+        "A": "It actually compiles and prints `found a string` then `Some(\"Hello!\")`",
+        "B": "Unlike `_`, the name `_s` still binds the value — it moves the `String` out of `s`, so the later `println!(\"{s:?}\")` uses a moved value; write `Some(_)` (which never binds) or match on `&s`",
+        "C": "`_s` is not a valid identifier because it starts with an underscore",
+        "D": "It compiles but panics at runtime when printing `s`"
+      },
+      "answer": "B",
+      "explanation": "An underscore-prefixed name like `_s` only silences the unused-variable warning; it is still a real binding, so ownership of the `String` moves into it and `s` becomes unusable. The bare wildcard `_` never binds at all, so `if let Some(_) = s` leaves `s` intact and the program compiles."
+    },
+    {
+      "id": "ch19-q15",
+      "section": "19.3 Pattern Syntax",
+      "tag": "Code Output",
+      "difficulty": 3,
+      "prompt": "What does this program print?",
+      "code": "fn main() {\n    let x = 4;\n    let y = false;\n\n    match x {\n        4 | 5 | 6 if y => println!(\"yes\"),\n        _ => println!(\"no\"),\n    }\n}",
+      "options": {
+        "A": "yes",
+        "B": "no",
+        "C": "Compile error: match guards cannot be combined with `|` patterns",
+        "D": "`yes` followed by `no`"
+      },
+      "answer": "B",
+      "explanation": "A match guard applies to the entire `|` chain: the arm behaves like `(4 | 5 | 6) if y`, not `4 | 5 | (6 if y)`. Even though `x` is 4 and matches the pattern, the guard `if y` is false, so the arm is rejected and the `_` arm prints `no`."
+    },
+    {
+      "id": "ch19-q16",
+      "section": "19.3 Pattern Syntax",
+      "tag": "Concept",
+      "difficulty": 2,
+      "prompt": "Match guards (an extra `if` condition after a pattern, like `Some(x) if x % 2 == 0`) add expressive power. What is their downside?",
+      "options": {
+        "A": "A guard makes the arm's pattern irrefutable",
+        "B": "The compiler does not take guard conditions into account when checking exhaustiveness, so a `match` relying on guards still needs arms that cover all cases without them",
+        "C": "Guards may only refer to variables bound inside the pattern, never to outer variables",
+        "D": "The guard runs after the arm body has already executed"
+      },
+      "answer": "B",
+      "explanation": "Guards can express conditions patterns alone cannot (including comparing against outer variables, which sidesteps the shadowing problem), but the compiler cannot reason about arbitrary `if` expressions, so guarded arms don't count toward exhaustiveness checking. The guard is evaluated after the pattern matches and before the body runs."
+    },
+    {
+      "id": "ch19-q17",
+      "section": "19.3 Pattern Syntax",
+      "tag": "Code Output",
+      "difficulty": 2,
+      "prompt": "What does this program print?",
+      "code": "fn main() {\n    enum Message {\n        Hello { id: i32 },\n    }\n\n    let msg = Message::Hello { id: 5 };\n\n    match msg {\n        Message::Hello { id: id_variable @ 3..=7 } => {\n            println!(\"Found an id in range: {id_variable}\")\n        }\n        Message::Hello { id: 10..=12 } => {\n            println!(\"Found an id in another range\")\n        }\n        Message::Hello { id } => println!(\"Some other id: {id}\"),\n    }\n}",
+      "options": {
+        "A": "Found an id in range: 5",
+        "B": "Found an id in another range",
+        "C": "Some other id: 5",
+        "D": "Compile error: a binding cannot be combined with a range pattern"
+      },
+      "answer": "A",
+      "explanation": "The `@` operator both tests a value against a pattern and binds it: `id_variable @ 3..=7` matches because 5 is in the range, and captures 5 in `id_variable`. By contrast, the second arm's plain `10..=12` tests the field but binds nothing, so its body could not use the id value."
+    },
+    {
+      "id": "ch19-q18",
+      "section": "19.3 Pattern Syntax",
+      "tag": "Behavior",
+      "difficulty": 3,
+      "prompt": "Which statements about destructuring patterns are true? Select all that apply.",
+      "options": {
+        "A": "The struct field shorthand `Point { x, y }` creates variables named `x` and `y` from the corresponding fields",
+        "B": "Enum variants are destructured with patterns that mirror the variant's shape, e.g. `Message::ChangeColor(r, g, b)` for a tuple-like variant and `Message::Move { x, y }` for a struct-like one",
+        "C": "Patterns can be nested, e.g. `Message::ChangeColor(Color::Hsv(h, s, v))` matches one enum stored inside another enum's variant",
+        "D": "`Point { x, .. }` binds `x` and ignores all remaining fields of the struct",
+        "E": "Destructuring works for structs and enums but not for tuples nested inside them"
+      },
+      "answer": ["A", "B", "C", "D"],
+      "explanation": "Patterns compose: structs, enums, tuples, and references can all be destructured and nested arbitrarily, such as `let ((feet, inches), Point { x, y }) = ...`, so E is false. `..` inside a struct pattern skips whatever fields are not named, and the shorthand avoids writing `x: x`."
+    }
+  ]
+}
