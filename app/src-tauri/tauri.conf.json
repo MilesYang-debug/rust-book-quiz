@@ -25,6 +25,10 @@
     }
   },
   "bundle": {
-    "active": false
+    "active": true,
+    "targets": ["deb", "appimage"],
+    "icon": ["icons/icon.ico", "icons/icon.png"],
+    "category": "Education",
+    "shortDescription": "Quiz app for The Rust Programming Language (the Rust Book)"
   }
 }

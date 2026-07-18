@@ -1,0 +1,218 @@
+# 发布流水线：推送 v* 标签（如 v0.1.0）即自动构建四端产物并创建 GitHub Release。
+# 也可在 Actions 页面手动触发（workflow_dispatch，仅构建产物，不发 Release）。
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  # ── Windows 桌面版：自包含 exe ──────────────────────────────
+  windows:
+    name: Windows (exe)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: 安装 trunk（预编译二进制）
+        uses: taiki-e/install-action@v2
+        with:
+          tool: trunk
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            app -> target
+            app/src-tauri -> target
+
+      - name: 构建前端（WASM）
+        working-directory: app
+        run: trunk build --release
+
+      - name: 构建桌面壳
+        working-directory: app/src-tauri
+        run: cargo build --release
+
+      - name: 整理产物
+        run: cp app/src-tauri/target/release/rust-book-quiz-desktop.exe RustBookQuiz.exe
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: RustBookQuiz.exe
+
+  # ── Linux 桌面版：deb + AppImage + 裸二进制 ─────────────────
+  linux:
+    name: Linux (deb / AppImage)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 安装系统依赖（WebKitGTK 等）
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential \
+            curl wget file libssl-dev libgtk-3-dev librsvg2-dev libxdo-dev
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: 安装 trunk（预编译二进制）
+        uses: taiki-e/install-action@v2
+        with:
+          tool: trunk
+
+      - name: 安装 tauri-cli（npm 预编译版，避免 cargo install 的长编译）
+        run: npm install -g @tauri-apps/cli@^2
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            app -> target
+            app/src-tauri -> target
+
+      - name: 构建前端（WASM）
+        working-directory: app
+        run: trunk build --release
+
+      - name: 构建并打包（deb + AppImage）
+        working-directory: app
+        run: tauri build --bundles deb appimage
+
+      - name: 整理产物（统一命名，去掉文件名空格）
+        run: |
+          mkdir out
+          cp app/src-tauri/target/release/rust-book-quiz-desktop out/RustBookQuiz-linux
+          cp app/src-tauri/target/release/bundle/deb/*.deb out/RustBookQuiz_amd64.deb
+          cp app/src-tauri/target/release/bundle/appimage/*.AppImage out/RustBookQuiz_x86_64.AppImage
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux
+          path: out/*
+
+  # ── Android：arm64 APK（debug 密钥签名，可直接安装） ────────
+  android:
+    name: Android (apk)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: android-actions/setup-android@v3
+
+      - name: 安装 SDK 组件与 NDK
+        run: |
+          sdkmanager "platform-tools" "platforms;android-34" \
+            "build-tools;34.0.0" "ndk;27.1.12297006"
+          echo "NDK_HOME=$ANDROID_HOME/ndk/27.1.12297006" >> "$GITHUB_ENV"
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown,aarch64-linux-android
+
+      - name: 安装 trunk（预编译二进制）
+        uses: taiki-e/install-action@v2
+        with:
+          tool: trunk
+
+      - name: 安装 tauri-cli（npm 预编译版）
+        run: npm install -g @tauri-apps/cli@^2
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            app -> target
+            app/src-tauri -> target
+
+      - name: 构建前端（WASM）
+        working-directory: app
+        run: trunk build --release
+
+      - name: 构建 release APK（仅 arm64）
+        working-directory: app
+        run: tauri android build --apk --target aarch64
+
+      - name: 用 debug 密钥签名
+        run: |
+          keytool -genkeypair -keystore debug.keystore \
+            -storepass android -keypass android -alias androiddebugkey \
+            -dname "CN=Android Debug,O=Android,C=US" \
+            -keyalg RSA -keysize 2048 -validity 10000
+          BUILD_TOOLS="$ANDROID_HOME/build-tools/34.0.0"
+          "$BUILD_TOOLS/apksigner" sign \
+            --ks debug.keystore --ks-pass pass:android --key-pass pass:android \
+            --ks-key-alias androiddebugkey \
+            --out RustBookQuiz.apk \
+            app/src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-unsigned.apk
+          "$BUILD_TOOLS/apksigner" verify RustBookQuiz.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android
+          path: RustBookQuiz.apk
+
+  # ── Web 静态包：自部署用（在线版由 deploy-pages.yml 负责） ──
+  web:
+    name: Web (静态文件包)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: 安装 trunk（预编译二进制）
+        uses: taiki-e/install-action@v2
+        with:
+          tool: trunk
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: app -> target
+
+      - name: 构建前端（根路径部署用）
+        working-directory: app
+        run: trunk build --release
+
+      - name: 打包 dist
+        working-directory: app/dist
+        run: zip -r "$GITHUB_WORKSPACE/RustBookQuiz-web.zip" .
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: web
+          path: RustBookQuiz-web.zip
+
+  # ── 汇总四端产物，创建 GitHub Release ───────────────────────
+  release:
+    name: 创建 Release
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [windows, linux, android, web]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/*
+          generate_release_notes: true
