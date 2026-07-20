@@ -29,15 +29,13 @@ fn load_bank_files() -> Vec<String> {
         .collect()
 }
 
-/// Open a link in the system default browser (desktop only).
+/// Open a link in the system default browser (all platforms, incl. Android).
 #[tauri::command]
-fn open_url(url: String) {
-    #[cfg(not(target_os = "android"))]
+fn open_url(app: tauri::AppHandle, url: String) {
+    use tauri_plugin_opener::OpenerExt;
     if url.starts_with("https://") || url.starts_with("http://") {
-        let _ = open::that(url);
+        let _ = app.opener().open_url(url, None::<&str>);
     }
-    #[cfg(target_os = "android")]
-    let _ = url;
 }
 
 /* Window controls for the custom (frameless) desktop titlebar.
@@ -73,6 +71,7 @@ fn win_close(window: tauri::WebviewWindow) {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![
             load_bank_files,
             open_url,

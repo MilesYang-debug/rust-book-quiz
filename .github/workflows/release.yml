@@ -116,8 +116,8 @@ jobs:
 
       - name: 安装 SDK 组件与 NDK
         run: |
-          sdkmanager "platform-tools" "platforms;android-34" \
-            "build-tools;34.0.0" "ndk;27.1.12297006"
+          sdkmanager "platform-tools" "platforms;android-36" \
+            "build-tools;36.0.0" "ndk;27.1.12297006"
           echo "NDK_HOME=$ANDROID_HOME/ndk/27.1.12297006" >> "$GITHUB_ENV"
 
       - uses: dtolnay/rust-toolchain@stable
@@ -144,7 +144,10 @@ jobs:
 
       - name: 构建 release APK（仅 arm64）
         working-directory: app
-        run: tauri android build --apk --target aarch64
+        run: |
+          # gradlew 从 Windows 提交时会丢失可执行位（100644），Linux runner 上会 Permission denied
+          chmod +x src-tauri/gen/android/gradlew
+          tauri android build --apk --target aarch64
 
       - name: 用 debug 密钥签名
         run: |
@@ -152,12 +155,12 @@ jobs:
             -storepass android -keypass android -alias androiddebugkey \
             -dname "CN=Android Debug,O=Android,C=US" \
             -keyalg RSA -keysize 2048 -validity 10000
-          BUILD_TOOLS="$ANDROID_HOME/build-tools/34.0.0"
+          BUILD_TOOLS="$ANDROID_HOME/build-tools/36.0.0"
           "$BUILD_TOOLS/apksigner" sign \
             --ks debug.keystore --ks-pass pass:android --key-pass pass:android \
             --ks-key-alias androiddebugkey \
             --out RustBookQuiz.apk \
-            app/src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-unsigned.apk
+            app/src-tauri/gen/android/app/build/outputs/apk/arm64/release/app-arm64-release-unsigned.apk
           "$BUILD_TOOLS/apksigner" verify RustBookQuiz.apk
 
       - uses: actions/upload-artifact@v4

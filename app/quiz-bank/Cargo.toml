@@ -1,0 +1,9 @@
+[package]
+name = "quiz-bank"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+# preserve_order keeps question fields in authored order when regenerating the snapshot
+serde_json = { version = "1", features = ["preserve_order"] }

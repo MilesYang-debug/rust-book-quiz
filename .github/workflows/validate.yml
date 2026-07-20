@@ -1,0 +1,37 @@
+# 题库校验：push / PR 涉及题库或校验器时，校验 bank/*.json 并确认内嵌快照已同步。
+# 快照不同步（改了 bank/ 但忘了跑 --sync）会直接失败，日志里能看到 diff。
+name: Validate Bank
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "bank/**"
+      - "app/assets/bank.json"
+      - "app/quiz-bank/**"
+      - ".github/workflows/validate.yml"
+  pull_request:
+    paths:
+      - "bank/**"
+      - "app/assets/bank.json"
+      - "app/quiz-bank/**"
+      - ".github/workflows/validate.yml"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: app -> target
+
+      - name: 校验题库并重新生成内嵌快照
+        working-directory: app
+        run: cargo run -p quiz-bank -- --sync
+
+      - name: 确认快照与题库同步（有 diff 说明忘了跑 --sync）
+        run: git diff --exit-code app/assets/bank.json

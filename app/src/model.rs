@@ -1,54 +1,8 @@
-use serde::Deserialize;
-use std::collections::BTreeMap;
-
-#[derive(Debug, Clone, PartialEq, Deserialize)]
-pub struct Chapter {
-    pub chapter: u32,
-    pub title: String,
-    #[serde(default)]
-    pub link: String,
-    pub questions: Vec<Question>,
-}
-
-#[derive(Debug, Clone, PartialEq, Deserialize)]
-pub struct Question {
-    pub id: String,
-    pub section: String,
-    pub tag: String,
-    pub difficulty: u8,
-    pub prompt: String,
-    #[serde(default)]
-    pub code: Option<String>,
-    /// BTreeMap keeps option letters in A..E order.
-    pub options: BTreeMap<String, String>,
-    pub answer: Answer,
-    pub explanation: String,
-}
-
-#[derive(Debug, Clone, PartialEq, Deserialize)]
-#[serde(untagged)]
-pub enum Answer {
-    Single(String),
-    Multi(Vec<String>),
-}
-
-impl Answer {
-    pub fn is_multi(&self) -> bool {
-        matches!(self, Answer::Multi(_))
-    }
-
-    /// Sorted answer letters, e.g. ["A", "C"].
-    pub fn letters(&self) -> Vec<String> {
-        match self {
-            Answer::Single(s) => vec![s.clone()],
-            Answer::Multi(v) => {
-                let mut v = v.clone();
-                v.sort();
-                v
-            }
-        }
-    }
-}
+/// Bank schema types live in the `quiz-bank` crate (shared with the
+/// validator: `cargo run -p quiz-bank`) — re-exported here so the rest of
+/// the app keeps using `crate::model::{Chapter, Question}`. (`Answer` is
+/// only used through its methods; name it via `quiz_bank::Answer` if needed.)
+pub use quiz_bank::{Chapter, Question};
 
 /// Embedded snapshot of the bank — fallback when no external bank/ folder
 /// is found (or when running outside Tauri, e.g. `trunk serve`).

@@ -51,7 +51,7 @@ fn App() -> impl IntoView {
 
     view! {
         <div class="titlebar" data-tauri-drag-region="">
-            <img class="tb-crab" src="/ferris.png" alt="" data-tauri-drag-region=""/>
+            <img class="tb-crab" src="ferris.png" alt="" data-tauri-drag-region=""/>
             <span class="tb-title" data-tauri-drag-region="">"Rust Book Quiz"</span>
             <div class="tb-controls">
                 <button class="tb-btn" title="Toggle theme" on:click=move |_| light.update(|l| *l = !*l)>
