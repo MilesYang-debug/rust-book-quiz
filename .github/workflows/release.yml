@@ -140,26 +140,27 @@ jobs:
         working-directory: app
         run: |
           chmod +x src-tauri/gen/android/gradlew
-          # 显式加 --release，target 写完整三元组
-          cargo tauri android build --apk --target aarch64-linux-android --release
+          cargo tauri android build --apk --target aarch64-linux-android
 
-      # 新增：打印所有 APK 路径，方便排查真实路径
-      - name: 查看 APK 产物真实路径
-        run: find app/src-tauri/gen/android -name "*.apk"
-
-      - name: 用 debug 密钥签名
+      # 兜底：自动查找未签名APK，避免硬编码路径出错
+      - name: 签名 APK
         run: |
           keytool -genkeypair -keystore debug.keystore \
             -storepass android -keypass android -alias androiddebugkey \
             -dname "CN=Android Debug,O=Android,C=US" \
             -keyalg RSA -keysize 2048 -validity 10000
+
+          # 自动定位 unsigned apk，不用手写路径
+          UNSIGNED_APK=$(find app/src-tauri/gen/android -name "*release-unsigned.apk" | head -n1)
+          echo "找到未签名APK: $UNSIGNED_APK"
+
           BUILD_TOOLS="$ANDROID_HOME/build-tools/36.0.0"
-          # 这里替换成上面 find 命令输出的真实 unsigned apk 路径
           "$BUILD_TOOLS/apksigner" sign \
             --ks debug.keystore --ks-pass pass:android --key-pass pass:android \
             --ks-key-alias androiddebugkey \
             --out RustBookQuiz.apk \
-            app/src-tauri/gen/android/app/build/outputs/apk/release/arm64-v8a/app-arm64-v8a-release-unsigned.apk
+            "$UNSIGNED_APK"
+
           "$BUILD_TOOLS/apksigner" verify RustBookQuiz.apk
 
       - uses: actions/upload-artifact@v4
