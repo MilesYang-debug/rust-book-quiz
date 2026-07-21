@@ -4,7 +4,7 @@ use leptos::*;
 use rand::seq::SliceRandom;
 use wasm_bindgen::JsCast;
 
-use crate::model::{difficulty_label, highlight_rust, mastery_message, open_url, rich_text, Chapter, Question};
+use crate::model::{difficulty_label, highlight_rust, mastery_message, open_url, rich_text, Answer, Chapter, Question};
 use crate::storage;
 use crate::Route;
 
@@ -32,6 +32,32 @@ pub struct QuizConfig {
 
 /* ================= Shared helpers ================= */
 
+/// Randomize a question's option order: the option texts are re-lettered
+/// A.. in a random permutation and the answer letters follow their text,
+/// so the displayed A/B/C/D always matches the graded answer.
+fn shuffle_options(q: &mut Question) {
+    let mut entries: Vec<(String, String)> = std::mem::take(&mut q.options).into_iter().collect();
+    entries.shuffle(&mut rand::thread_rng());
+    let mut new_letter: HashMap<String, String> = HashMap::new();
+    for (i, (old, text)) in entries.into_iter().enumerate() {
+        let letter = char::from(b'A' + i as u8).to_string();
+        new_letter.insert(old, letter.clone());
+        q.options.insert(letter, text);
+    }
+    q.answer = match &q.answer {
+        Answer::Single(a) => Answer::Single(new_letter[a].clone()),
+        Answer::Multi(v) => Answer::Multi(v.iter().map(|a| new_letter[a].clone()).collect()),
+    };
+}
+
+/// Shuffle question order and each question's options for a fresh quiz run.
+fn shuffle_quiz(questions: &mut Vec<QuestionCtx>) {
+    questions.shuffle(&mut rand::thread_rng());
+    for qc in questions.iter_mut() {
+        shuffle_options(&mut qc.q);
+    }
+}
+
 fn wrong_entries(bank: RwSignal<Vec<Chapter>>) -> Vec<QuestionCtx> {
     bank.with_untracked(|b| {
         storage::wrong_book()
@@ -51,15 +77,17 @@ fn wrong_entries(bank: RwSignal<Vec<Chapter>>) -> Vec<QuestionCtx> {
 fn start_chapter(bank: RwSignal<Vec<Chapter>>, route: RwSignal<Route>, num: u32) {
     bank.with_untracked(|b| {
         if let Some(ch) = b.iter().find(|c| c.chapter == num) {
+            let mut questions: Vec<QuestionCtx> = ch
+                .questions
+                .iter()
+                .cloned()
+                .map(|q| QuestionCtx { q, chapter: num })
+                .collect();
+            shuffle_quiz(&mut questions);
             route.set(Route::Quiz(QuizConfig {
                 mode: Mode::Chapter,
                 title: format!("Ch {} · {}", num, ch.title),
-                questions: ch
-                    .questions
-                    .iter()
-                    .cloned()
-                    .map(|q| QuestionCtx { q, chapter: num })
-                    .collect(),
+                questions,
                 chapter_for_score: Some(num),
             }));
         }
@@ -70,7 +98,7 @@ fn start_chapter(bank: RwSignal<Vec<Chapter>>, route: RwSignal<Route>, num: u32)
 fn start_section(bank: RwSignal<Vec<Chapter>>, route: RwSignal<Route>, num: u32, section: String) {
     bank.with_untracked(|b| {
         if let Some(ch) = b.iter().find(|c| c.chapter == num) {
-            let questions: Vec<QuestionCtx> = ch
+            let mut questions: Vec<QuestionCtx> = ch
                 .questions
                 .iter()
                 .filter(|q| q.section == section)
@@ -80,6 +108,7 @@ fn start_section(bank: RwSignal<Vec<Chapter>>, route: RwSignal<Route>, num: u32,
             if questions.is_empty() {
                 return;
             }
+            shuffle_quiz(&mut questions);
             route.set(Route::Quiz(QuizConfig {
                 mode: Mode::Chapter,
                 title: format!("Ch {num} · § {section}"),
@@ -95,7 +124,7 @@ fn start_wrong(bank: RwSignal<Vec<Chapter>>, route: RwSignal<Route>) {
     if questions.is_empty() {
         return;
     }
-    questions.shuffle(&mut rand::thread_rng());
+    shuffle_quiz(&mut questions);
     route.set(Route::Quiz(QuizConfig {
         mode: Mode::Wrong,
         title: "Wrong Answer Practice".into(),
@@ -345,6 +374,9 @@ pub fn ExamView() -> impl IntoView {
         }
         pool.shuffle(&mut rand::thread_rng());
         pool.truncate(want);
+        for qc in pool.iter_mut() {
+            shuffle_options(&mut qc.q);
+        }
         let n = pool.len();
         route.set(Route::Quiz(QuizConfig {
             mode: Mode::Exam,

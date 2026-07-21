@@ -2,6 +2,9 @@
 name = "quiz-bank"
 version = "0.1.0"
 edition = "2021"
+# Two binaries live here (validate, code_check); keep the historical
+# `cargo run -p quiz-bank` invocation pointing at the validator.
+default-run = "validate"
 
 [dependencies]
 serde = { version = "1", features = ["derive"] }

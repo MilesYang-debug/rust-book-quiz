@@ -225,7 +225,7 @@
     "D": "`use std::io::{self, cmp::Ordering};`"
    },
    "answer": "B",
-   "explanation": "Nested paths merge imports that share a prefix: `use std::{cmp::Ordering, io};` brings in both items in one line. Option A wrongly nests `io` under `cmp`, and the glob in option C imports every public item of `std`, not just those two."
+   "explanation": "Nested paths merge imports that share a prefix: `use std::{cmp::Ordering, io};` brings in both items in one line. Writing `use std::cmp::{Ordering, io};` wrongly nests `io` under `cmp`, and the glob `use std::*;` imports every public item of `std`, not just those two."
   },
   {
    "id": "ch07-q15",

@@ -35,3 +35,7 @@ jobs:
 
       - name: 确认快照与题库同步（有 diff 说明忘了跑 --sync）
         run: git diff --exit-code app/assets/bank.json
+
+      - name: 机械验证代码片段行为（rustc 实跑，比对题目断言）
+        working-directory: app
+        run: cargo run -p quiz-bank --bin code_check

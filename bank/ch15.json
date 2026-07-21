@@ -157,7 +157,7 @@
         "D": "The allocator reallocates the `String` as a `str` slice the first time the coercion happens."
       },
       "answer": "B",
-      "explanation": "Deref coercion chains as many times as needed: `Box<String>: Deref<Target = String>` and `String: Deref<Target = str>`, so `&Box<String>` coerces to `&String` and then `&str`. The number of `Deref::deref` insertions is resolved entirely at compile time, so using the coercion costs nothing at runtime — option C's \"one level only\" limit does not exist."
+      "explanation": "Deref coercion chains as many times as needed: `Box<String>: Deref<Target = String>` and `String: Deref<Target = str>`, so `&Box<String>` coerces to `&String` and then `&str`. The number of `Deref::deref` insertions is resolved entirely at compile time, so using the coercion costs nothing at runtime — a \"one level only\" limit on deref coercion does not exist."
     },
     {
       "id": "ch15-q11",
@@ -293,7 +293,7 @@
       "code": "use std::cell::RefCell;\n\nfn main() {\n    let cell = RefCell::new(vec![1, 2]);\n    let mut one = cell.borrow_mut();\n    let mut two = cell.borrow_mut();\n    one.push(3);\n    two.push(4);\n    println!(\"{:?}\", one);\n}",
       "options": {
         "A": "It fails to compile: two mutable borrows of `cell` are active at once.",
-        "B": "It compiles, but panics at runtime on the second `borrow_mut()` with `already borrowed: BorrowMutError`.",
+        "B": "It compiles, but panics at runtime on the second `borrow_mut()` with a `BorrowMutError` (the message text varies by Rust version, e.g. `RefCell already borrowed`).",
         "C": "It prints `[1, 2, 3, 4]` — `RefCell` permits any number of mutable borrows.",
         "D": "It is undefined behavior: both handles write to the vector unsynchronized."
       },
@@ -371,7 +371,7 @@
       "difficulty": 2,
       "prompt": "Two `Rc` values end up pointing at each other (`a`'s tail refers to `b`, and `b`'s tail is mutated via a `RefCell` to refer back to `a`). What happens when both variables go out of scope?",
       "options": {
-        "A": "Each drop decrements the other's strong count from 2 to 1, never reaching 0, so neither value is freed: the memory is leaked. Safe Rust permits this — leaks are not undefined behavior, and the compiler does not detect cycles.",
+        "A": "When each variable is dropped, the strong count of the value it points to falls from 2 to 1, never reaching 0, so neither value is freed: the memory is leaked. Safe Rust permits this — leaks are not undefined behavior, and the compiler does not detect cycles.",
         "B": "The compiler detects the cycle at compile time and refuses to build the program.",
         "C": "Rust's runtime includes a cycle-collecting garbage collector that eventually reclaims the pair.",
         "D": "The program panics with a `CycleError` as soon as the second link is created."

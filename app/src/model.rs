@@ -1,8 +1,7 @@
 /// Bank schema types live in the `quiz-bank` crate (shared with the
 /// validator: `cargo run -p quiz-bank`) — re-exported here so the rest of
-/// the app keeps using `crate::model::{Chapter, Question}`. (`Answer` is
-/// only used through its methods; name it via `quiz_bank::Answer` if needed.)
-pub use quiz_bank::{Chapter, Question};
+/// the app keeps using `crate::model::{Answer, Chapter, Question}`.
+pub use quiz_bank::{Answer, Chapter, Question};
 
 /// Embedded snapshot of the bank — fallback when no external bank/ folder
 /// is found (or when running outside Tauri, e.g. `trunk serve`).

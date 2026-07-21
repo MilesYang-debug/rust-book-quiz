@@ -129,8 +129,13 @@ jobs:
         with:
           tool: trunk
 
-      - name: 安装 tauri-cli（npm 预编译版）
-        run: npm install -g @tauri-apps/cli@^2
+      # gen/android 的 gradle 构建任务会回调 `cargo tauri`（见 buildSrc/BuildTask.kt），
+      # npm 版 CLI 满足不了；用 binstall 拉 cargo 版预编译二进制，避免 10 分钟源码编译。
+      - name: 安装 cargo-binstall
+        uses: cargo-bins/cargo-binstall@main
+
+      - name: 安装 tauri-cli（cargo 版，预编译二进制）
+        run: cargo binstall tauri-cli --locked --no-confirm
 
       - uses: Swatinem/rust-cache@v2
         with:
@@ -147,7 +152,7 @@ jobs:
         run: |
           # gradlew 从 Windows 提交时会丢失可执行位（100644），Linux runner 上会 Permission denied
           chmod +x src-tauri/gen/android/gradlew
-          tauri android build --apk --target aarch64
+          cargo tauri android build --apk --target aarch64
 
       - name: 用 debug 密钥签名
         run: |

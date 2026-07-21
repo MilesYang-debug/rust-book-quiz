@@ -1,33 +1,67 @@
-# Rust Book Quiz 🦀
+<div align="center">
 
-中文 | [English](README.en.md)
+<img src="app/ferris.png" width="90" alt="Ferris"/>
 
-《The Rust Programming Language》（官方 Rust Book）配套刷题应用。**一套 Rust 代码，四端交付**：Windows / Linux 桌面 + Android + Web 浏览器。无 JS 框架、无后端、离线可用。
+# Rust Book Quiz
 
-- **394 道题**覆盖全书 ch1–ch20（英文题干，贴合官方文档原文）
-- 三种模式：**章节练习**（逐题即时判分 + 解析）、**随机模拟考**（整卷交卷统一判分 + 回看）、**错题本**（答错自动收录，答对移出）
-- 题型：单选 / 多选 / 代码输出预测 / 找错题，附难度与章节小节标签
-- 桌面端**加题免编译**：往可执行文件旁的 `bank/` 目录放 JSON，重启即生效
+**A quiz app for *The Rust Programming Language* (the official Rust Book)**
 
-## 快速开始（不编译，直接用）
+One Rust codebase, four targets: Windows / Linux desktop · Android · web browser
+No JS framework · no backend · works offline
 
-| 平台 | 获取方式 | 使用方法 |
+[![Rust](https://img.shields.io/badge/Rust-100%25-f74c00?logo=rust&logoColor=white)](https://www.rust-lang.org/)
+[![Leptos](https://img.shields.io/badge/Leptos-0.6-ef3939)](https://leptos.dev/)
+[![Tauri](https://img.shields.io/badge/Tauri-2-24C8DB?logo=tauri&logoColor=white)](https://tauri.app/)
+[![Questions](https://img.shields.io/badge/questions-394-blue)](bank/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
+[中文](README.zh.md) | English | [🎮 Try it online](https://MilesYang-debug.github.io/rust-book-quiz/)
+
+</div>
+
+- **394 questions** covering the whole book, ch1–ch20 (English prompts, faithful to the official text)
+- Three modes: **chapter practice** (per-question instant grading + explanations), **random mock exam** (submit the whole paper, graded at once, with review), and a **wrong-answer book** (misses are collected automatically, removed once answered correctly)
+- Question types: single choice / multiple choice / code-output prediction / spot-the-bug, tagged with difficulty and book section
+- Desktop supports **adding questions without recompiling**: drop JSON files into a `bank/` directory next to the executable and restart
+
+## Where This Fits in the Rust Learning Path
+
+The official learning resources each cover one part of the loop; this project fills the **self-testing** slot none of them covers:
+
+| Resource | How you learn | What it trains |
 |---|---|---|
-| **在线体验** | [浏览器直接访问](https://MilesYang-debug.github.io/rust-book-quiz/) | 打开即用，进度存本地浏览器 |
-| **Windows** | [Releases](../../releases) 下载 `RustBookQuiz.exe` | 双击运行（约 6MB，依赖系统自带 WebView2） |
-| **Linux (Debian/Ubuntu)** | [Releases](../../releases) 下载 `RustBookQuiz_amd64.deb` | `sudo apt install ./RustBookQuiz_amd64.deb` |
-| **Linux (任意发行版)** | [Releases](../../releases) 下载 `RustBookQuiz_x86_64.AppImage` | `chmod +x` 后直接运行 |
-| **Linux (裸二进制)** | [Releases](../../releases) 下载 `RustBookQuiz-linux` | 需系统装有 `libwebkit2gtk-4.1`，`chmod +x` 后运行 |
-| **Android** | [Releases](../../releases) 下载 `RustBookQuiz.apk` | 传到手机安装（约 12MB，arm64，需允许"未知来源"） |
-| **自部署 Web 版** | [Releases](../../releases) 下载 `RustBookQuiz-web.zip` | 解压丢到任意静态服务器，见 [4. Web 版](#4-web-版) |
+| [The Book](https://doc.rust-lang.org/book/) | Systematic reading | Building the concept framework |
+| [Rust by Example](https://doc.rust-lang.org/rust-by-example/) | Reading runnable examples | Recognizing idiomatic code |
+| [rustlings](https://github.com/rust-lang/rustlings) | Fixing code until it compiles | Hands-on fights with the borrow checker |
+| **This project** | Quizzes + explanations + wrong-answer book | **Verifying understanding, exposing misconceptions** |
 
-所有产物由 [GitHub Actions 自动构建](#自动构建与发布github-actions)；想自己编译的话见文末的[手工编译指南](#手工编译指南)。
+Reading alone fades fast, and rustlings always has the compiler as a crutch. The **Code Output** (predict without running) and **Misconception** question types here force you to simulate Rust's semantics with no compiler feedback — active-recall testing, which is how counter-intuitive details like ownership moves, `Deref` coercion, and `match` exhaustiveness actually stick. Missed questions are collected automatically and leave the book once answered correctly, closing the review loop.
 
-## 题库：自己加题 / 贡献题目
+Recommended usage (questions are aligned to the Book's chapters and sections, so this slots straight into a reading schedule):
 
-### 题库规范（bank/chNN.json）
+> **Read a Book chapter → quiz that chapter here → re-read the sections you missed → get hands-on with rustlings / a small project**
 
-每章一个 JSON 文件，单个 Chapter 对象：
+Quizzing is *testing*, writing code is *training* — treat this as the checkpoint between reading and building.
+
+## Quick Start (no build required)
+
+| Platform | Get it | How to use |
+|---|---|---|
+| **Online** | [Open in your browser](https://MilesYang-debug.github.io/rust-book-quiz/) | Works immediately; progress is stored in your browser |
+| **Windows** | Download `RustBookQuiz.exe` from [Releases](../../releases) | Double-click to run (~6MB, uses the system WebView2) |
+| **Linux (Debian/Ubuntu)** | Download `RustBookQuiz_amd64.deb` from [Releases](../../releases) | `sudo apt install ./RustBookQuiz_amd64.deb` |
+| **Linux (any distro)** | Download `RustBookQuiz_x86_64.AppImage` from [Releases](../../releases) | `chmod +x`, then run |
+| **Linux (bare binary)** | Download `RustBookQuiz-linux` from [Releases](../../releases) | Requires `libwebkit2gtk-4.1`; `chmod +x`, then run |
+| **Android** | Download `RustBookQuiz.apk` from [Releases](../../releases) | Install on your phone (~12MB, arm64, allow "unknown sources") |
+| **Self-hosted web** | Download `RustBookQuiz-web.zip` from [Releases](../../releases) | Unzip onto any static file server, see [4. Web](#4-web) |
+
+All artifacts are built automatically by [GitHub Actions](#automated-builds-and-releases-github-actions); if you'd rather build them yourself, see the [manual build guide](#manual-build-guide) at the end.
+
+## Question Bank: Adding / Contributing Questions
+
+### Bank format (bank/chNN.json)
+
+One JSON file per chapter, containing a single Chapter object:
 
 ```json
 {
@@ -40,8 +74,8 @@
       "section": "11.1 How to Write Tests",
       "tag": "Concept",
       "difficulty": 1,
-      "prompt": "题干，可用 `反引号` 标记行内代码",
-      "code": "可选 Rust 片段；换行写 \\n，引号写 \\\"",
+      "prompt": "Question text; inline code goes in `backticks`",
+      "code": "Optional Rust snippet; newlines as \\n, quotes as \\\"",
       "options": { "A": "...", "B": "...", "C": "...", "D": "..." },
       "answer": "B",
       "explanation": "..."
@@ -50,165 +84,172 @@
 }
 ```
 
-- `tag`：Concept | Behavior | Code Output | Spot the Bug | Misconception
-- `difficulty`：1 易 / 2 中 / 3 难
-- 多选题：`"answer": ["A","C"]`，5 个选项 A–E
+- `tag`: Concept | Behavior | Code Output | Spot the Bug | Misconception
+- `difficulty`: 1 easy / 2 medium / 3 hard
+- Multiple choice: `"answer": ["A","C"]`, with 5 options A–E
 
-### 加题流程
+### Workflow for adding questions
 
-**桌面端（零编译）**：写 `bank/chNN.json` → `cd app && cargo run -p quiz-bank` 校验 → 把 `bank/` 放到可执行文件旁 → 重启应用即生效。
+**Desktop (zero compilation)**: write `bank/chNN.json` → validate with `cd app && cargo run -p quiz-bank` → put the `bank/` directory next to the executable → restart the app.
 
-**同步内嵌快照**（影响 APK、Web 版和无 bank 目录时的回退，改完题库后执行并重新编译）：
-
-```bash
-cd app && cargo run -p quiz-bank -- --sync    # 校验通过后重新生成 app/assets/bank.json
-```
-
-> 校验器与应用共用同一套 serde 数据类型（`app/quiz-bank`）——校验通过即保证应用能加载。
-
-欢迎 PR 补充题目——只需改 `bank/` 下的 JSON 并确保 `cargo run -p quiz-bank`（或 `cargo test -p quiz-bank`）通过。
-
-## 开发工作流
+**Regenerate the embedded snapshot** (affects the APK, the web build, and the fallback when no `bank/` directory exists; run after editing the bank, then rebuild):
 
 ```bash
-cd app && trunk serve            # 热重载开发（http://127.0.0.1:8080，走内嵌题库回退路径）
-cargo check --target wasm32-unknown-unknown        # 前端类型检查（app/ 下执行）
-cd src-tauri && cargo check                        # 壳类型检查
-cargo run -p quiz-bank                             # 题库校验（app/ 下执行；--sync 同步内嵌快照）
-cargo test -p quiz-bank                            # 同一校验的测试形式（CI 门禁用）
+cd app && cargo run -p quiz-bank -- --sync    # validates, then regenerates app/assets/bank.json
 ```
 
-> 前置：Rust stable 工具链 + `wasm32-unknown-unknown` 目标 + trunk，安装步骤见[手工编译指南 · 公共准备](#公共准备所有平台都要做一次)。日常开发只需要这三样，**不需要 Node.js**。
+> The validator shares the app's own serde data types (`app/quiz-bank`) — passing validation guarantees the app can load the file.
 
-### 数据存储
+PRs adding questions are welcome — just edit the JSON under `bank/` and make sure `cargo run -p quiz-bank` (or `cargo test -p quiz-bank`) passes.
 
-进度存于各端 WebView 的 localStorage（互相独立，不同步）：
-`rustQuizRs.scores`（章节最高/最近分）、`rustQuizRs.wrong`（错题本）、`rustQuizRs.theme`（深浅主题）。
+## Development Workflow
 
-## 技术架构
-
-```
-┌─────────────────────────────────────────────┐
-│ 前端：Leptos 0.6 (Rust → WASM)               │
-│  - 全部业务逻辑：判分/多选/抽题/错题本        │
-│  - 纯 Rust 语法高亮器（无 JS 依赖）           │
-│  - 内嵌字体 Inter + JetBrains Mono（多端一致）│
-├─────────────────────────────────────────────┤
-│ 壳：Tauri 2                                  │
-│  - Windows: WebView2   Linux: WebKitGTK      │
-│  - Android: 系统 WebView   Web: 无壳直接跑    │
-│  - 命令: load_bank_files / open_url / 窗控    │
-├─────────────────────────────────────────────┤
-│ 题库：bank/chNN.json（每章一个文件）          │
-│  - 桌面: 运行时读可执行文件旁的 bank/ 目录    │
-│  - 移动/Web/回退: 编译期内嵌 assets/bank.json │
-└─────────────────────────────────────────────┘
+```bash
+cd app && trunk serve            # hot-reload dev server (http://127.0.0.1:8080, uses the embedded-bank fallback)
+cargo check --target wasm32-unknown-unknown        # front-end type check (run inside app/)
+cd src-tauri && cargo check                        # shell type check
+cargo run -p quiz-bank                             # bank validation (inside app/; --sync regenerates the snapshot)
+cargo test -p quiz-bank                            # same validation as a test (CI gate)
 ```
 
-## 目录结构
+> Prerequisites: stable Rust toolchain + the `wasm32-unknown-unknown` target + trunk — see [Manual build guide · Common setup](#common-setup-once-for-every-platform). That's all day-to-day development needs; **no Node.js required**.
 
+### Data storage
+
+Progress lives in each platform's WebView localStorage (independent, not synced):
+`rustQuizRs.scores` (best/latest chapter scores), `rustQuizRs.wrong` (wrong-answer book), `rustQuizRs.theme` (dark/light theme).
+
+## Architecture
+
+```mermaid
+flowchart LR
+    bank[("📚 bank/chNN.json<br/>bank source data")]
+    snap["assets/bank.json<br/>embedded snapshot (generated)"]
+    front["Leptos 0.6 front end<br/>Rust → WASM"]
+    shell["Tauri 2 shell"]
+    win["Windows<br/>WebView2"]
+    linux["Linux<br/>WebKitGTK"]
+    android["Android<br/>system WebView"]
+    web["Web<br/>pure static · no shell"]
+
+    bank -->|sync snapshot| snap
+    snap -- embedded at compile time --> front
+    bank -. hot-loaded at runtime on desktop .-> shell
+    front --> shell
+    front --> web
+    shell --> win
+    shell --> linux
+    shell --> android
 ```
-bank/chNN.json            题库源数据（唯一数据源）
-.github/workflows/        CI：release.yml（四端产物）+ deploy-pages.yml（在线版）
-app/                      源码
-  quiz-bank/              题库 schema 类型 + 校验器（cargo run -p quiz-bank）
-  index.html              trunk 构建入口（声明字体/图标资源拷贝）
-  style.css               暗色科技风主题 + 浅色主题 + 移动端媒体查询
-  fonts/  ferris.png      内嵌资源（OFL 字体 / 自绘 Ferris）
-  assets/bank.json        内嵌题库快照（生成物，勿手改）
-  src/main.rs             应用壳：路由/标题栏/主题/抽屉
-  src/model.rs            题库加载、语法高亮（schema 类型复用 quiz-bank）
-  src/storage.rs          localStorage 持久化（分数/错题/主题）
-  src/views.rs            Sidebar/Home/Exam/Wrong/Quiz 组件
-  src-tauri/              Tauri 壳
-    src/lib.rs            入口 + 全部命令（移动端入口在此）
-    src/main.rs           桌面入口（调用 lib::run）
-    tauri.conf.json       窗口配置 + 打包配置（deb/AppImage）
-    capabilities/         窗口拖拽权限
-    icons/                icon.ico（Windows）/ icon.png（移动 + Linux 打包）
-    gen/android/          Android 工程（已提交，无需重新 init）
-```
 
-## 自动构建与发布（GitHub Actions）
-
-日常开发**不需要**在本地凑齐四个平台的环境——CI 全部代劳：
-
-| 工作流 | 触发 | 产出 |
+| Layer | Tech | Responsibilities |
 |---|---|---|
-| [release.yml](.github/workflows/release.yml) | 推送 `v*` 标签 | exe / deb / AppImage / Linux 裸二进制 / apk / web zip，自动挂到 Releases |
-| [deploy-pages.yml](.github/workflows/deploy-pages.yml) | 推送 main（app/ 有改动） | 在线版自动更新到 GitHub Pages |
-| [validate.yml](.github/workflows/validate.yml) | push / PR 涉及 bank/ 或校验器 | 校验题库 + 确认内嵌快照已同步（忘跑 `--sync` 会失败） |
+| **Front end** | Leptos 0.6 (Rust → WASM) | All business logic (grading / multi-select / question drawing / wrong-answer book) · pure-Rust syntax highlighter (no JS deps) · embedded Inter + JetBrains Mono fonts for identical rendering everywhere |
+| **Shell** | Tauri 2 | `load_bank_files` / `open_url` / window-control commands · WebView2 on Windows, WebKitGTK on Linux, system WebView on Android · the web build runs without a shell |
+| **Bank** | JSON (one file per chapter) | Single source of truth `bank/chNN.json` · desktop reads `bank/` next to the executable at runtime · mobile / web / fallback use the compile-time embedded snapshot |
 
-发一个版本只需要：
+## Repository Layout
+
+| Path | Description |
+|---|---|
+| [`bank/`](bank/) | Question bank source data `chNN.json`, one file per chapter (**single source of truth**) |
+| [`.github/workflows/`](.github/workflows/) | CI: `release.yml` (four-platform artifacts) · `deploy-pages.yml` (online version) · `validate.yml` (bank gate) |
+| [`app/quiz-bank/`](app/quiz-bank/) | Bank schema types + validator (`cargo run -p quiz-bank`) |
+| [`app/index.html`](app/index.html) | trunk build entry (declares font/icon asset copies) |
+| [`app/style.css`](app/style.css) | Dark tech theme + light theme + mobile media queries |
+| [`app/fonts/`](app/fonts/) · [`ferris.png`](app/ferris.png) | Embedded assets (OFL fonts / hand-drawn Ferris) |
+| [`app/assets/bank.json`](app/assets/bank.json) | Embedded bank snapshot (**generated — do not edit by hand**) |
+| [`app/src/main.rs`](app/src/main.rs) | App shell: routing / title bar / theme / drawer |
+| [`app/src/model.rs`](app/src/model.rs) | Bank loading, syntax highlighting (schema types re-used from quiz-bank) |
+| [`app/src/storage.rs`](app/src/storage.rs) | localStorage persistence (scores / wrong answers / theme) |
+| [`app/src/views.rs`](app/src/views.rs) | Sidebar / Home / Exam / Wrong / Quiz components |
+| [`app/src-tauri/src/lib.rs`](app/src-tauri/src/lib.rs) | Tauri shell entry + all commands (mobile entry point lives here) |
+| [`app/src-tauri/src/main.rs`](app/src-tauri/src/main.rs) | Desktop entry (calls `lib::run`) |
+| [`app/src-tauri/tauri.conf.json`](app/src-tauri/tauri.conf.json) | Window config + bundling config (deb / AppImage) |
+| [`app/src-tauri/capabilities/`](app/src-tauri/capabilities/) | Window drag permission |
+| [`app/src-tauri/icons/`](app/src-tauri/icons/) | `icon.ico` (Windows) / `icon.png` (mobile + Linux bundling) |
+| [`app/src-tauri/gen/android/`](app/src-tauri/gen/android/) | Android project (committed — no need to re-init) |
+
+## Automated Builds and Releases (GitHub Actions)
+
+Day-to-day development does **not** require setting up all four platform toolchains locally — CI does it all:
+
+| Workflow | Trigger | Output |
+|---|---|---|
+| [release.yml](.github/workflows/release.yml) | Push a `v*` tag | exe / deb / AppImage / Linux bare binary / apk / web zip, attached to Releases automatically |
+| [deploy-pages.yml](.github/workflows/deploy-pages.yml) | Push to main (changes under app/) | Online version auto-deployed to GitHub Pages |
+| [validate.yml](.github/workflows/validate.yml) | push / PR touching bank/ or the validator | Validates the bank + checks the embedded snapshot is in sync (fails if `--sync` was forgotten) |
+
+Shipping a release is just:
 
 ```bash
 git tag v0.1.0
 git push origin v0.1.0
-# ✅ 等 CI 跑完（约 20 分钟），Releases 页面出现全部产物
+# ✅ Wait for CI (~20 minutes); all artifacts appear on the Releases page
 ```
 
-一次性配置（仓库建好后做一次）：**Settings → Pages → Source 选 "GitHub Actions"**，在线版即生效。
+One-time setup (once after creating the repo): **Settings → Pages → Source → "GitHub Actions"** — the online version goes live.
 
 ---
 
-# 手工编译指南
+# Manual Build Guide
 
-> 每个平台小节都是**自包含**的：按顺序执行完"公共准备"+ 对应平台小节即得产物。
-> 每一步标注了 ✅ 预期结果，实际输出对不上时先查[疑难排查](#疑难排查)。
+> Each platform section is **self-contained**: run "Common setup" plus the section for your platform and you get the artifact.
+> Every step lists its ✅ expected result; if yours doesn't match, check [Troubleshooting](#troubleshooting) first.
 
-## 公共准备（所有平台都要做一次）
+## Common setup (once, for every platform)
 
-**第 1 步**：安装 Rust 工具链（stable）。访问 <https://rustup.rs/> 按提示安装，然后验证：
+**Step 1**: Install the Rust toolchain (stable). Follow <https://rustup.rs/>, then verify:
 
 ```bash
-rustc --version        # ✅ 输出形如 rustc 1.8x.0
-cargo --version        # ✅ 输出形如 cargo 1.8x.0
+rustc --version        # ✅ prints something like rustc 1.8x.0
+cargo --version        # ✅ prints something like cargo 1.8x.0
 ```
 
-**第 2 步**：添加 WASM 编译目标（前端编译成 WebAssembly 用）：
+**Step 2**: Add the WASM compilation target (the front end compiles to WebAssembly):
 
 ```bash
 rustup target add wasm32-unknown-unknown
 rustup target list --installed | grep wasm
-# ✅ 输出 wasm32-unknown-unknown
+# ✅ prints wasm32-unknown-unknown
 ```
 
-**第 3 步**：安装前端打包器 trunk：
+**Step 3**: Install the trunk bundler:
 
 ```bash
-cargo install trunk --locked      # 首次编译约 10 分钟
-trunk --version                   # ✅ 输出形如 trunk 0.2x.x
+cargo install trunk --locked      # first build takes ~10 minutes
+trunk --version                   # ✅ prints something like trunk 0.2x.x
 ```
 
-**第 4 步**：克隆仓库并构建前端（**所有平台产物都依赖这一步**）：
+**Step 4**: Clone the repo and build the front end (**every platform artifact depends on this**):
 
 ```bash
 git clone https://github.com/MilesYang-debug/rust-book-quiz.git
 cd rust-book-quiz/app
 trunk build --release
 ls dist/
-# ✅ dist/ 下出现 index.html、*.wasm、*.js、fonts/ 等文件（约 4MB）
+# ✅ dist/ contains index.html, *.wasm, *.js, fonts/, etc. (~4MB)
 ```
 
-> 本项目不依赖 Node.js——题库校验与内嵌快照生成也是 Rust（`cargo run -p quiz-bank`）。
+> This project does not depend on Node.js — bank validation and snapshot generation are Rust too (`cargo run -p quiz-bank`).
 
-## 1. Windows 桌面版
+## 1. Windows desktop
 
-前置：完成[公共准备](#公共准备所有平台都要做一次)。
+Prerequisite: complete [Common setup](#common-setup-once-for-every-platform).
 
 ```bash
 cd app/src-tauri
 cargo build --release
-# ✅ 产物: target/release/rust-book-quiz-desktop.exe
+# ✅ artifact: target/release/rust-book-quiz-desktop.exe
 ```
 
-把 exe 拷出来改名 `RustBookQuiz.exe` 即可分发——它完全自包含（前端、字体、内嵌题库全在里面），拷走即用。旁边放 `bank/` 目录可覆盖内嵌题库（见[加题流程](#加题流程)）。
+Copy the exe out and rename it `RustBookQuiz.exe` — it's fully self-contained (front end, fonts, and embedded bank included). Placing a `bank/` directory next to it overrides the embedded bank (see [Workflow for adding questions](#workflow-for-adding-questions)).
 
-## 2. Linux 桌面版（deb / AppImage / 裸二进制）
+## 2. Linux desktop (deb / AppImage / bare binary)
 
-前置：完成[公共准备](#公共准备所有平台都要做一次)，且以下操作**在 Linux 上执行**。
+Prerequisite: complete [Common setup](#common-setup-once-for-every-platform); the steps below must run **on Linux**.
 
-**第 1 步**：安装系统依赖（Ubuntu/Debian 为例）：
+**Step 1**: Install system dependencies (Ubuntu/Debian shown):
 
 ```bash
 sudo apt update
@@ -216,53 +257,53 @@ sudo apt install -y libwebkit2gtk-4.1-dev build-essential curl wget file \
   libssl-dev libgtk-3-dev librsvg2-dev libxdo-dev
 ```
 
-**第 2 步**：安装 Tauri CLI（二选一）：
+**Step 2**: Install the Tauri CLI (pick one):
 
 ```bash
-npm install -g @tauri-apps/cli@^2     # 快，预编译二进制（后续命令写 tauri ...）
-# 或
-cargo install tauri-cli --locked      # 慢（约 10 分钟），无需 Node（后续命令写 cargo tauri ...）
+npm install -g @tauri-apps/cli@^2     # fast, prebuilt binary (subsequent commands: tauri ...)
+# or
+cargo install tauri-cli --locked      # slow (~10 minutes), no Node needed (subsequent commands: cargo tauri ...)
 ```
 
-**第 3 步**：构建并打包：
+**Step 3**: Build and bundle:
 
 ```bash
 cd app
-cargo tauri build --bundles deb appimage    # npm 版则是: tauri build --bundles deb appimage
+cargo tauri build --bundles deb appimage    # npm variant: tauri build --bundles deb appimage
 ```
 
-✅ 产物（在 `app/src-tauri/target/release/` 下）：
+✅ Artifacts (under `app/src-tauri/target/release/`):
 
-| 路径 | 说明 |
+| Path | Notes |
 |---|---|
-| `bundle/deb/*.deb` | Debian/Ubuntu 安装包，`sudo apt install ./xxx.deb` |
-| `bundle/appimage/*.AppImage` | 免安装通用包，`chmod +x` 后运行 |
-| `rust-book-quiz-desktop` | 裸二进制，需系统有 `libwebkit2gtk-4.1` |
+| `bundle/deb/*.deb` | Debian/Ubuntu package: `sudo apt install ./xxx.deb` |
+| `bundle/appimage/*.AppImage` | Portable, no install: `chmod +x`, then run |
+| `rust-book-quiz-desktop` | Bare binary; requires `libwebkit2gtk-4.1` on the system |
 
-> ⚠️ 只跑 `cargo build --release` **只能得到裸二进制，打不出 deb**——deb/AppImage 必须走
-> `cargo tauri build`（打包器已在 `tauri.conf.json` 的 `bundle` 段启用）。
+> ⚠️ Running only `cargo build --release` gives you **just the bare binary — no deb**. deb/AppImage require
+> `cargo tauri build` (bundling is already enabled in the `bundle` section of `tauri.conf.json`).
 
-## 3. Android 版
+## 3. Android
 
-前置：完成[公共准备](#公共准备所有平台都要做一次)。环境搭建步骤多，但每步都是一次性的。
+Prerequisite: complete [Common setup](#common-setup-once-for-every-platform). The environment setup has many steps, but each is one-time.
 
-### 3.1 一次性环境搭建
+### 3.1 One-time environment setup
 
-**第 1 步**：安装 JDK 17（[Temurin](https://adoptium.net/) 等发行版均可），验证：
+**Step 1**: Install JDK 17 (any distribution, e.g. [Temurin](https://adoptium.net/)), then verify:
 
 ```bash
-java -version    # ✅ 输出含 "17."
+java -version    # ✅ output contains "17."
 ```
 
-**第 2 步**：安装 Android SDK 命令行工具。从
-<https://developer.android.com/studio#command-line-tools-only> 下载 commandline-tools，
-解压成如下布局（**目录名必须是 `latest`**）：
+**Step 2**: Install the Android SDK command-line tools. Download commandline-tools from
+<https://developer.android.com/studio#command-line-tools-only> and unpack into this layout
+(**the directory must be named `latest`**):
 
 ```
 <sdk>/cmdline-tools/latest/bin/sdkmanager
 ```
 
-**第 3 步**：接受许可并安装组件（约 3GB 下载）：
+**Step 3**: Accept licenses and install components (~3GB download):
 
 ```bash
 cd <sdk>
@@ -271,123 +312,128 @@ cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-36" \
   "build-tools;36.0.0" "ndk;27.1.12297006"
 ```
 
-> Windows 下建议用 Git Bash 执行（`sdkmanager` 换成 `sdkmanager.bat`）。公司代理环境
-> Gradle 连不上网的话，见[疑难排查](#疑难排查)最后两条。
+> On Windows, use Git Bash (and `sdkmanager.bat` instead of `sdkmanager`). If Gradle can't reach the
+> network behind a corporate proxy, see the last two rows of [Troubleshooting](#troubleshooting).
 
-**第 4 步**：Rust Android 目标 + Tauri CLI：
+**Step 4**: Rust Android target + Tauri CLI:
 
 ```bash
 rustup target add aarch64-linux-android
-cargo install tauri-cli --locked        # 或 npm install -g @tauri-apps/cli@^2
+cargo install tauri-cli --locked    # or cargo binstall tauri-cli (prebuilt, seconds)
 ```
 
-**第 5 步**：环境变量（每次构建前 export，或写入系统变量）：
+> ⚠️ Android builds **require the cargo edition of tauri-cli**: the gradle task in `gen/android`
+> (buildSrc/BuildTask.kt) calls back into `cargo tauri`, so the npm `@tauri-apps/cli` alone fails
+> with ``no such command: `tauri` ``.
+
+**Step 5**: Environment variables (export before each build, or set them system-wide):
 
 ```bash
-export JAVA_HOME=<jdk17 安装目录>
-export ANDROID_HOME=<sdk 目录>
+export JAVA_HOME=<jdk17 install dir>
+export ANDROID_HOME=<sdk dir>
 export NDK_HOME=$ANDROID_HOME/ndk/27.1.12297006
 ```
 
-### 3.2 构建 APK
+### 3.2 Building the APK
 
 ```bash
-cd app && trunk build --release     # 前端产物（会嵌入 APK）
+cd app && trunk build --release     # front-end assets (embedded into the APK)
 cd src-tauri
 cargo tauri android build --apk --target aarch64
-# ✅ 产物: gen/android/app/build/outputs/apk/arm64/release/app-arm64-release-unsigned.apk
+# ✅ artifact: gen/android/app/build/outputs/apk/arm64/release/app-arm64-release-unsigned.apk
 ```
 
-> - 本仓库已提交 `gen/android/` 工程，**不需要**执行 `cargo tauri android init`
-> - Linux/macOS 下若报 gradlew Permission denied：`chmod +x gen/android/gradlew`
-> - ⚠️ 不要用 `--debug`：debug 版含未剥离符号约 238MB，release 版仅约 12MB
+> - The `gen/android/` project is committed to this repo — do **not** run `cargo tauri android init`
+> - On Linux/macOS, if you get gradlew Permission denied: `chmod +x gen/android/gradlew`
+> - ⚠️ Don't use `--debug`: the debug build carries unstripped symbols (~238MB) vs ~12MB for release
 
-### 3.3 签名（release APK 必须签名才能安装）
+### 3.3 Signing (a release APK must be signed to install)
 
 ```bash
-# 用 debug keystore（gradle 首次构建自动生成于 ~/.android/debug.keystore），个人自用足够
+# Use the debug keystore (auto-generated by gradle at ~/.android/debug.keystore on first build) — fine for personal use
 $ANDROID_HOME/build-tools/36.0.0/apksigner sign \
   --ks ~/.android/debug.keystore --ks-pass pass:android \
   --key-pass pass:android --ks-key-alias androiddebugkey \
   --out RustBookQuiz.apk app-arm64-release-unsigned.apk
 
-$ANDROID_HOME/build-tools/36.0.0/apksigner verify RustBookQuiz.apk   # ✅ 无报错即签名有效
+$ANDROID_HOME/build-tools/36.0.0/apksigner verify RustBookQuiz.apk   # ✅ no errors means a valid signature
 ```
 
-> 上架应用商店需 `keytool -genkeypair` 生成正式密钥另签。
+> Publishing to an app store requires a proper key generated with `keytool -genkeypair`.
 
-APK 传到手机直接安装（允许"未知来源"）。手机端用内嵌题库；UI 自动切换移动布局（☰ 抽屉侧边栏、系统状态栏、单列触控）。
+Transfer the APK to your phone and install (allow "unknown sources"). The phone uses the embedded bank; the UI switches to the mobile layout automatically (☰ drawer sidebar, system status bar, single-column touch layout).
 
-### 3.4 改壳代码时的移动端要点
+### 3.4 Mobile notes when changing the shell code
 
-- 入口在 `lib.rs`：`#[cfg_attr(mobile, tauri::mobile_entry_point)] pub fn run()`；`main.rs` 只是桌面薄壳
-- 窗口 API（minimize/maximize 等）必须 `#[cfg(desktop)]` 门控——Android 目标上这些方法不存在，否则 E0599
-- 外链统一走 `tauri-plugin-opener`（桌面 + Android 通用），命令实现在 `lib.rs` 的 `open_url`
-- 移动端必须有 `icons/icon.png`（桌面用 .ico，移动用 .png）
+- The entry point is in `lib.rs`: `#[cfg_attr(mobile, tauri::mobile_entry_point)] pub fn run()`; `main.rs` is just a thin desktop wrapper
+- Window APIs (minimize/maximize, etc.) must be gated with `#[cfg(desktop)]` — they don't exist on the Android target, otherwise you get E0599
+- External links go through `tauri-plugin-opener` (works on desktop and Android alike); the command lives in `open_url` in `lib.rs`
+- Mobile requires `icons/icon.png` (desktop uses .ico, mobile uses .png)
 
-## 4. Web 版
+## 4. Web
 
-前端本身就是纯静态 WASM 应用，[公共准备第 4 步](#公共准备所有平台都要做一次)产出的 `app/dist/` 就是全部部署物——**无需后端、无需数据库**，任何能托管静态文件的地方都行。
+The front end is a plain static WASM app: the `app/dist/` produced in [Common setup step 4](#common-setup-once-for-every-platform) is the entire deployable — **no backend, no database**; anything that serves static files works.
 
-本地预览：
+Local preview:
 
 ```bash
 python -m http.server 8000 --directory app/dist
-# ✅ 浏览器访问 http://localhost:8000 可正常刷题
+# ✅ open http://localhost:8000 and start quizzing
 ```
 
-部署到静态服务器（nginx 示例）：
+Deploying to a static server (nginx example):
 
 ```nginx
 server {
     listen 80;
-    root /var/www/rust-book-quiz;    # dist/ 的内容
+    root /var/www/rust-book-quiz;    # contents of dist/
     index index.html;
-    types { application/wasm wasm; } # 老版本 nginx 需手动加 wasm MIME
-    gzip on;                         # WASM 体积较大，开压缩收益明显
+    types { application/wasm wasm; } # older nginx needs the wasm MIME type added manually
+    gzip on;                         # WASM is large; compression pays off
     gzip_types application/wasm application/javascript text/css;
 }
 ```
 
-部署到**子路径**（如 GitHub Pages 的 `https://MilesYang-debug.github.io/rust-book-quiz/`）需在构建时指定资源前缀：
+Deploying under a **subpath** (e.g. GitHub Pages at `https://MilesYang-debug.github.io/rust-book-quiz/`) requires setting the asset prefix at build time:
 
 ```bash
 trunk build --release --public-url /rust-book-quiz/
 ```
 
-Web 版行为差异：
+Behavioral differences of the web build:
 
-- 题库固定为编译期内嵌快照（`app/assets/bank.json`）——改题后需重新构建部署，没有桌面端的 `bank/` 热加载
-- 标题栏自动隐藏窗口控制按钮（最小化/关闭交给浏览器），主题切换保留
-- 进度存在访问者各自浏览器的 localStorage 里，服务器不存任何用户数据
-- 移动浏览器访问自动切换移动布局（与 APK 同一套响应式 CSS）
+- The bank is fixed to the compile-time embedded snapshot (`app/assets/bank.json`) — after editing questions you must rebuild and redeploy; there's no desktop-style `bank/` hot loading
+- The title bar hides the window controls automatically (minimize/close are the browser's job); theme switching stays
+- Progress lives in each visitor's own browser localStorage; the server stores no user data
+- Mobile browsers get the mobile layout automatically (same responsive CSS as the APK)
 
 ---
 
-# 疑难排查
+# Troubleshooting
 
-| 症状 | 原因与解法 |
+| Symptom | Cause and fix |
 |---|---|
-| `can't find crate for core`（wasm 目标） | 没装 WASM 目标：`rustup target add wasm32-unknown-unknown` |
-| `error: linking with cc failed` / 找不到 `webkit2gtk` | Linux 系统依赖没装齐，重跑 [2. Linux 第 1 步](#2-linux-桌面版deb--appimage--裸二进制)的 `apt install` |
-| `icon.ico not found` | `app/src-tauri/icons/icon.ico` 缺失（tauri-build 生成 Windows 资源必需），从仓库恢复 |
-| `cargo tauri build` 没产出 deb | 确认命令是 `cargo tauri build` 而不是 `cargo build`，且 `tauri.conf.json` 里 `bundle.active: true` |
-| AppImage 打包卡在下载工具 | Tauri 首次打包会下载 linuxdeploy，网络不通时挂代理重试 |
-| Android 构建 `gradlew: Permission denied` | gradlew 丢失可执行位（从 Windows 提交的常见问题）：`chmod +x app/src-tauri/gen/android/gradlew`；在 git 里根治：`git update-index --chmod=+x app/src-tauri/gen/android/gradlew` |
-| Android 构建报 E0599 找不到窗口方法 | 桌面窗口 API 没加 `#[cfg(desktop)]` 门控，见 [3.4 移动端要点](#34-改壳代码时的移动端要点) |
-| Web 版部署后一片空白 | 子路径部署没加 `--public-url /<子路径>/`；或服务器 .wasm 的 MIME 不对（需 `application/wasm`） |
-| Web 版图标/字体 404 | 资源必须用相对路径引用（`ferris.png`、`fonts/...`），绝对路径 `/xxx` 在子路径部署下会指向域名根 |
-| Gradle 连不上网（公司代理环境） | JVM 不读 `HTTPS_PROXY` 环境变量。写 `~/.gradle/gradle.properties`：四行 `systemProp.http(s).proxyHost/proxyPort=<代理主机/端口>`，另加 `systemProp.http(s).nonProxyHosts=localhost\|127.0.0.1\|10.*\|172.16.*\|192.168.*` |
-| Gradle wrapper 下载发行版失败（代理环境） | wrapper 下载在读到代理配置前执行：手动 `curl -L -o <本地目录>/gradle-8.14.3-bin.zip https://services.gradle.org/distributions/gradle-8.14.3-bin.zip`，把 `gen/android/gradle/wrapper/gradle-wrapper.properties` 的 `distributionUrl` 临时改成 `file:///<本地路径>`（**勿提交此改动**，可用 `git update-index --skip-worktree` 让 git 忽略） |
+| `can't find crate for core` (wasm target) | WASM target not installed: `rustup target add wasm32-unknown-unknown` |
+| `error: linking with cc failed` / `webkit2gtk` not found | Missing Linux system deps; re-run the `apt install` from [2. Linux step 1](#2-linux-desktop-deb--appimage--bare-binary) |
+| `icon.ico not found` | `app/src-tauri/icons/icon.ico` is missing (required by tauri-build for Windows resources); restore it from the repo |
+| `cargo tauri build` produces no deb | Make sure the command is `cargo tauri build`, not `cargo build`, and that `bundle.active: true` in `tauri.conf.json` |
+| AppImage bundling hangs downloading tools | Tauri downloads linuxdeploy on first bundling; retry behind a proxy if the network is blocked |
+| Android build: `gradlew: Permission denied` | gradlew lost its executable bit (common when committed from Windows): `chmod +x app/src-tauri/gen/android/gradlew`; fix it in git for good with `git update-index --chmod=+x app/src-tauri/gen/android/gradlew` |
+| Android build: ``no such command: `tauri` `` | gradle calls back into `cargo tauri`; the npm CLI is not enough: `cargo install tauri-cli --locked` (or `cargo binstall tauri-cli`) |
+| Android build fails with E0599 on window methods | Desktop window APIs missing the `#[cfg(desktop)]` gate; see [3.4 Mobile notes](#34-mobile-notes-when-changing-the-shell-code) |
+| Web deploy shows a blank page | Subpath deploy missing `--public-url /<subpath>/`; or the server serves .wasm with the wrong MIME type (must be `application/wasm`) |
+| Web icon/fonts 404 | Assets must be referenced with relative paths (`ferris.png`, `fonts/...`); absolute paths like `/xxx` point at the domain root under a subpath deploy |
+| Gradle can't reach the network (corporate proxy) | The JVM ignores the `HTTPS_PROXY` env var. Write `~/.gradle/gradle.properties` with four lines `systemProp.http(s).proxyHost/proxyPort=<proxy host/port>`, plus `systemProp.http(s).nonProxyHosts=localhost\|127.0.0.1\|10.*\|172.16.*\|192.168.*` |
+| Gradle wrapper fails to download the distribution (proxy) | The wrapper download runs before proxy config is read: manually `curl -L -o <local dir>/gradle-8.14.3-bin.zip https://services.gradle.org/distributions/gradle-8.14.3-bin.zip`, then temporarily point `distributionUrl` in `gen/android/gradle/wrapper/gradle-wrapper.properties` at `file:///<local path>` (**don't commit this change** — `git update-index --skip-worktree` makes git ignore it) |
 
-# 已知限制
+# Known Limitations
 
-- APK 为 debug 密钥签名，不可直接上架应用商店
-- 各端进度不互通（无云同步）
-- 未覆盖 ch21（Web 服务器实战——纯项目走读章节，不适合出题）
+- The APK is signed with a debug key and can't be published to app stores as-is
+- Progress doesn't sync across platforms (no cloud sync)
+- ch21 isn't covered (the web-server capstone — a pure project walkthrough, not quiz material)
 
-# 资源许可
+# Asset Licenses
 
-- 字体 Inter、JetBrains Mono：SIL OFL 1.1，随应用分发合规
-- Ferris 图标为本项目程序化绘制（官方 Ferris 本身 CC0）
-- 题目基于[官方教程](https://doc.rust-lang.org/book/)原创编写
+- Fonts Inter and JetBrains Mono: SIL OFL 1.1, redistributable with the app
+- The Ferris icon is drawn programmatically by this project (the official Ferris itself is CC0)
+- Questions are written originally, based on [the official book](https://doc.rust-lang.org/book/)

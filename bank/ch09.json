@@ -47,7 +47,7 @@
     "D": "It compiles and runs fine because the indexed value is never used"
    },
    "answer": "C",
-   "explanation": "Indexing a `Vec` past its end compiles but panics at runtime (\"index out of bounds: the len is 3 but the index is 99\"). Rust panics here precisely to prevent the C-style buffer overread in option B."
+   "explanation": "Indexing a `Vec` past its end compiles but panics at runtime (\"index out of bounds: the len is 3 but the index is 99\"). Rust panics here precisely to prevent a C-style buffer overread of whatever memory lies past the end."
   },
   {
    "id": "ch09-q04",
