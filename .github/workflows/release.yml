@@ -106,43 +106,32 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "17"
-
       - uses: android-actions/setup-android@v3
-
       - name: 安装 SDK 组件与 NDK
         run: |
           sdkmanager "platform-tools" "platforms;android-36" \
             "build-tools;36.0.0" "ndk;27.1.12297006"
           echo "NDK_HOME=$ANDROID_HOME/ndk/27.1.12297006" >> "$GITHUB_ENV"
-
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: wasm32-unknown-unknown,aarch64-linux-android
-
       - name: 安装 trunk（预编译二进制）
         uses: taiki-e/install-action@v2
         with:
           tool: trunk
-
-      # gen/android 的 gradle 构建任务会回调 `cargo tauri`（见 buildSrc/BuildTask.kt），
-      # npm 版 CLI 满足不了；用 binstall 拉 cargo 版预编译二进制，避免 10 分钟源码编译。
       - name: 安装 cargo-binstall
         uses: cargo-bins/cargo-binstall@main
-
-      - name: 安装 tauri-cli（cargo 版，预编译二进制）
+      - name: 安装 tauri-cli（cargo 版）
         run: cargo binstall tauri-cli --locked --no-confirm
-
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: |
             app -> target
             app/src-tauri -> target
-
       - name: 构建前端（WASM）
         working-directory: app
         run: trunk build --release
@@ -150,9 +139,13 @@ jobs:
       - name: 构建 release APK（仅 arm64）
         working-directory: app
         run: |
-          # gradlew 从 Windows 提交时会丢失可执行位（100644），Linux runner 上会 Permission denied
           chmod +x src-tauri/gen/android/gradlew
-          cargo tauri android build --apk --target aarch64
+          # 显式加 --release，target 写完整三元组
+          cargo tauri android build --apk --target aarch64-linux-android --release
+
+      # 新增：打印所有 APK 路径，方便排查真实路径
+      - name: 查看 APK 产物真实路径
+        run: find app/src-tauri/gen/android -name "*.apk"
 
       - name: 用 debug 密钥签名
         run: |
@@ -161,11 +154,12 @@ jobs:
             -dname "CN=Android Debug,O=Android,C=US" \
             -keyalg RSA -keysize 2048 -validity 10000
           BUILD_TOOLS="$ANDROID_HOME/build-tools/36.0.0"
+          # 这里替换成上面 find 命令输出的真实 unsigned apk 路径
           "$BUILD_TOOLS/apksigner" sign \
             --ks debug.keystore --ks-pass pass:android --key-pass pass:android \
             --ks-key-alias androiddebugkey \
             --out RustBookQuiz.apk \
-            app/src-tauri/gen/android/app/build/outputs/apk/arm64/release/app-arm64-release-unsigned.apk
+            app/src-tauri/gen/android/app/build/outputs/apk/release/arm64-v8a/app-arm64-v8a-release-unsigned.apk
           "$BUILD_TOOLS/apksigner" verify RustBookQuiz.apk
 
       - uses: actions/upload-artifact@v4
