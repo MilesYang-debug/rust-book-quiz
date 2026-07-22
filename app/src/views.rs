@@ -22,12 +22,41 @@ pub struct QuestionCtx {
     pub chapter: u32,
 }
 
+/// Where a quiz was started from: decides the exit route and score keeping.
+#[derive(Clone, PartialEq)]
+pub enum QuizSource {
+    /// Whole-chapter run (scored).
+    Chapter(u32),
+    /// Single-section practice (chapter, section).
+    Section(u32, String),
+    Exam,
+    Wrong,
+}
+
+impl QuizSource {
+    pub fn chapter(&self) -> Option<u32> {
+        match self {
+            QuizSource::Chapter(n) | QuizSource::Section(n, _) => Some(*n),
+            _ => None,
+        }
+    }
+
+    /// Where Done / Exit / Esc should land.
+    pub fn exit_route(&self) -> Route {
+        match self {
+            QuizSource::Chapter(n) | QuizSource::Section(n, _) => Route::Chapter(*n),
+            QuizSource::Exam => Route::Exam,
+            QuizSource::Wrong => Route::Wrong,
+        }
+    }
+}
+
 #[derive(Clone)]
 pub struct QuizConfig {
     pub mode: Mode,
     pub title: String,
     pub questions: Vec<QuestionCtx>,
-    pub chapter_for_score: Option<u32>,
+    pub source: QuizSource,
 }
 
 /* ================= Shared helpers ================= */
@@ -84,11 +113,12 @@ fn start_chapter(bank: RwSignal<Vec<Chapter>>, route: RwSignal<Route>, num: u32)
                 .map(|q| QuestionCtx { q, chapter: num })
                 .collect();
             shuffle_quiz(&mut questions);
+            storage::save_last_visit(num, None);
             route.set(Route::Quiz(QuizConfig {
                 mode: Mode::Chapter,
                 title: format!("Ch {} · {}", num, ch.title),
                 questions,
-                chapter_for_score: Some(num),
+                source: QuizSource::Chapter(num),
             }));
         }
     });
@@ -109,11 +139,12 @@ fn start_section(bank: RwSignal<Vec<Chapter>>, route: RwSignal<Route>, num: u32,
                 return;
             }
             shuffle_quiz(&mut questions);
+            storage::save_last_visit(num, Some(section.clone()));
             route.set(Route::Quiz(QuizConfig {
                 mode: Mode::Chapter,
                 title: format!("Ch {num} · § {section}"),
                 questions,
-                chapter_for_score: None,
+                source: QuizSource::Section(num, section.clone()),
             }));
         }
     });
@@ -129,7 +160,7 @@ fn start_wrong(bank: RwSignal<Vec<Chapter>>, route: RwSignal<Route>) {
         mode: Mode::Wrong,
         title: "Wrong Answer Practice".into(),
         questions,
-        chapter_for_score: None,
+        source: QuizSource::Wrong,
     }));
 }
 
@@ -203,7 +234,7 @@ pub fn Sidebar() -> impl IntoView {
                             let num = ch.chapter;
                             let best = scores.get(&num).map(|e| e.best);
                             let active = matches!(&cur, Route::Chapter(n) if *n == num)
-                                || matches!(&cur, Route::Quiz(c) if c.chapter_for_score == Some(num));
+                                || matches!(&cur, Route::Quiz(c) if c.source.chapter() == Some(num));
                             view! {
                                 <div class="chrow" class:act=active on:click=move |_| route.set(Route::Chapter(num))>
                                     <span class="ch-name">{format!("Ch{} {}", num, ch.title)}</span>
@@ -231,10 +262,19 @@ pub fn HomeView() -> impl IntoView {
     let route = use_context::<RwSignal<Route>>().expect("route context");
 
     let scores = storage::scores();
+    let done = storage::done_book();
     let wrong_n = wrong_entries(bank).len();
     let chapters = bank.get_untracked();
     let total_q: usize = chapters.iter().map(|c| c.questions.len()).sum();
+    let done_q: usize = chapters
+        .iter()
+        .flat_map(|c| &c.questions)
+        .filter(|q| done.contains_key(&q.id))
+        .count();
     let n_ch = chapters.len();
+
+    // "Continue where you left off" shortcut (only if the chapter still exists).
+    let resume = storage::last_visit().filter(|lv| chapters.iter().any(|c| c.chapter == lv.chapter));
 
     view! {
         <div class="page">
@@ -249,8 +289,22 @@ pub fn HomeView() -> impl IntoView {
             <div class="stat-cards">
                 <div class="stat-card"><b>{n_ch}</b><span>"Chapters"</span></div>
                 <div class="stat-card"><b>{total_q}</b><span>"Questions"</span></div>
+                <div class="stat-card"><b>{format!("{done_q}/{total_q}")}</b><span>"Answered"</span></div>
                 <div class="stat-card"><b>{wrong_n}</b><span>"In wrong book"</span></div>
             </div>
+
+            {resume.map(|lv| {
+                let n = lv.chapter;
+                let label = match &lv.section {
+                    Some(s) => format!("Continue where you left off · Ch {n} § {s} →"),
+                    None => format!("Continue where you left off · Ch {n} →"),
+                };
+                view! {
+                    <button class="btn primary" style="margin-top:14px;" on:click=move |_| route.set(Route::Chapter(n))>
+                        {label}
+                    </button>
+                }
+            })}
 
             <h2 class="sec-title">"Chapters"</h2>
             <div class="grid">
@@ -258,16 +312,21 @@ pub fn HomeView() -> impl IntoView {
                     let num = ch.chapter;
                     let link = ch.link.clone();
                     let best = scores.get(&num).map(|e| e.best);
+                    let n_q = ch.questions.len();
+                    let n_done = ch.questions.iter().filter(|q| done.contains_key(&q.id)).count();
                     view! {
                         <div class="gcard" on:click=move |_| route.set(Route::Chapter(num))>
                             <div class="gc-num">{format!("CH {num:02}")}</div>
                             <div class="gc-title">{ch.title.clone()}</div>
                             <div class="gc-meta">
-                                <span class="pill">{format!("{} Q", ch.questions.len())}</span>
-                                {match best {
-                                    Some(b) => view! { <span class="pill ok">{format!("best {b}%")}</span> }.into_view(),
-                                    None => view! { <span class="pill dim">"new"</span> }.into_view(),
+                                <span class="pill">{format!("{n_q} Q")}</span>
+                                {match (n_done, best) {
+                                    (0, None) => view! { <span class="pill dim">"new"</span> }.into_view(),
+                                    (d, _) if d == n_q => view! { <span class="pill ok">"✓ all done"</span> }.into_view(),
+                                    (d, _) if d > 0 => view! { <span class="pill">{format!("{d}/{n_q} done")}</span> }.into_view(),
+                                    _ => view! {}.into_view(),
                                 }}
+                                {best.map(|b| view! { <span class="pill ok">{format!("best {b}%")}</span> })}
                                 <span class="gc-link" on:click=move |e| {
                                     e.stop_propagation();
                                     open_url(&link);
@@ -296,12 +355,21 @@ pub fn ChapterView(num: u32) -> impl IntoView {
     let total = ch.questions.len();
     let link = ch.link.clone();
 
-    // Sections in order of first appearance, with question counts.
-    let mut sections: Vec<(String, usize)> = Vec::new();
+    let done = storage::done_book();
+    let ch_done = ch.questions.iter().filter(|q| done.contains_key(&q.id)).count();
+
+    // Sections in order of first appearance: (name, questions, done, correct).
+    let mut sections: Vec<(String, usize, usize, usize)> = Vec::new();
     for q in &ch.questions {
-        match sections.iter_mut().find(|(s, _)| s == &q.section) {
-            Some((_, n)) => *n += 1,
-            None => sections.push((q.section.clone(), 1)),
+        let is_done = done.contains_key(&q.id) as usize;
+        let is_right = done.get(&q.id).copied().unwrap_or(false) as usize;
+        match sections.iter_mut().find(|(s, ..)| s == &q.section) {
+            Some((_, n, d, r)) => {
+                *n += 1;
+                *d += is_done;
+                *r += is_right;
+            }
+            None => sections.push((q.section.clone(), 1, is_done, is_right)),
         }
     }
 
@@ -312,6 +380,7 @@ pub fn ChapterView(num: u32) -> impl IntoView {
                     <h1>{format!("Ch {} · {}", num, ch.title)}</h1>
                     <p class="page-sub">
                         {format!("{total} questions · {} section(s)", sections.len())}
+                        {(ch_done > 0).then(|| format!(" · {ch_done}/{total} done")).unwrap_or_default()}
                         {best.map(|b| format!(" · best {b}%")).unwrap_or_default()}
                     </p>
                 </div>
@@ -322,14 +391,22 @@ pub fn ChapterView(num: u32) -> impl IntoView {
                 <button class="btn primary big" on:click=move |_| start_chapter(bank, route, num)>
                     {format!("Practice whole chapter · {total} Q →")}
                 </button>
-                <div class="field-label" style="margin-top:6px;">"Or practice one section (not scored)"</div>
+                <div class="field-label" style="margin-top:6px;">"Or practice one section (no chapter score)"</div>
                 <div class="sec-list">
-                    {sections.into_iter().map(|(section, n)| {
+                    {sections.into_iter().map(|(section, n, d, r)| {
                         let sec2 = section.clone();
+                        let progress = if d == 0 {
+                            view! { <span class="pill dim">"new"</span> }.into_view()
+                        } else if d < n {
+                            view! { <span class="pill">{format!("{d}/{n} done")}</span> }.into_view()
+                        } else {
+                            view! { <span class="pill ok">{format!("✓ {r}/{n} right")}</span> }.into_view()
+                        };
                         view! {
                             <div class="sec-row" on:click=move |_| start_section(bank, route, num, sec2.clone())>
                                 <span class="sec-name">{format!("§ {section}")}</span>
                                 <span class="pill">{format!("{n} Q")}</span>
+                                {progress}
                                 <span class="sec-go">"→"</span>
                             </div>
                         }
@@ -382,7 +459,7 @@ pub fn ExamView() -> impl IntoView {
             mode: Mode::Exam,
             title: format!("Random Exam · {n} questions"),
             questions: pool,
-            chapter_for_score: None,
+            source: QuizSource::Exam,
         }));
     };
 
@@ -519,7 +596,9 @@ pub fn WrongView() -> impl IntoView {
 pub fn QuizView(cfg: QuizConfig) -> impl IntoView {
     let route = use_context::<RwSignal<Route>>().expect("route context");
     let ver = use_context::<RwSignal<u32>>().expect("storage version context");
-    let QuizConfig { mode, title, questions, chapter_for_score } = cfg;
+    let QuizConfig { mode, title, questions, source } = cfg;
+    let source = store_value(source);
+    let exit_quiz = move || source.with_value(|s| s.exit_route());
     let total = questions.len();
     let questions = store_value(questions);
 
@@ -550,6 +629,7 @@ pub fn QuizView(cfg: QuizConfig) -> impl IntoView {
         checked.update(|c| {
             c.insert(qc.q.id.clone(), ok);
         });
+        storage::record_done(&qc.q.id, ok);
         if ok {
             storage::clear_wrong(&qc.q.id);
         } else {
@@ -570,6 +650,9 @@ pub fn QuizView(cfg: QuizConfig) -> impl IntoView {
                         checked.update(|c| {
                             c.insert(qc.q.id.clone(), ok);
                         });
+                        if attempted {
+                            storage::record_done(&qc.q.id, ok);
+                        }
                         if ok {
                             storage::clear_wrong(&qc.q.id);
                         } else if attempted {
@@ -578,7 +661,12 @@ pub fn QuizView(cfg: QuizConfig) -> impl IntoView {
                     }
                 });
             }
-            if let (Mode::Chapter, Some(ch)) = (mode, chapter_for_score) {
+            // Only full-chapter runs record a chapter score (partial runs would skew it).
+            let score_ch = source.with_value(|s| match s {
+                QuizSource::Chapter(n) => Some(*n),
+                _ => None,
+            });
+            if let Some(ch) = score_ch {
                 let right = checked.with_untracked(|c| c.values().filter(|v| **v).count());
                 let pct = ((right as f64 / total.max(1) as f64) * 100.0).round() as u32;
                 storage::save_score(ch, pct);
@@ -633,7 +721,7 @@ pub fn QuizView(cfg: QuizConfig) -> impl IntoView {
             return;
         }
         if e.key() == "Escape" {
-            route.set(Route::Home);
+            route.set(exit_quiz());
             return;
         }
         if finished.get_untracked() {
@@ -787,6 +875,17 @@ pub fn QuizView(cfg: QuizConfig) -> impl IntoView {
                             {(!ok).then(|| view! { <span class="fb-ans">{format!("answer: {}", answer_letters.join(", "))}</span> })}
                         </div>
                         <div class="fb-body" inner_html=rich_text(&q.explanation)></div>
+                        {quiz_bank::book_toc::book_url(chapter, &q.section).map(|url| {
+                            let url = match &q.anchor {
+                                Some(a) => format!("{url}#{a}"),
+                                None => url,
+                            };
+                            view! {
+                                <button class="fb-src" on:click=move |_| open_url(&url)>
+                                    {format!("📖 Read in The Book · § {} ↗", q.section)}
+                                </button>
+                            }
+                        })}
                     </div>
                 })}
                 <div class="qfoot">
@@ -866,7 +965,7 @@ pub fn QuizView(cfg: QuizConfig) -> impl IntoView {
                         graded.set(false);
                         finished.set(false);
                     }>"Retry"</button>
-                    <button class="btn primary big" on:click=move |_| route.set(Route::Home)>"Done ✓"</button>
+                    <button class="btn primary big" on:click=move |_| route.set(exit_quiz())>"Done ✓"</button>
                 </div>
             </div>
         }
@@ -875,7 +974,7 @@ pub fn QuizView(cfg: QuizConfig) -> impl IntoView {
     view! {
         <div class="quiz">
             <div class="quiz-head">
-                <button class="btn ghost" on:click=move |_| route.set(Route::Home)>"← Exit"</button>
+                <button class="btn ghost" on:click=move |_| route.set(exit_quiz())>"← Exit"</button>
                 <span class="quiz-title">{title.clone()}</span>
                 <div class="quiz-prog">{progress}</div>
             </div>

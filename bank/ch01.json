@@ -21,6 +21,7 @@
   {
    "id": "ch01-q02",
    "section": "1.1 Installation",
+   "anchor": "troubleshooting",
    "tag": "Behavior",
    "difficulty": 1,
    "prompt": "After installing Rust, which command verifies that the compiler is installed correctly and prints its version?",
@@ -36,6 +37,7 @@
   {
    "id": "ch01-q03",
    "section": "1.1 Installation",
+   "anchor": "installing-rustup-on-linux-or-macos",
    "tag": "Misconception",
    "difficulty": 2,
    "prompt": "You get \"linker not found\" errors when compiling a fresh Rust installation on macOS or Linux. According to the book, what is the fix?",
@@ -51,6 +53,7 @@
   {
    "id": "ch01-q04",
    "section": "1.2 Hello, World!",
+   "anchor": "the-anatomy-of-a-rust-program",
    "tag": "Concept",
    "difficulty": 1,
    "prompt": "In the Hello, World! program, what does the `!` in `println!` signify?",
@@ -67,6 +70,7 @@
   {
    "id": "ch01-q05",
    "section": "1.2 Hello, World!",
+   "anchor": "compilation-and-execution",
    "tag": "Behavior",
    "difficulty": 2,
    "prompt": "You run `rustc main.rs` on Linux and it succeeds, but nothing prints to the screen. Why?",
@@ -82,6 +86,7 @@
   {
    "id": "ch01-q06",
    "section": "1.2 Hello, World!",
+   "anchor": "the-anatomy-of-a-rust-program",
    "tag": "Spot the Bug",
    "difficulty": 2,
    "prompt": "This program fails to compile. What is the problem?",
@@ -98,6 +103,7 @@
   {
    "id": "ch01-q07",
    "section": "1.3 Hello, Cargo!",
+   "anchor": "creating-a-project-with-cargo",
    "tag": "Behavior",
    "difficulty": 1,
    "prompt": "What does `cargo new hello_cargo` create?",
@@ -113,6 +119,7 @@
   {
    "id": "ch01-q08",
    "section": "1.3 Hello, Cargo!",
+   "anchor": "building-and-running-a-cargo-project",
    "tag": "Concept",
    "difficulty": 2,
    "prompt": "Which statements about Cargo commands are true? (Select all that apply.)",
@@ -133,6 +140,7 @@
   {
    "id": "ch01-q09",
    "section": "1.3 Hello, Cargo!",
+   "anchor": "building-for-release",
    "tag": "Misconception",
    "difficulty": 3,
    "prompt": "A teammate says: \"Before benchmarking, just run `cargo build` and time the binary in `target/debug/`.\" Why is this advice wrong?",

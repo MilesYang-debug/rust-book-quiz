@@ -22,6 +22,7 @@
     {
       "id": "ch19-q02",
       "section": "19.1 All the Places Patterns Can Be Used",
+      "anchor": "let-statements",
       "tag": "Misconception",
       "difficulty": 1,
       "prompt": "Consider the statement `let x = 5;`. Which statement about `let` and patterns is true?",
@@ -37,6 +38,7 @@
     {
       "id": "ch19-q03",
       "section": "19.1 All the Places Patterns Can Be Used",
+      "anchor": "conditional-if-let-expressions",
       "tag": "Code Output",
       "difficulty": 2,
       "prompt": "What does this program print?",
@@ -53,6 +55,7 @@
     {
       "id": "ch19-q04",
       "section": "19.1 All the Places Patterns Can Be Used",
+      "anchor": "while-let-conditional-loops",
       "tag": "Code Output",
       "difficulty": 2,
       "prompt": "What does this loop print?",
@@ -69,6 +72,7 @@
     {
       "id": "ch19-q05",
       "section": "19.1 All the Places Patterns Can Be Used",
+      "anchor": "for-loops",
       "tag": "Code Output",
       "difficulty": 1,
       "prompt": "What is the first line this program prints?",
@@ -132,6 +136,7 @@
     {
       "id": "ch19-q09",
       "section": "19.3 Pattern Syntax",
+      "anchor": "matching-named-variables",
       "tag": "Code Output",
       "difficulty": 2,
       "prompt": "What does this program print?",
@@ -148,6 +153,7 @@
     {
       "id": "ch19-q10",
       "section": "19.3 Pattern Syntax",
+      "anchor": "matching-named-variables",
       "tag": "Misconception",
       "difficulty": 3,
       "prompt": "An outer variable `y` already exists, and a `match` arm uses the pattern `Some(y)`. Which statements are true? Select all that apply.",
@@ -180,6 +186,7 @@
     {
       "id": "ch19-q12",
       "section": "19.3 Pattern Syntax",
+      "anchor": "destructuring-to-break-apart-values",
       "tag": "Code Output",
       "difficulty": 2,
       "prompt": "What does this program print?",
@@ -196,6 +203,7 @@
     {
       "id": "ch19-q13",
       "section": "19.3 Pattern Syntax",
+      "anchor": "ignoring-values-in-a-pattern",
       "tag": "Spot the Bug",
       "difficulty": 3,
       "prompt": "What is wrong with this code?",
@@ -212,6 +220,7 @@
     {
       "id": "ch19-q14",
       "section": "19.3 Pattern Syntax",
+      "anchor": "ignoring-values-in-a-pattern",
       "tag": "Spot the Bug",
       "difficulty": 3,
       "prompt": "This program fails to compile. Why?",
@@ -228,6 +237,7 @@
     {
       "id": "ch19-q15",
       "section": "19.3 Pattern Syntax",
+      "anchor": "adding-conditionals-with-match-guards",
       "tag": "Code Output",
       "difficulty": 3,
       "prompt": "What does this program print?",
@@ -244,6 +254,7 @@
     {
       "id": "ch19-q16",
       "section": "19.3 Pattern Syntax",
+      "anchor": "adding-conditionals-with-match-guards",
       "tag": "Concept",
       "difficulty": 2,
       "prompt": "Match guards (an extra `if` condition after a pattern, like `Some(x) if x % 2 == 0`) add expressive power. What is their downside?",
@@ -259,6 +270,7 @@
     {
       "id": "ch19-q17",
       "section": "19.3 Pattern Syntax",
+      "anchor": "using--bindings",
       "tag": "Code Output",
       "difficulty": 2,
       "prompt": "What does this program print?",
@@ -275,6 +287,7 @@
     {
       "id": "ch19-q18",
       "section": "19.3 Pattern Syntax",
+      "anchor": "destructuring-to-break-apart-values",
       "tag": "Behavior",
       "difficulty": 3,
       "prompt": "Which statements about destructuring patterns are true? Select all that apply.",

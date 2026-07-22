@@ -1,0 +1,30 @@
+name: "New question proposal / 提议新题"
+description: "Propose a question without opening a PR yourself"
+title: "[bank] new question: "
+labels: ["question-bank"]
+body:
+  - type: input
+    id: section
+    attributes:
+      label: "Book section / 对应章节"
+      description: "Format: N.M Title, copied from The Book's table of contents"
+      placeholder: "4.2 References and Borrowing"
+    validations:
+      required: true
+  - type: textarea
+    id: question
+    attributes:
+      label: "Question draft / 题目草稿"
+      description: "Prompt, options A–D (or A–E for multi-select), the answer, and an explanation. JSON per README's bank format is ideal but plain text is fine."
+      value: |
+        Prompt:
+
+        A.
+        B.
+        C.
+        D.
+
+        Answer:
+        Explanation:
+    validations:
+      required: true

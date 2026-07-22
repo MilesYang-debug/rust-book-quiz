@@ -37,6 +37,7 @@
   {
    "id": "ch03-q03",
    "section": "3.1 Variables and Mutability",
+   "anchor": "shadowing",
    "tag": "Code Output",
    "difficulty": 2,
    "prompt": "What does this program print?",
@@ -53,6 +54,7 @@
   {
    "id": "ch03-q04",
    "section": "3.1 Variables and Mutability",
+   "anchor": "declaring-constants",
    "tag": "Concept",
    "difficulty": 2,
    "prompt": "Which of the following statements about `const` in Rust are true? (Select all that apply.)",
@@ -73,6 +75,7 @@
   {
    "id": "ch03-q05",
    "section": "3.1 Variables and Mutability",
+   "anchor": "shadowing",
    "tag": "Misconception",
    "difficulty": 3,
    "prompt": "The shadowing version `let spaces = \"   \"; let spaces = spaces.len();` compiles, but this version does not. Why?",
@@ -89,6 +92,7 @@
   {
    "id": "ch03-q06",
    "section": "3.2 Data Types",
+   "anchor": "scalar-types",
    "tag": "Concept",
    "difficulty": 1,
    "prompt": "If you write `let x = 42;` with no type annotation and no other constraints, what integer type does Rust use for `x`?",
@@ -104,6 +108,7 @@
   {
    "id": "ch03-q07",
    "section": "3.2 Data Types",
+   "anchor": "scalar-types",
    "tag": "Behavior",
    "difficulty": 3,
    "prompt": "The value 255 is parsed at runtime, so the compiler cannot see the overflow ahead of time. What happens on the line `let y = x + 1;`?",
@@ -120,6 +125,7 @@
   {
    "id": "ch03-q08",
    "section": "3.2 Data Types",
+   "anchor": "compound-types",
    "tag": "Code Output",
    "difficulty": 2,
    "prompt": "What does this program print?",
@@ -136,6 +142,7 @@
   {
    "id": "ch03-q09",
    "section": "3.2 Data Types",
+   "anchor": "compound-types",
    "tag": "Behavior",
    "difficulty": 2,
    "prompt": "A program indexes a 5-element array with an index of 10 that was read from user input at runtime. What happens?",
@@ -151,6 +158,7 @@
   {
    "id": "ch03-q10",
    "section": "3.2 Data Types",
+   "anchor": "scalar-types",
    "tag": "Spot the Bug",
    "difficulty": 2,
    "prompt": "Why does this program fail to compile?",
@@ -167,6 +175,7 @@
   {
    "id": "ch03-q11",
    "section": "3.2 Data Types",
+   "anchor": "compound-types",
    "tag": "Concept",
    "difficulty": 2,
    "prompt": "Which of the following statements about Rust's compound types are true? (Select all that apply.)",
@@ -187,6 +196,7 @@
   {
    "id": "ch03-q12",
    "section": "3.3 Functions",
+   "anchor": "parameters",
    "tag": "Concept",
    "difficulty": 1,
    "prompt": "In a Rust function signature such as `fn print_measurement(value: i32, unit: char)`, are the parameter type annotations optional?",
@@ -202,6 +212,7 @@
   {
    "id": "ch03-q13",
    "section": "3.3 Functions",
+   "anchor": "statements-and-expressions",
    "tag": "Code Output",
    "difficulty": 2,
    "prompt": "What does this program print?",
@@ -218,6 +229,7 @@
   {
    "id": "ch03-q14",
    "section": "3.3 Functions",
+   "anchor": "functions-with-return-values",
    "tag": "Spot the Bug",
    "difficulty": 2,
    "prompt": "Why does this function fail to compile?",
@@ -234,6 +246,7 @@
   {
    "id": "ch03-q15",
    "section": "3.3 Functions",
+   "anchor": "statements-and-expressions",
    "tag": "Misconception",
    "difficulty": 3,
    "prompt": "Coming from C, a programmer expects `x = y = 6` style code to work and writes `let x = (let y = 6);`. Why does Rust reject this?",
@@ -249,6 +262,7 @@
   {
    "id": "ch03-q16",
    "section": "3.3 Functions",
+   "anchor": "functions-with-return-values",
    "tag": "Code Output",
    "difficulty": 1,
    "prompt": "What does this program print?",
@@ -280,6 +294,7 @@
   {
    "id": "ch03-q18",
    "section": "3.5 Control Flow",
+   "anchor": "if-expressions",
    "tag": "Spot the Bug",
    "difficulty": 1,
    "prompt": "Why does this program fail to compile?",
@@ -296,6 +311,7 @@
   {
    "id": "ch03-q19",
    "section": "3.5 Control Flow",
+   "anchor": "repetition-with-loops",
    "tag": "Code Output",
    "difficulty": 2,
    "prompt": "What does this program print?",
@@ -312,6 +328,7 @@
   {
    "id": "ch03-q20",
    "section": "3.5 Control Flow",
+   "anchor": "repetition-with-loops",
    "tag": "Code Output",
    "difficulty": 2,
    "prompt": "What does this program print?",
@@ -328,6 +345,7 @@
   {
    "id": "ch03-q21",
    "section": "3.5 Control Flow",
+   "anchor": "repetition-with-loops",
    "tag": "Code Output",
    "difficulty": 3,
    "prompt": "What is the final line this program prints?",

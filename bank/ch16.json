@@ -6,6 +6,7 @@
     {
       "id": "ch16-q01",
       "section": "16.1 Using Threads",
+      "anchor": "creating-a-new-thread-with-spawn",
       "tag": "Concept",
       "difficulty": 1,
       "prompt": "How do you create a new thread in Rust's standard library?",
@@ -21,6 +22,7 @@
     {
       "id": "ch16-q02",
       "section": "16.1 Using Threads",
+      "anchor": "creating-a-new-thread-with-spawn",
       "tag": "Code Output",
       "difficulty": 2,
       "prompt": "What is the most accurate description of this program's output?",
@@ -37,6 +39,7 @@
     {
       "id": "ch16-q03",
       "section": "16.1 Using Threads",
+      "anchor": "waiting-for-all-threads-to-finish",
       "tag": "Behavior",
       "difficulty": 1,
       "prompt": "What does calling `join()` on the `JoinHandle` returned by `thread::spawn` do?",
@@ -52,6 +55,7 @@
     {
       "id": "ch16-q04",
       "section": "16.1 Using Threads",
+      "anchor": "waiting-for-all-threads-to-finish",
       "tag": "Code Output",
       "difficulty": 2,
       "prompt": "What does this program print?",
@@ -68,6 +72,7 @@
     {
       "id": "ch16-q05",
       "section": "16.1 Using Threads",
+      "anchor": "using-move-closures-with-threads",
       "tag": "Spot the Bug",
       "difficulty": 2,
       "prompt": "Why does this code fail to compile?",
@@ -84,6 +89,7 @@
     {
       "id": "ch16-q06",
       "section": "16.1 Using Threads",
+      "anchor": "using-move-closures-with-threads",
       "tag": "Misconception",
       "difficulty": 3,
       "prompt": "Select ALL statements that are true about `move` closures used with `thread::spawn`.",
@@ -115,6 +121,7 @@
     {
       "id": "ch16-q08",
       "section": "16.2 Using Message Passing to Transfer Data Between Threads",
+      "anchor": "transferring-ownership-through-channels",
       "tag": "Spot the Bug",
       "difficulty": 2,
       "prompt": "What is wrong with this code?",
@@ -146,6 +153,7 @@
     {
       "id": "ch16-q10",
       "section": "16.2 Using Message Passing to Transfer Data Between Threads",
+      "anchor": "sending-multiple-values",
       "tag": "Code Output",
       "difficulty": 2,
       "prompt": "What does this program do?",
@@ -162,6 +170,7 @@
     {
       "id": "ch16-q11",
       "section": "16.2 Using Message Passing to Transfer Data Between Threads",
+      "anchor": "creating-multiple-producers",
       "tag": "Code Output",
       "difficulty": 3,
       "prompt": "Two threads send over the same channel via a cloned transmitter. What is true of the output?",
@@ -194,6 +203,7 @@
     {
       "id": "ch16-q13",
       "section": "16.3 Shared-State Concurrency",
+      "anchor": "controlling-access-with-mutexes",
       "tag": "Concept",
       "difficulty": 1,
       "prompt": "What does `Mutex::lock()` return, and when is it an `Err`?",
@@ -209,6 +219,7 @@
     {
       "id": "ch16-q14",
       "section": "16.3 Shared-State Concurrency",
+      "anchor": "controlling-access-with-mutexes",
       "tag": "Behavior",
       "difficulty": 2,
       "prompt": "How is a `Mutex` lock released in safe Rust?",
@@ -224,6 +235,7 @@
     {
       "id": "ch16-q15",
       "section": "16.3 Shared-State Concurrency",
+      "anchor": "controlling-access-with-mutexes",
       "tag": "Code Output",
       "difficulty": 1,
       "prompt": "What does this single-threaded program print?",
@@ -240,6 +252,7 @@
     {
       "id": "ch16-q16",
       "section": "16.3 Shared-State Concurrency",
+      "anchor": "controlling-access-with-mutexes",
       "tag": "Spot the Bug",
       "difficulty": 2,
       "prompt": "Why does this code fail to compile?",
@@ -256,6 +269,7 @@
     {
       "id": "ch16-q17",
       "section": "16.3 Shared-State Concurrency",
+      "anchor": "controlling-access-with-mutexes",
       "tag": "Spot the Bug",
       "difficulty": 3,
       "prompt": "To share the counter, a programmer wraps it in `Rc`. What happens?",
@@ -272,6 +286,7 @@
     {
       "id": "ch16-q18",
       "section": "16.3 Shared-State Concurrency",
+      "anchor": "controlling-access-with-mutexes",
       "tag": "Code Output",
       "difficulty": 2,
       "prompt": "What does this program print?",
@@ -334,6 +349,7 @@
     {
       "id": "ch16-q22",
       "section": "16.4 Extensible Concurrency with the Send and Sync Traits",
+      "anchor": "implementing-send-and-sync-manually-is-unsafe",
       "tag": "Concept",
       "difficulty": 3,
       "prompt": "How do types come to implement `Send` and `Sync`, and what does implementing them manually involve?",

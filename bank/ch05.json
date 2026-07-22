@@ -37,6 +37,7 @@
   {
    "id": "ch05-q03",
    "section": "5.1 Defining and Instantiating Structs",
+   "anchor": "using-the-field-init-shorthand",
    "tag": "Concept",
    "difficulty": 2,
    "prompt": "Inside `build_user(email: String, username: String)`, when is it valid to write just `email` instead of `email: email` in the `User { ... }` literal?",
@@ -52,6 +53,7 @@
   {
    "id": "ch05-q04",
    "section": "5.1 Defining and Instantiating Structs",
+   "anchor": "creating-instances-with-struct-update-syntax",
    "tag": "Code Output",
    "difficulty": 3,
    "prompt": "What happens when you compile and run this program?",
@@ -68,6 +70,7 @@
   {
    "id": "ch05-q05",
    "section": "5.1 Defining and Instantiating Structs",
+   "anchor": "creating-instances-with-struct-update-syntax",
    "tag": "Behavior",
    "difficulty": 2,
    "prompt": "Which statements about struct update syntax (`..other`) are true? (Select all that apply.)",
@@ -88,6 +91,7 @@
   {
    "id": "ch05-q06",
    "section": "5.1 Defining and Instantiating Structs",
+   "anchor": "creating-different-types-with-tuple-structs",
    "tag": "Misconception",
    "difficulty": 2,
    "prompt": "Given `struct Color(i32, i32, i32);` and `struct Point(i32, i32, i32);`, can a function `fn show(c: Color)` be called with a `Point` value?",
@@ -103,6 +107,7 @@
   {
    "id": "ch05-q07",
    "section": "5.1 Defining and Instantiating Structs",
+   "anchor": "defining-unit-like-structs",
    "tag": "Concept",
    "difficulty": 1,
    "prompt": "What is the primary use of a unit-like struct such as `struct AlwaysEqual;`?",
@@ -118,6 +123,7 @@
   {
    "id": "ch05-q08",
    "section": "5.1 Defining and Instantiating Structs",
+   "anchor": "ownership-of-struct-data",
    "tag": "Spot the Bug",
    "difficulty": 3,
    "prompt": "This struct definition fails to compile. Why?",
@@ -134,6 +140,7 @@
   {
    "id": "ch05-q09",
    "section": "5.2 An Example Program Using Structs",
+   "anchor": "refactoring-with-structs",
    "tag": "Concept",
    "difficulty": 1,
    "prompt": "In the rectangles example, the function is defined as `fn area(rectangle: &Rectangle) -> u32`. Why does it take `&Rectangle` instead of `Rectangle`?",
@@ -149,6 +156,7 @@
   {
    "id": "ch05-q10",
    "section": "5.2 An Example Program Using Structs",
+   "anchor": "adding-functionality-with-derived-traits",
    "tag": "Code Output",
    "difficulty": 2,
    "prompt": "What happens when you compile this program?",
@@ -165,6 +173,7 @@
   {
    "id": "ch05-q11",
    "section": "5.2 An Example Program Using Structs",
+   "anchor": "adding-functionality-with-derived-traits",
    "tag": "Concept",
    "difficulty": 1,
    "prompt": "What is the difference between printing a struct with `{:?}` and with `{:#?}`?",
@@ -180,6 +189,7 @@
   {
    "id": "ch05-q12",
    "section": "5.2 An Example Program Using Structs",
+   "anchor": "adding-functionality-with-derived-traits",
    "tag": "Behavior",
    "difficulty": 2,
    "prompt": "Which statements about the `dbg!` macro are true? (Select all that apply.)",
@@ -200,6 +210,7 @@
   {
    "id": "ch05-q13",
    "section": "5.3 Method Syntax",
+   "anchor": "method-syntax",
    "tag": "Concept",
    "difficulty": 1,
    "prompt": "In a method signature inside `impl Rectangle`, what is `&self` shorthand for?",
@@ -215,6 +226,7 @@
   {
    "id": "ch05-q14",
    "section": "5.3 Method Syntax",
+   "anchor": "method-syntax",
    "tag": "Code Output",
    "difficulty": 2,
    "prompt": "What does this program print?",
@@ -231,6 +243,7 @@
   {
    "id": "ch05-q15",
    "section": "5.3 Method Syntax",
+   "anchor": "wheres-the---operator",
    "tag": "Misconception",
    "difficulty": 2,
    "prompt": "A C++ programmer asks where Rust's `->` operator is for calling methods through a reference. What is the correct answer?",
@@ -282,6 +295,7 @@
   {
    "id": "ch05-q18",
    "section": "5.3 Method Syntax",
+   "anchor": "method-syntax",
    "tag": "Code Output",
    "difficulty": 3,
    "prompt": "What happens when you compile and run this program?",

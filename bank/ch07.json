@@ -56,6 +56,7 @@
   {
    "id": "ch07-q04",
    "section": "7.2 Defining Modules to Control Scope and Privacy",
+   "anchor": "modules-cheat-sheet",
    "tag": "Concept",
    "difficulty": 1,
    "prompt": "In the crate root you write `mod garden;` with a semicolon instead of a body. Where does the compiler look for the module's code?",
@@ -71,6 +72,7 @@
   {
    "id": "ch07-q05",
    "section": "7.2 Defining Modules to Control Scope and Privacy",
+   "anchor": "grouping-related-code-in-modules",
    "tag": "Behavior",
    "difficulty": 2,
    "prompt": "A library crate defines `mod front_of_house` at the top level of `src/lib.rs`. In the module tree, what is the parent of `front_of_house`?",
@@ -86,6 +88,7 @@
   {
    "id": "ch07-q06",
    "section": "7.2 Defining Modules to Control Scope and Privacy",
+   "anchor": "modules-cheat-sheet",
    "tag": "Code Output",
    "difficulty": 2,
    "prompt": "What happens when this program in `src/main.rs` is compiled and run?",
@@ -117,6 +120,7 @@
   {
    "id": "ch07-q08",
    "section": "7.3 Paths for Referring to an Item in the Module Tree",
+   "anchor": "exposing-paths-with-the-pub-keyword",
    "tag": "Spot the Bug",
    "difficulty": 2,
    "prompt": "This library crate fails to compile. What is the bug?",
@@ -133,6 +137,7 @@
   {
    "id": "ch07-q09",
    "section": "7.3 Paths for Referring to an Item in the Module Tree",
+   "anchor": "starting-relative-paths-with-super",
    "tag": "Code Output",
    "difficulty": 3,
    "prompt": "What is the result of compiling and running this program?",
@@ -149,6 +154,7 @@
   {
    "id": "ch07-q10",
    "section": "7.3 Paths for Referring to an Item in the Module Tree",
+   "anchor": "making-structs-and-enums-public",
    "tag": "Misconception",
    "difficulty": 2,
    "prompt": "Inside a module you declare `pub struct Breakfast { toast: String }` and `pub enum Appetizer { Soup, Salad }`. What can code outside the module access?",
@@ -164,6 +170,7 @@
   {
    "id": "ch07-q11",
    "section": "7.4 Bringing Paths into Scope with the use Keyword",
+   "anchor": "creating-idiomatic-use-paths",
    "tag": "Concept",
    "difficulty": 2,
    "prompt": "According to the book, what is the idiomatic way to bring the function `add_to_waitlist` (in `crate::front_of_house::hosting`) into scope and call it?",
@@ -215,6 +222,7 @@
   {
    "id": "ch07-q14",
    "section": "7.4 Bringing Paths into Scope with the use Keyword",
+   "anchor": "using-nested-paths-to-clean-up-use-lists",
    "tag": "Behavior",
    "difficulty": 1,
    "prompt": "Which single statement brings exactly the same items into scope as the two lines `use std::cmp::Ordering;` and `use std::io;`?",

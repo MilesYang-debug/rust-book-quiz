@@ -1,0 +1,30 @@
+# 链接巡检：每周核对题库引用的 The Book 页面与锚点是否仍然有效。
+# The Book 在线版会重构（改标题 id、小节改名），这不会破坏构建，
+# 只会让应用里的"查看原文"悄悄失效——所以用定时任务而非 PR 门禁来盯。
+# 失败时 GitHub 会向仓库所有者发送 workflow 失败通知邮件。
+#
+# 注意：仓库 60 天无提交后 GitHub 会自动暂停 schedule 触发，
+# 需要在 Actions 页面手动 re-enable（或由任何一次新提交唤醒）。
+name: Link Check
+
+on:
+  schedule:
+    - cron: "23 2 * * 1" # 每周一 02:23 UTC（北京时间周一 10:23）
+  workflow_dispatch:
+
+jobs:
+  link-check:
+    name: 核对 The Book 链接与锚点
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: app -> target
+
+      - name: 抓取并核对全部引用页面
+        working-directory: app
+        run: cargo run -p quiz-bank --features net --bin link_check

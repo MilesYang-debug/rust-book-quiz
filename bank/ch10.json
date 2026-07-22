@@ -6,6 +6,7 @@
   {
    "id": "ch10-q01",
    "section": "10.1 Generic Data Types",
+   "anchor": "in-function-definitions",
    "tag": "Concept",
    "difficulty": 1,
    "prompt": "In the signature `fn largest<T>(list: &[T]) -> &T`, what does the `<T>` after the function name do?",
@@ -21,6 +22,7 @@
   {
    "id": "ch10-q02",
    "section": "10.1 Generic Data Types",
+   "anchor": "in-struct-definitions",
    "tag": "Code Output",
    "difficulty": 1,
    "prompt": "What happens when you compile and run this program?",
@@ -37,6 +39,7 @@
   {
    "id": "ch10-q03",
    "section": "10.1 Generic Data Types",
+   "anchor": "in-struct-definitions",
    "tag": "Concept",
    "difficulty": 1,
    "prompt": "How can you define a `Point` struct so that `Point { x: 5, y: 4.0 }` compiles?",
@@ -52,6 +55,7 @@
   {
    "id": "ch10-q04",
    "section": "10.1 Generic Data Types",
+   "anchor": "in-method-definitions",
    "tag": "Concept",
    "difficulty": 2,
    "prompt": "Why must you write `impl<T> Point<T>` (with `<T>` right after `impl`) when defining methods on the generic struct `Point<T>`?",
@@ -67,6 +71,7 @@
   {
    "id": "ch10-q05",
    "section": "10.1 Generic Data Types",
+   "anchor": "in-method-definitions",
    "tag": "Behavior",
    "difficulty": 2,
    "prompt": "What happens when you compile this program?",
@@ -83,6 +88,7 @@
   {
    "id": "ch10-q06",
    "section": "10.1 Generic Data Types",
+   "anchor": "performance-of-code-using-generics",
    "tag": "Misconception",
    "difficulty": 1,
    "prompt": "A colleague claims: \"Using generics makes Rust programs slower at runtime than writing duplicate concrete functions.\" Why is this wrong?",
@@ -98,6 +104,7 @@
   {
    "id": "ch10-q07",
    "section": "10.1 Generic Data Types",
+   "anchor": "in-function-definitions",
    "tag": "Spot the Bug",
    "difficulty": 2,
    "prompt": "This function fails to compile. What is the bug?",
@@ -114,6 +121,7 @@
   {
    "id": "ch10-q08",
    "section": "10.1 Generic Data Types",
+   "anchor": "in-method-definitions",
    "tag": "Code Output",
    "difficulty": 3,
    "prompt": "What does this program print?",
@@ -150,6 +158,7 @@
   {
    "id": "ch10-q10",
    "section": "10.2 Traits: Defining Shared Behavior",
+   "anchor": "defining-a-trait",
    "tag": "Concept",
    "difficulty": 1,
    "prompt": "What is a trait in Rust?",
@@ -165,6 +174,7 @@
   {
    "id": "ch10-q11",
    "section": "10.2 Traits: Defining Shared Behavior",
+   "anchor": "implementing-a-trait-on-a-type",
    "tag": "Spot the Bug",
    "difficulty": 2,
    "prompt": "In your own crate (which defines neither `Display` nor `Vec`), this code fails to compile. Why?",
@@ -181,6 +191,7 @@
   {
    "id": "ch10-q12",
    "section": "10.2 Traits: Defining Shared Behavior",
+   "anchor": "using-default-implementations",
    "tag": "Code Output",
    "difficulty": 2,
    "prompt": "What does this program print?",
@@ -197,6 +208,7 @@
   {
    "id": "ch10-q13",
    "section": "10.2 Traits: Defining Shared Behavior",
+   "anchor": "using-traits-as-parameters",
    "tag": "Concept",
    "difficulty": 1,
    "prompt": "The parameter syntax `pub fn notify(item: &impl Summary)` is syntax sugar for which longer form?",
@@ -212,6 +224,7 @@
   {
    "id": "ch10-q14",
    "section": "10.2 Traits: Defining Shared Behavior",
+   "anchor": "using-traits-as-parameters",
    "tag": "Behavior",
    "difficulty": 3,
    "prompt": "What is the key difference between these two signatures?",
@@ -228,6 +241,7 @@
   {
    "id": "ch10-q15",
    "section": "10.2 Traits: Defining Shared Behavior",
+   "anchor": "using-traits-as-parameters",
    "tag": "Concept",
    "difficulty": 2,
    "prompt": "Which of these are valid ways to require that a parameter's type implements BOTH `Summary` and `Display`? (Select all that apply.)",
@@ -248,6 +262,7 @@
   {
    "id": "ch10-q16",
    "section": "10.2 Traits: Defining Shared Behavior",
+   "anchor": "returning-types-that-implement-traits",
    "tag": "Spot the Bug",
    "difficulty": 3,
    "prompt": "Assuming both `NewsArticle` and `SocialPost` implement `Summary`, why does this fail to compile?",
@@ -264,6 +279,7 @@
   {
    "id": "ch10-q17",
    "section": "10.2 Traits: Defining Shared Behavior",
+   "anchor": "using-trait-bounds-to-conditionally-implement-methods",
    "tag": "Behavior",
    "difficulty": 2,
    "prompt": "Given the definitions below, what happens if you call `pair.cmp_display()` where `pair` is a `Pair<Vec<i32>>` (and `Vec<i32>` does not implement `Display`)?",
@@ -280,6 +296,7 @@
   {
    "id": "ch10-q18",
    "section": "10.2 Traits: Defining Shared Behavior",
+   "anchor": "using-trait-bounds-to-conditionally-implement-methods",
    "tag": "Concept",
    "difficulty": 3,
    "prompt": "Why can you call `3.to_string()` even though the integer types never explicitly implement `ToString`?",
@@ -315,6 +332,7 @@
   {
    "id": "ch10-q20",
    "section": "10.3 Validating References with Lifetimes",
+   "anchor": "dangling-references",
    "tag": "Code Output",
    "difficulty": 1,
    "prompt": "What happens when you compile this program?",
@@ -331,6 +349,7 @@
   {
    "id": "ch10-q21",
    "section": "10.3 Validating References with Lifetimes",
+   "anchor": "generic-lifetimes-in-functions",
    "tag": "Spot the Bug",
    "difficulty": 2,
    "prompt": "This function fails with \"missing lifetime specifier\". Why can't the compiler accept it as written?",
@@ -347,6 +366,7 @@
   {
    "id": "ch10-q22",
    "section": "10.3 Validating References with Lifetimes",
+   "anchor": "in-function-signatures",
    "tag": "Concept",
    "difficulty": 2,
    "prompt": "In `fn longest<'a>(x: &'a str, y: &'a str) -> &'a str`, what does the lifetime `'a` actually mean for callers?",
@@ -362,6 +382,7 @@
   {
    "id": "ch10-q23",
    "section": "10.3 Validating References with Lifetimes",
+   "anchor": "in-function-signatures",
    "tag": "Code Output",
    "difficulty": 3,
    "prompt": "What happens when you compile this program?",
@@ -378,6 +399,7 @@
   {
    "id": "ch10-q24",
    "section": "10.3 Validating References with Lifetimes",
+   "anchor": "lifetime-elision",
    "tag": "Behavior",
    "difficulty": 3,
    "prompt": "The function `fn first_word(s: &str) -> &str` compiles without any lifetime annotations, while `fn longest(x: &str, y: &str) -> &str` does not. Which elision rule explains why `first_word` is accepted?",
@@ -393,6 +415,7 @@
   {
    "id": "ch10-q25",
    "section": "10.3 Validating References with Lifetimes",
+   "anchor": "relationships",
    "tag": "Spot the Bug",
    "difficulty": 3,
    "prompt": "This implementation of `longest` fails to compile. What is the fundamental problem?",
@@ -409,6 +432,7 @@
   {
    "id": "ch10-q26",
    "section": "10.3 Validating References with Lifetimes",
+   "anchor": "in-struct-definitions",
    "tag": "Concept",
    "difficulty": 2,
    "prompt": "Why does this struct definition require the lifetime parameter `'a`?",
@@ -425,6 +449,7 @@
   {
    "id": "ch10-q27",
    "section": "10.3 Validating References with Lifetimes",
+   "anchor": "lifetime-elision",
    "tag": "Concept",
    "difficulty": 3,
    "prompt": "Which of the following statements about lifetimes and the elision rules are TRUE? (Select all that apply.)",
@@ -445,6 +470,7 @@
   {
    "id": "ch10-q28",
    "section": "10.3 Validating References with Lifetimes",
+   "anchor": "generic-type-parameters-trait-bounds-and-lifetimes",
    "tag": "Code Output",
    "difficulty": 2,
    "prompt": "What does this program (combining generics, trait bounds, and lifetimes) print?",

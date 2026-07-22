@@ -6,6 +6,7 @@
     {
       "id": "ch13-q01",
       "section": "13.1 Closures",
+      "anchor": "capturing-the-environment",
       "tag": "Concept",
       "difficulty": 1,
       "prompt": "What is the key capability that closures have but plain `fn` functions do not?",
@@ -21,6 +22,7 @@
     {
       "id": "ch13-q02",
       "section": "13.1 Closures",
+      "anchor": "inferring-and-annotating-closure-types",
       "tag": "Spot the Bug",
       "difficulty": 2,
       "prompt": "This code fails to compile. Why?",
@@ -37,6 +39,7 @@
     {
       "id": "ch13-q03",
       "section": "13.1 Closures",
+      "anchor": "capturing-references-or-moving-ownership",
       "tag": "Concept",
       "difficulty": 1,
       "prompt": "How does the closure `only_borrows` capture `list`?",
@@ -53,6 +56,7 @@
     {
       "id": "ch13-q04",
       "section": "13.1 Closures",
+      "anchor": "capturing-references-or-moving-ownership",
       "tag": "Code Output",
       "difficulty": 2,
       "prompt": "What does this program print?",
@@ -69,6 +73,7 @@
     {
       "id": "ch13-q05",
       "section": "13.1 Closures",
+      "anchor": "capturing-references-or-moving-ownership",
       "tag": "Concept",
       "difficulty": 2,
       "prompt": "Why is the `move` keyword required in this code?",
@@ -85,6 +90,7 @@
     {
       "id": "ch13-q06",
       "section": "13.1 Closures",
+      "anchor": "moving-captured-values-out-of-closures",
       "tag": "Concept",
       "difficulty": 3,
       "prompt": "Which of the following statements about the `Fn`, `FnMut`, and `FnOnce` traits are TRUE? (Select all that apply.)",
@@ -101,6 +107,7 @@
     {
       "id": "ch13-q07",
       "section": "13.1 Closures",
+      "anchor": "moving-captured-values-out-of-closures",
       "tag": "Behavior",
       "difficulty": 2,
       "prompt": "The standard library defines `Option::unwrap_or_else` with the bound `F: FnOnce() -> T`. Why is `FnOnce` the right choice?",
@@ -116,6 +123,7 @@
     {
       "id": "ch13-q08",
       "section": "13.1 Closures",
+      "anchor": "moving-captured-values-out-of-closures",
       "tag": "Spot the Bug",
       "difficulty": 3,
       "prompt": "This code fails to compile. What is the actual problem?",
@@ -132,6 +140,7 @@
     {
       "id": "ch13-q09",
       "section": "13.1 Closures",
+      "anchor": "capturing-references-or-moving-ownership",
       "tag": "Code Output",
       "difficulty": 2,
       "prompt": "What does this program print?",
@@ -148,6 +157,7 @@
     {
       "id": "ch13-q10",
       "section": "13.1 Closures",
+      "anchor": "moving-captured-values-out-of-closures",
       "tag": "Misconception",
       "difficulty": 2,
       "prompt": "A colleague claims: \"If you write `move` in front of a closure, it becomes `FnOnce`-only, so you can't call it twice.\" Which statement is correct?",
@@ -163,6 +173,7 @@
     {
       "id": "ch13-q11",
       "section": "13.1 Closures",
+      "anchor": "moving-captured-values-out-of-closures",
       "tag": "Code Output",
       "difficulty": 3,
       "prompt": "What is the result of compiling and running this program?",
@@ -179,6 +190,7 @@
     {
       "id": "ch13-q12",
       "section": "13.2 Processing a Series of Items with Iterators",
+      "anchor": "methods-that-produce-other-iterators",
       "tag": "Spot the Bug",
       "difficulty": 1,
       "prompt": "This code compiles with a warning and has no visible effect. What went wrong?",
@@ -195,6 +207,7 @@
     {
       "id": "ch13-q13",
       "section": "13.2 Processing a Series of Items with Iterators",
+      "anchor": "the-iterator-trait-and-the-next-method",
       "tag": "Concept",
       "difficulty": 1,
       "prompt": "For a `Vec<String>` named `v`, which method creates an iterator that yields owned `String` values, consuming the vector?",
@@ -210,6 +223,7 @@
     {
       "id": "ch13-q14",
       "section": "13.2 Processing a Series of Items with Iterators",
+      "anchor": "the-iterator-trait-and-the-next-method",
       "tag": "Code Output",
       "difficulty": 2,
       "prompt": "What does this program print?",
@@ -226,6 +240,7 @@
     {
       "id": "ch13-q15",
       "section": "13.2 Processing a Series of Items with Iterators",
+      "anchor": "the-iterator-trait-and-the-next-method",
       "tag": "Spot the Bug",
       "difficulty": 2,
       "prompt": "This code fails to compile. Why?",
@@ -242,6 +257,7 @@
     {
       "id": "ch13-q16",
       "section": "13.2 Processing a Series of Items with Iterators",
+      "anchor": "closures-that-capture-their-environment",
       "tag": "Code Output",
       "difficulty": 2,
       "prompt": "What does this program print?",
@@ -258,6 +274,7 @@
     {
       "id": "ch13-q17",
       "section": "13.2 Processing a Series of Items with Iterators",
+      "anchor": "methods-that-consume-the-iterator",
       "tag": "Concept",
       "difficulty": 2,
       "prompt": "Which of these iterator methods are consuming adapters, i.e. they call `next` repeatedly and use up the iterator? (Select all that apply.)",
@@ -274,6 +291,7 @@
     {
       "id": "ch13-q18",
       "section": "13.2 Processing a Series of Items with Iterators",
+      "anchor": "the-iterator-trait-and-the-next-method",
       "tag": "Concept",
       "difficulty": 1,
       "prompt": "To implement the `Iterator` trait for your own type, what is the minimum you must provide?",
@@ -305,6 +323,7 @@
     {
       "id": "ch13-q20",
       "section": "13.2 Processing a Series of Items with Iterators",
+      "anchor": "the-iterator-trait-and-the-next-method",
       "tag": "Misconception",
       "difficulty": 3,
       "prompt": "Calling `next()` directly requires a mutable iterator, yet this compiles even though `v1_iter` is not declared `mut`. Why?",
@@ -321,6 +340,7 @@
     {
       "id": "ch13-q21",
       "section": "13.3 Improving Our I/O Project",
+      "anchor": "removing-a-clone-using-an-iterator",
       "tag": "Concept",
       "difficulty": 2,
       "prompt": "In the minigrep project, `Config::build` was changed from taking `args: &[String]` to `mut args: impl Iterator<Item = String>`. What is the main benefit?",
@@ -336,6 +356,7 @@
     {
       "id": "ch13-q22",
       "section": "13.3 Improving Our I/O Project",
+      "anchor": "clarifying-code-with-iterator-adapters",
       "tag": "Behavior",
       "difficulty": 3,
       "prompt": "The `search` function was rewritten from a `for` loop pushing into a `Vec` to:\n`contents.lines().filter(|line| line.contains(query)).collect()`. Which statements about this version are TRUE? (Select all that apply.)",

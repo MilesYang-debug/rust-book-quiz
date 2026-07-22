@@ -52,6 +52,7 @@
     {
       "id": "ch14-q04",
       "section": "14.2 Publishing a Crate to Crates.io",
+      "anchor": "making-useful-documentation-comments",
       "tag": "Concept",
       "difficulty": 1,
       "prompt": "What is the difference between `///` and `//!` documentation comments?",
@@ -67,6 +68,7 @@
     {
       "id": "ch14-q05",
       "section": "14.2 Publishing a Crate to Crates.io",
+      "anchor": "making-useful-documentation-comments",
       "tag": "Code Output",
       "difficulty": 3,
       "prompt": "This is the entire `src/lib.rs` of crate `my_crate`. What happens when you run `cargo test`?",
@@ -83,6 +85,7 @@
     {
       "id": "ch14-q06",
       "section": "14.2 Publishing a Crate to Crates.io",
+      "anchor": "exporting-a-convenient-public-api",
       "tag": "Concept",
       "difficulty": 2,
       "prompt": "The crate `art` defines `PrimaryColor` in module `kinds` and `mix` in module `utils`. What does adding these lines to the crate root accomplish?",
@@ -99,6 +102,7 @@
     {
       "id": "ch14-q07",
       "section": "14.2 Publishing a Crate to Crates.io",
+      "anchor": "adding-metadata-to-a-new-crate",
       "tag": "Spot the Bug",
       "difficulty": 2,
       "prompt": "Running `cargo publish` with this `Cargo.toml` fails with a 400 error from crates.io. Why?",
@@ -146,6 +150,7 @@
     {
       "id": "ch14-q10",
       "section": "14.3 Cargo Workspaces",
+      "anchor": "creating-the-second-package-in-the-workspace",
       "tag": "Spot the Bug",
       "difficulty": 2,
       "prompt": "In this workspace, `adder/src/main.rs` calls `add_one::add_one(10)` but the build fails with `can't find crate for add_one`. The workspace `Cargo.toml` lists `members = [\"adder\", \"add_one\"]`. What is missing?",
@@ -162,6 +167,7 @@
     {
       "id": "ch14-q11",
       "section": "14.3 Cargo Workspaces",
+      "anchor": "adding-a-test-to-a-workspace",
       "tag": "Behavior",
       "difficulty": 2,
       "prompt": "From the root of a workspace with several members, how do you run only the tests of the `add_one` crate?",

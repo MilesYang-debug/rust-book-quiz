@@ -6,6 +6,7 @@
     {
       "id": "ch12-q01",
       "section": "12.1 Accepting Command Line Arguments",
+      "anchor": "the-args-function-and-invalid-unicode",
       "tag": "Concept",
       "difficulty": 1,
       "prompt": "What happens if a program iterates over `std::env::args()` and one of the command-line arguments contains invalid Unicode?",
@@ -21,6 +22,7 @@
     {
       "id": "ch12-q02",
       "section": "12.1 Accepting Command Line Arguments",
+      "anchor": "reading-the-argument-values",
       "tag": "Code Output",
       "difficulty": 1,
       "prompt": "This program is compiled to the binary `minigrep` and run with `cargo run -- needle haystack`. What does it print?",
@@ -53,6 +55,7 @@
     {
       "id": "ch12-q04",
       "section": "12.3 Improving Error Handling and Modularity",
+      "anchor": "separating-concerns-in-binary-projects",
       "tag": "Concept",
       "difficulty": 2,
       "prompt": "After the chapter's separation-of-concerns refactor splits the program into `main.rs` and `lib.rs`, which responsibilities remain in the `main` function? Select all that apply.",
@@ -69,6 +72,7 @@
     {
       "id": "ch12-q05",
       "section": "12.3 Improving Error Handling and Modularity",
+      "anchor": "fixing-the-error-handling",
       "tag": "Behavior",
       "difficulty": 2,
       "prompt": "Given this `main` and a `Config::build` that returns `Err(\"not enough arguments\")` when `args.len() < 3`, what happens when the user runs `cargo run` with no extra arguments?",
@@ -85,6 +89,7 @@
     {
       "id": "ch12-q06",
       "section": "12.3 Improving Error Handling and Modularity",
+      "anchor": "fixing-the-error-handling",
       "tag": "Concept",
       "difficulty": 1,
       "prompt": "In `Config::build(&args).unwrap_or_else(|err| { ... })`, what does `unwrap_or_else` do when `Config::build` returns `Ok(config)`?",
@@ -100,6 +105,7 @@
     {
       "id": "ch12-q07",
       "section": "12.3 Improving Error Handling and Modularity",
+      "anchor": "extracting-logic-from-main",
       "tag": "Concept",
       "difficulty": 2,
       "prompt": "Why does the chapter give `run` the return type `Result<(), Box<dyn Error>>` rather than a concrete error type like `std::io::Error`?",
@@ -115,6 +121,7 @@
     {
       "id": "ch12-q08",
       "section": "12.3 Improving Error Handling and Modularity",
+      "anchor": "extracting-logic-from-main",
       "tag": "Spot the Bug",
       "difficulty": 2,
       "prompt": "This refactored `run` function does not compile. What is the problem?",
@@ -131,6 +138,7 @@
     {
       "id": "ch12-q09",
       "section": "12.3 Improving Error Handling and Modularity",
+      "anchor": "extracting-logic-from-main",
       "tag": "Misconception",
       "difficulty": 1,
       "prompt": "A learner asks: \"Why does `main` use `if let Err(e) = run(config)` instead of `unwrap_or_else`, like it does for `Config::build`?\" What is the book's reasoning?",
@@ -161,6 +169,7 @@
     {
       "id": "ch12-q11",
       "section": "12.4 Testing the Library's Functionality",
+      "anchor": "writing-a-failing-test",
       "tag": "Spot the Bug",
       "difficulty": 3,
       "prompt": "This first attempt at `search` fails to compile. Why?",
@@ -177,6 +186,7 @@
     {
       "id": "ch12-q12",
       "section": "12.4 Testing the Library's Functionality",
+      "anchor": "writing-code-to-pass-the-test",
       "tag": "Code Output",
       "difficulty": 2,
       "prompt": "Using the book's final `search` implementation (case-sensitive, matching lines that contain the query), what does this print?",
@@ -193,6 +203,7 @@
     {
       "id": "ch12-q13",
       "section": "12.4 Testing the Library's Functionality",
+      "anchor": "writing-a-failing-test",
       "tag": "Misconception",
       "difficulty": 3,
       "prompt": "A colleague looks at `pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str>` and claims: \"The lifetime `'a` means `query` and `contents` must live equally long.\" Which statement is correct?",
@@ -208,6 +219,7 @@
     {
       "id": "ch12-q14",
       "section": "12.5 Working with Environment Variables",
+      "anchor": "implementing-the-search_case_insensitive-function",
       "tag": "Behavior",
       "difficulty": 3,
       "prompt": "`Config::build` sets `let ignore_case = env::var(\"IGNORE_CASE\").is_ok();`. A user runs the program with the environment variable set to `IGNORE_CASE=0`, intending to disable case-insensitive search. What actually happens?",
@@ -223,6 +235,7 @@
     {
       "id": "ch12-q15",
       "section": "12.5 Working with Environment Variables",
+      "anchor": "implementing-the-search_case_insensitive-function",
       "tag": "Code Output",
       "difficulty": 3,
       "prompt": "Using the book's `search_case_insensitive` (which lowercases the query and each line for comparison), what does this print?",
@@ -239,6 +252,7 @@
     {
       "id": "ch12-q16",
       "section": "12.6 Writing Error Messages to Standard Error Instead of Standard Output",
+      "anchor": "printing-errors-to-standard-error",
       "tag": "Behavior",
       "difficulty": 2,
       "prompt": "After the final refactor, error messages are printed with `eprintln!` and `main` calls `process::exit(1)` on failure. The user runs `cargo run > output.txt` with no arguments, triggering the `not enough arguments` error. Which statements are true? Select all that apply.",

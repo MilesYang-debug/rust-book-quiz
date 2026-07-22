@@ -6,6 +6,7 @@
     {
       "id": "ch20-q01",
       "section": "20.1 Unsafe Rust",
+      "anchor": "performing-unsafe-superpowers",
       "tag": "Concept",
       "difficulty": 2,
       "prompt": "Which of the following operations require an `unsafe` block (or an `unsafe fn`)? Select all that apply.",
@@ -22,6 +23,7 @@
     {
       "id": "ch20-q02",
       "section": "20.1 Unsafe Rust",
+      "anchor": "performing-unsafe-superpowers",
       "tag": "Misconception",
       "difficulty": 1,
       "prompt": "A colleague claims: \"Inside an `unsafe` block, Rust turns off the borrow checker, so I can create two mutable references to the same value.\" What is true?",
@@ -37,6 +39,7 @@
     {
       "id": "ch20-q03",
       "section": "20.1 Unsafe Rust",
+      "anchor": "dereferencing-a-raw-pointer",
       "tag": "Code Output",
       "difficulty": 2,
       "prompt": "What is the result of compiling and running this program?",
@@ -53,6 +56,7 @@
     {
       "id": "ch20-q04",
       "section": "20.1 Unsafe Rust",
+      "anchor": "calling-an-unsafe-function-or-method",
       "tag": "Spot the Bug",
       "difficulty": 2,
       "prompt": "Why does this program fail to compile?",
@@ -69,6 +73,7 @@
     {
       "id": "ch20-q05",
       "section": "20.1 Unsafe Rust",
+      "anchor": "creating-a-safe-abstraction-over-unsafe-code",
       "tag": "Behavior",
       "difficulty": 3,
       "prompt": "The standard library's `split_at_mut` returns two mutable slices into one slice. Its implementation uses raw pointers and `slice::from_raw_parts_mut` inside `unsafe`, yet the function itself is safe to call. Why is this a valid \"safe abstraction\"?",
@@ -85,6 +90,7 @@
     {
       "id": "ch20-q06",
       "section": "20.1 Unsafe Rust",
+      "anchor": "using-extern-functions-to-call-external-code",
       "tag": "Concept",
       "difficulty": 2,
       "prompt": "Consider this foreign function declaration. Which statement is true?",
@@ -101,6 +107,7 @@
     {
       "id": "ch20-q07",
       "section": "20.2 Advanced Traits",
+      "anchor": "defining-traits-with-associated-types",
       "tag": "Concept",
       "difficulty": 2,
       "prompt": "`Iterator` is defined with an associated type (`type Item;`) instead of a generic parameter (`trait Iterator<T>`). What key difference motivates that choice?",
@@ -116,6 +123,7 @@
     {
       "id": "ch20-q08",
       "section": "20.2 Advanced Traits",
+      "anchor": "using-default-generic-parameters-and-operator-overloading",
       "tag": "Code Output",
       "difficulty": 3,
       "prompt": "What does this program print?",
@@ -132,6 +140,7 @@
     {
       "id": "ch20-q09",
       "section": "20.2 Advanced Traits",
+      "anchor": "disambiguating-between-identically-named-methods",
       "tag": "Code Output",
       "difficulty": 2,
       "prompt": "What does this program print?",
@@ -148,6 +157,7 @@
     {
       "id": "ch20-q10",
       "section": "20.2 Advanced Traits",
+      "anchor": "disambiguating-between-identically-named-methods",
       "tag": "Spot the Bug",
       "difficulty": 3,
       "prompt": "This program fails to compile at the `println!` line. What is wrong, and what is the fix?",
@@ -164,6 +174,7 @@
     {
       "id": "ch20-q11",
       "section": "20.2 Advanced Traits",
+      "anchor": "using-supertraits",
       "tag": "Spot the Bug",
       "difficulty": 2,
       "prompt": "Why does this code fail to compile?",
@@ -180,6 +191,7 @@
     {
       "id": "ch20-q12",
       "section": "20.2 Advanced Traits",
+      "anchor": "implementing-external-traits-with-the-newtype-pattern",
       "tag": "Concept",
       "difficulty": 2,
       "prompt": "You want `Display` output for `Vec<String>`, but both `Display` and `Vec<String>` are defined outside your crate, so the orphan rule blocks `impl Display for Vec<String>`. How does the newtype pattern solve this?",
@@ -196,6 +208,7 @@
     {
       "id": "ch20-q13",
       "section": "20.3 Advanced Types",
+      "anchor": "type-synonyms-and-type-aliases",
       "tag": "Misconception",
       "difficulty": 1,
       "prompt": "Given `type Kilometers = i32;`, a developer assumes the compiler will now reject `fn add_miles(m: i32)` being called with a `Kilometers` value, catching unit mix-ups. What is true?",
@@ -211,6 +224,7 @@
     {
       "id": "ch20-q14",
       "section": "20.3 Advanced Types",
+      "anchor": "type-synonyms-and-type-aliases",
       "tag": "Code Output",
       "difficulty": 1,
       "prompt": "What does this program print?",
@@ -243,6 +257,7 @@
     {
       "id": "ch20-q16",
       "section": "20.3 Advanced Types",
+      "anchor": "dynamically-sized-types-and-the-sized-trait",
       "tag": "Spot the Bug",
       "difficulty": 2,
       "prompt": "Why does this code fail to compile?",
@@ -259,6 +274,7 @@
     {
       "id": "ch20-q17",
       "section": "20.4 Advanced Functions & Closures",
+      "anchor": "function-pointers",
       "tag": "Concept",
       "difficulty": 2,
       "prompt": "Given `fn do_twice(f: fn(i32) -> i32, arg: i32) -> i32` and `fn add_one(x: i32) -> i32 { x + 1 }`, which statement about the function pointer type `fn` is true?",
@@ -274,6 +290,7 @@
     {
       "id": "ch20-q18",
       "section": "20.4 Advanced Functions & Closures",
+      "anchor": "returning-closures",
       "tag": "Spot the Bug",
       "difficulty": 3,
       "prompt": "This function fails to compile. What is the problem?",
@@ -290,6 +307,7 @@
     {
       "id": "ch20-q19",
       "section": "20.5 Macros",
+      "anchor": "declarative-macros-for-general-metaprogramming",
       "tag": "Code Output",
       "difficulty": 3,
       "prompt": "What does this program print?",
@@ -306,6 +324,7 @@
     {
       "id": "ch20-q20",
       "section": "20.5 Macros",
+      "anchor": "the-difference-between-macros-and-functions",
       "tag": "Concept",
       "difficulty": 2,
       "prompt": "Which of the following are real differences between macros and functions in Rust? Select all that apply.",
@@ -322,6 +341,7 @@
     {
       "id": "ch20-q21",
       "section": "20.5 Macros",
+      "anchor": "procedural-macros-for-generating-code-from-attributes",
       "tag": "Concept",
       "difficulty": 1,
       "prompt": "What are the three kinds of procedural macros in Rust?",
@@ -337,6 +357,7 @@
     {
       "id": "ch20-q22",
       "section": "20.5 Macros",
+      "anchor": "custom-derive-macros",
       "tag": "Behavior",
       "difficulty": 3,
       "prompt": "A crate defines a custom derive macro as shown. What happens when a user writes `#[derive(HelloMacro)] struct Pancakes;`?",

@@ -1,0 +1,32 @@
+name: "Bad question report / 题目报错"
+description: "An answer is wrong, an option is ambiguous, or an explanation is misleading"
+title: "[bank] chNN-qNN: "
+labels: ["question-bank"]
+body:
+  - type: input
+    id: qid
+    attributes:
+      label: "Question id / 题目编号"
+      description: "e.g. ch04-q07 (the id field in bank/chNN.json)"
+      placeholder: "chNN-qNN"
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: "Problem type / 问题类型"
+      options:
+        - "Official answer is wrong / 标准答案本身是错的"
+        - "A distractor is also defensible (ambiguous) / 干扰项也说得通（有歧义）"
+        - "Explanation is wrong or misleading / 解析有误或误导"
+        - "Code snippet doesn't behave as claimed / 代码行为与题目断言不符"
+        - "Typo or formatting / 笔误或格式问题"
+    validations:
+      required: true
+  - type: textarea
+    id: detail
+    attributes:
+      label: "What's wrong / 具体说明"
+      description: "Quote The Book if you can — every question links to its source section in-app. / 尽量引用 The Book 原文，题目答完后有原文链接。"
+    validations:
+      required: true

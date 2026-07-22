@@ -6,6 +6,7 @@
     {
       "id": "ch18-q01",
       "section": "18.1 Characteristics of Object-Oriented Languages",
+      "anchor": "objects-contain-data-and-behavior",
       "tag": "Concept",
       "difficulty": 1,
       "prompt": "The book cites the Gang of Four definition: an object packages both data and the procedures that operate on that data. By this definition, why does Rust qualify as object-oriented?",
@@ -21,6 +22,7 @@
     {
       "id": "ch18-q02",
       "section": "18.1 Characteristics of Object-Oriented Languages",
+      "anchor": "encapsulation-that-hides-implementation-details",
       "tag": "Spot the Bug",
       "difficulty": 2,
       "prompt": "This code uses the book's `AveragedCollection`. Why does it fail to compile?",
@@ -37,6 +39,7 @@
     {
       "id": "ch18-q03",
       "section": "18.1 Characteristics of Object-Oriented Languages",
+      "anchor": "inheritance-as-a-type-system-and-as-code-sharing",
       "tag": "Misconception",
       "difficulty": 1,
       "prompt": "A developer coming from Java asks how to make a `struct` inherit fields and methods from a parent `struct`. What does the book say?",
@@ -68,6 +71,7 @@
     {
       "id": "ch18-q05",
       "section": "18.2 Using Trait Objects That Allow for Values of Different Types",
+      "anchor": "defining-a-trait-for-common-behavior",
       "tag": "Concept",
       "difficulty": 1,
       "prompt": "In the type `Box<dyn Draw>`, what does the `dyn Draw` part denote?",
@@ -83,6 +87,7 @@
     {
       "id": "ch18-q06",
       "section": "18.2 Using Trait Objects That Allow for Values of Different Types",
+      "anchor": "defining-a-trait-for-common-behavior",
       "tag": "Concept",
       "difficulty": 2,
       "prompt": "The book defines `Screen` with `components: Vec<Box<dyn Draw>>` instead of a generic `Screen<T: Draw>` with `components: Vec<T>`. What is the key capability the trait-object version gains?",
@@ -98,6 +103,7 @@
     {
       "id": "ch18-q07",
       "section": "18.2 Using Trait Objects That Allow for Values of Different Types",
+      "anchor": "implementing-the-trait",
       "tag": "Code Output",
       "difficulty": 2,
       "prompt": "What does this program print?",
@@ -114,6 +120,7 @@
     {
       "id": "ch18-q08",
       "section": "18.2 Using Trait Objects That Allow for Values of Different Types",
+      "anchor": "implementing-the-trait",
       "tag": "Spot the Bug",
       "difficulty": 2,
       "prompt": "Using the book's `Screen`, why does this code fail to compile?",
@@ -130,6 +137,7 @@
     {
       "id": "ch18-q09",
       "section": "18.2 Using Trait Objects That Allow for Values of Different Types",
+      "anchor": "performing-dynamic-dispatch",
       "tag": "Behavior",
       "difficulty": 2,
       "prompt": "Compare `fn show<T: Draw>(item: &T)` with `fn show(item: &dyn Draw)`. Which statement correctly describes how each call is dispatched?",
@@ -145,6 +153,7 @@
     {
       "id": "ch18-q10",
       "section": "18.2 Using Trait Objects That Allow for Values of Different Types",
+      "anchor": "performing-dynamic-dispatch",
       "tag": "Spot the Bug",
       "difficulty": 3,
       "prompt": "This code fails to compile at the function signature. Why?",
@@ -177,6 +186,7 @@
     {
       "id": "ch18-q12",
       "section": "18.3 Implementing an Object-Oriented Design Pattern",
+      "anchor": "attempting-traditional-object-oriented-style",
       "tag": "Concept",
       "difficulty": 2,
       "prompt": "In the blog example, `Post` stores `state: Option<Box<dyn State>>`, and `request_review` calls `self.state.take()`. Why is `take` needed?",
@@ -193,6 +203,7 @@
     {
       "id": "ch18-q13",
       "section": "18.3 Implementing an Object-Oriented Design Pattern",
+      "anchor": "attempting-traditional-object-oriented-style",
       "tag": "Code Output",
       "difficulty": 2,
       "prompt": "Using the book's completed state-pattern `Post` (Draft -> PendingReview -> Published), what does this program print?",
@@ -209,6 +220,7 @@
     {
       "id": "ch18-q14",
       "section": "18.3 Implementing an Object-Oriented Design Pattern",
+      "anchor": "attempting-traditional-object-oriented-style",
       "tag": "Code Output",
       "difficulty": 1,
       "prompt": "Still using the book's state-pattern `Post`: `approve` on the `Draft` state returns `self` unchanged. What does this print?",
@@ -240,6 +252,7 @@
     {
       "id": "ch18-q16",
       "section": "18.3 Implementing an Object-Oriented Design Pattern",
+      "anchor": "encoding-states-and-behavior-as-types",
       "tag": "Misconception",
       "difficulty": 3,
       "prompt": "In the book's alternative that encodes states as separate types (`DraftPost`, `PendingReviewPost`, `Post`), a teammate claims: \"If you forget to call `approve` and try `content()` on a `PendingReviewPost`, the program panics at runtime.\" What actually happens?",

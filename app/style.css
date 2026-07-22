@@ -628,6 +628,8 @@ body.light .menu-fab { background: rgba(255, 255, 255, 0.92); color: #334155; bo
 .feedback.bad .fb-head { color: var(--bad); }
 .fb-ans { color: var(--warn); font-weight: 700; letter-spacing: 0.02em; }
 .fb-body { margin-top: 0.4375rem; font-size: 0.8438rem; color: #c4cede; line-height: 1.65; }
+.fb-src { margin-top: 0.5rem; display: inline-block; background: none; border: none; padding: 0; cursor: pointer; font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.03em; color: var(--accent-2); }
+.fb-src:hover { text-decoration: underline; }
 
 .qfoot { display: flex; align-items: center; gap: 0.875rem; margin-top: 0.25rem; }
 
@@ -858,6 +860,7 @@ body.light .feedback.good .fb-head { color: #059669; }
 body.light .feedback.bad .fb-head { color: #dc2626; }
 body.light .fb-ans { color: #b45309; }
 body.light .fb-body { color: #475569; }
+body.light .fb-src { color: #0e7490; }
 
 body.light .kbd { color: #94a3b8; }
 body.light .kbd b { background: #f1f5f9; border-color: #e2e8f0; color: #64748b; }

@@ -1,7 +1,7 @@
 [package]
 name = "rust-book-quiz-desktop"
-version = "0.1.0"
-edition = "2021"
+version = "1.0.0"
+edition = "2024"
 
 [lib]
 name = "rust_book_quiz_desktop_lib"

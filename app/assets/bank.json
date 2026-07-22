@@ -22,6 +22,7 @@
    {
     "id": "ch01-q02",
     "section": "1.1 Installation",
+    "anchor": "troubleshooting",
     "tag": "Behavior",
     "difficulty": 1,
     "prompt": "After installing Rust, which command verifies that the compiler is installed correctly and prints its version?",
@@ -37,6 +38,7 @@
    {
     "id": "ch01-q03",
     "section": "1.1 Installation",
+    "anchor": "installing-rustup-on-linux-or-macos",
     "tag": "Misconception",
     "difficulty": 2,
     "prompt": "You get \"linker not found\" errors when compiling a fresh Rust installation on macOS or Linux. According to the book, what is the fix?",
@@ -52,6 +54,7 @@
    {
     "id": "ch01-q04",
     "section": "1.2 Hello, World!",
+    "anchor": "the-anatomy-of-a-rust-program",
     "tag": "Concept",
     "difficulty": 1,
     "prompt": "In the Hello, World! program, what does the `!` in `println!` signify?",
@@ -68,6 +71,7 @@
    {
     "id": "ch01-q05",
     "section": "1.2 Hello, World!",
+    "anchor": "compilation-and-execution",
     "tag": "Behavior",
     "difficulty": 2,
     "prompt": "You run `rustc main.rs` on Linux and it succeeds, but nothing prints to the screen. Why?",
@@ -83,6 +87,7 @@
    {
     "id": "ch01-q06",
     "section": "1.2 Hello, World!",
+    "anchor": "the-anatomy-of-a-rust-program",
     "tag": "Spot the Bug",
     "difficulty": 2,
     "prompt": "This program fails to compile. What is the problem?",
@@ -99,6 +104,7 @@
    {
     "id": "ch01-q07",
     "section": "1.3 Hello, Cargo!",
+    "anchor": "creating-a-project-with-cargo",
     "tag": "Behavior",
     "difficulty": 1,
     "prompt": "What does `cargo new hello_cargo` create?",
@@ -114,6 +120,7 @@
    {
     "id": "ch01-q08",
     "section": "1.3 Hello, Cargo!",
+    "anchor": "building-and-running-a-cargo-project",
     "tag": "Concept",
     "difficulty": 2,
     "prompt": "Which statements about Cargo commands are true? (Select all that apply.)",
@@ -134,6 +141,7 @@
    {
     "id": "ch01-q09",
     "section": "1.3 Hello, Cargo!",
+    "anchor": "building-for-release",
     "tag": "Misconception",
     "difficulty": 3,
     "prompt": "A teammate says: \"Before benchmarking, just run `cargo build` and time the binary in `target/debug/`.\" Why is this advice wrong?",
@@ -176,6 +184,7 @@
    {
     "id": "ch02-q01",
     "section": "Guessing Game Tutorial",
+    "anchor": "storing-values-with-variables",
     "tag": "Concept",
     "difficulty": 1,
     "prompt": "In `let mut guess = String::new();`, why is the `mut` keyword required?",
@@ -191,6 +200,7 @@
    {
     "id": "ch02-q02",
     "section": "Guessing Game Tutorial",
+    "anchor": "storing-values-with-variables",
     "tag": "Concept",
     "difficulty": 1,
     "prompt": "What does the `::` syntax in `String::new()` indicate?",
@@ -206,6 +216,7 @@
    {
     "id": "ch02-q03",
     "section": "Guessing Game Tutorial",
+    "anchor": "receiving-user-input",
     "tag": "Behavior",
     "difficulty": 2,
     "prompt": "Which of the following statements about `io::stdin().read_line(&mut guess)` are true? (Select all that apply.)",
@@ -226,6 +237,7 @@
    {
     "id": "ch02-q04",
     "section": "Guessing Game Tutorial",
+    "anchor": "receiving-user-input",
     "tag": "Spot the Bug",
     "difficulty": 2,
     "prompt": "This code fails to compile. Why?",
@@ -242,6 +254,7 @@
    {
     "id": "ch02-q05",
     "section": "Guessing Game Tutorial",
+    "anchor": "handling-potential-failure-with-result",
     "tag": "Behavior",
     "difficulty": 1,
     "prompt": "What does calling `.expect(\"Failed to read line\")` on a `Result` value do?",
@@ -257,6 +270,7 @@
    {
     "id": "ch02-q06",
     "section": "Guessing Game Tutorial",
+    "anchor": "increasing-functionality-with-a-crate",
     "tag": "Concept",
     "difficulty": 2,
     "prompt": "Which of the following statements about Cargo dependencies and `Cargo.lock` are true? (Select all that apply.)",
@@ -277,6 +291,7 @@
    {
     "id": "ch02-q07",
     "section": "Guessing Game Tutorial",
+    "anchor": "generating-a-random-number",
     "tag": "Behavior",
     "difficulty": 2,
     "prompt": "In the guessing game, what range of numbers can `rand::thread_rng().gen_range(1..=100)` produce?",
@@ -292,6 +307,7 @@
    {
     "id": "ch02-q08",
     "section": "Guessing Game Tutorial",
+    "anchor": "comparing-the-guess-to-the-secret-number",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "What does this program print?",
@@ -308,6 +324,7 @@
    {
     "id": "ch02-q09",
     "section": "Guessing Game Tutorial",
+    "anchor": "comparing-the-guess-to-the-secret-number",
     "tag": "Code Output",
     "difficulty": 3,
     "prompt": "What does this program print?",
@@ -324,6 +341,7 @@
    {
     "id": "ch02-q10",
     "section": "Guessing Game Tutorial",
+    "anchor": "comparing-the-guess-to-the-secret-number",
     "tag": "Spot the Bug",
     "difficulty": 3,
     "prompt": "This code fails to compile. Why?",
@@ -340,6 +358,7 @@
    {
     "id": "ch02-q11",
     "section": "Guessing Game Tutorial",
+    "anchor": "handling-invalid-input",
     "tag": "Code Output",
     "difficulty": 3,
     "prompt": "What happens when this program runs?",
@@ -356,6 +375,7 @@
    {
     "id": "ch02-q12",
     "section": "Guessing Game Tutorial",
+    "anchor": "comparing-the-guess-to-the-secret-number",
     "tag": "Misconception",
     "difficulty": 1,
     "prompt": "A learner says: \"To convert `guess` from a `String` to a `u32`, we must mark it `mut`, because its type is changing.\" What is wrong with this claim?",
@@ -409,6 +429,7 @@
    {
     "id": "ch03-q03",
     "section": "3.1 Variables and Mutability",
+    "anchor": "shadowing",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "What does this program print?",
@@ -425,6 +446,7 @@
    {
     "id": "ch03-q04",
     "section": "3.1 Variables and Mutability",
+    "anchor": "declaring-constants",
     "tag": "Concept",
     "difficulty": 2,
     "prompt": "Which of the following statements about `const` in Rust are true? (Select all that apply.)",
@@ -445,6 +467,7 @@
    {
     "id": "ch03-q05",
     "section": "3.1 Variables and Mutability",
+    "anchor": "shadowing",
     "tag": "Misconception",
     "difficulty": 3,
     "prompt": "The shadowing version `let spaces = \"   \"; let spaces = spaces.len();` compiles, but this version does not. Why?",
@@ -461,6 +484,7 @@
    {
     "id": "ch03-q06",
     "section": "3.2 Data Types",
+    "anchor": "scalar-types",
     "tag": "Concept",
     "difficulty": 1,
     "prompt": "If you write `let x = 42;` with no type annotation and no other constraints, what integer type does Rust use for `x`?",
@@ -476,6 +500,7 @@
    {
     "id": "ch03-q07",
     "section": "3.2 Data Types",
+    "anchor": "scalar-types",
     "tag": "Behavior",
     "difficulty": 3,
     "prompt": "The value 255 is parsed at runtime, so the compiler cannot see the overflow ahead of time. What happens on the line `let y = x + 1;`?",
@@ -492,6 +517,7 @@
    {
     "id": "ch03-q08",
     "section": "3.2 Data Types",
+    "anchor": "compound-types",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "What does this program print?",
@@ -508,6 +534,7 @@
    {
     "id": "ch03-q09",
     "section": "3.2 Data Types",
+    "anchor": "compound-types",
     "tag": "Behavior",
     "difficulty": 2,
     "prompt": "A program indexes a 5-element array with an index of 10 that was read from user input at runtime. What happens?",
@@ -523,6 +550,7 @@
    {
     "id": "ch03-q10",
     "section": "3.2 Data Types",
+    "anchor": "scalar-types",
     "tag": "Spot the Bug",
     "difficulty": 2,
     "prompt": "Why does this program fail to compile?",
@@ -539,6 +567,7 @@
    {
     "id": "ch03-q11",
     "section": "3.2 Data Types",
+    "anchor": "compound-types",
     "tag": "Concept",
     "difficulty": 2,
     "prompt": "Which of the following statements about Rust's compound types are true? (Select all that apply.)",
@@ -559,6 +588,7 @@
    {
     "id": "ch03-q12",
     "section": "3.3 Functions",
+    "anchor": "parameters",
     "tag": "Concept",
     "difficulty": 1,
     "prompt": "In a Rust function signature such as `fn print_measurement(value: i32, unit: char)`, are the parameter type annotations optional?",
@@ -574,6 +604,7 @@
    {
     "id": "ch03-q13",
     "section": "3.3 Functions",
+    "anchor": "statements-and-expressions",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "What does this program print?",
@@ -590,6 +621,7 @@
    {
     "id": "ch03-q14",
     "section": "3.3 Functions",
+    "anchor": "functions-with-return-values",
     "tag": "Spot the Bug",
     "difficulty": 2,
     "prompt": "Why does this function fail to compile?",
@@ -606,6 +638,7 @@
    {
     "id": "ch03-q15",
     "section": "3.3 Functions",
+    "anchor": "statements-and-expressions",
     "tag": "Misconception",
     "difficulty": 3,
     "prompt": "Coming from C, a programmer expects `x = y = 6` style code to work and writes `let x = (let y = 6);`. Why does Rust reject this?",
@@ -621,6 +654,7 @@
    {
     "id": "ch03-q16",
     "section": "3.3 Functions",
+    "anchor": "functions-with-return-values",
     "tag": "Code Output",
     "difficulty": 1,
     "prompt": "What does this program print?",
@@ -652,6 +686,7 @@
    {
     "id": "ch03-q18",
     "section": "3.5 Control Flow",
+    "anchor": "if-expressions",
     "tag": "Spot the Bug",
     "difficulty": 1,
     "prompt": "Why does this program fail to compile?",
@@ -668,6 +703,7 @@
    {
     "id": "ch03-q19",
     "section": "3.5 Control Flow",
+    "anchor": "repetition-with-loops",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "What does this program print?",
@@ -684,6 +720,7 @@
    {
     "id": "ch03-q20",
     "section": "3.5 Control Flow",
+    "anchor": "repetition-with-loops",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "What does this program print?",
@@ -700,6 +737,7 @@
    {
     "id": "ch03-q21",
     "section": "3.5 Control Flow",
+    "anchor": "repetition-with-loops",
     "tag": "Code Output",
     "difficulty": 3,
     "prompt": "What is the final line this program prints?",
@@ -743,6 +781,7 @@
    {
     "id": "ch04-q01",
     "section": "4.1 What Is Ownership?",
+    "anchor": "ownership-rules",
     "tag": "Concept",
     "difficulty": 1,
     "prompt": "Which of the following correctly states Rust's three ownership rules?",
@@ -758,6 +797,7 @@
    {
     "id": "ch04-q02",
     "section": "4.1 What Is Ownership?",
+    "anchor": "memory-and-allocation",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "What happens when this code is compiled and run?",
@@ -774,6 +814,7 @@
    {
     "id": "ch04-q03",
     "section": "4.1 What Is Ownership?",
+    "anchor": "memory-and-allocation",
     "tag": "Code Output",
     "difficulty": 1,
     "prompt": "What happens when this code is compiled and run?",
@@ -790,6 +831,7 @@
    {
     "id": "ch04-q04",
     "section": "4.1 What Is Ownership?",
+    "anchor": "memory-and-allocation",
     "tag": "Concept",
     "difficulty": 1,
     "prompt": "What does calling `s1.clone()` on a `String` do?",
@@ -805,6 +847,7 @@
    {
     "id": "ch04-q05",
     "section": "4.1 What Is Ownership?",
+    "anchor": "ownership-and-functions",
     "tag": "Spot the Bug",
     "difficulty": 2,
     "prompt": "This code does not compile. What is the bug, and what is the most idiomatic fix?",
@@ -821,6 +864,7 @@
    {
     "id": "ch04-q06",
     "section": "4.1 What Is Ownership?",
+    "anchor": "return-values-and-scope",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "What happens when this code is compiled and run?",
@@ -837,6 +881,7 @@
    {
     "id": "ch04-q07",
     "section": "4.1 What Is Ownership?",
+    "anchor": "memory-and-allocation",
     "tag": "Misconception",
     "difficulty": 2,
     "prompt": "A developer coming from Java writes `let s2 = s1;` with a `String` and expects both variables to point at the same data and stay usable. What actually happens in Rust?",
@@ -852,6 +897,7 @@
    {
     "id": "ch04-q08",
     "section": "4.1 What Is Ownership?",
+    "anchor": "memory-and-allocation",
     "tag": "Concept",
     "difficulty": 2,
     "prompt": "For `let s = String::from(\"hello\");`, where do the parts of the `String` live?",
@@ -867,6 +913,7 @@
    {
     "id": "ch04-q09",
     "section": "4.1 What Is Ownership?",
+    "anchor": "memory-and-allocation",
     "tag": "Behavior",
     "difficulty": 3,
     "prompt": "In this code, when is the memory holding \"hello\" freed?",
@@ -883,6 +930,7 @@
    {
     "id": "ch04-q10",
     "section": "4.1 What Is Ownership?",
+    "anchor": "memory-and-allocation",
     "tag": "Concept",
     "difficulty": 2,
     "prompt": "Which of these types implement the `Copy` trait, so that assignment leaves the original variable valid? (Select all that apply.)",
@@ -903,6 +951,7 @@
    {
     "id": "ch04-q11",
     "section": "4.1 What Is Ownership?",
+    "anchor": "memory-and-allocation",
     "tag": "Code Output",
     "difficulty": 3,
     "prompt": "What happens when this code is compiled and run?",
@@ -934,6 +983,7 @@
    {
     "id": "ch04-q13",
     "section": "4.2 References and Borrowing",
+    "anchor": "mutable-references",
     "tag": "Spot the Bug",
     "difficulty": 2,
     "prompt": "This code fails to compile. What is wrong, and what changes fix it?",
@@ -950,6 +1000,7 @@
    {
     "id": "ch04-q14",
     "section": "4.2 References and Borrowing",
+    "anchor": "mutable-references",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "What happens when this code is compiled and run?",
@@ -966,6 +1017,7 @@
    {
     "id": "ch04-q15",
     "section": "4.2 References and Borrowing",
+    "anchor": "mutable-references",
     "tag": "Code Output",
     "difficulty": 3,
     "prompt": "What happens when this code is compiled and run?",
@@ -982,6 +1034,7 @@
    {
     "id": "ch04-q16",
     "section": "4.2 References and Borrowing",
+    "anchor": "mutable-references",
     "tag": "Spot the Bug",
     "difficulty": 3,
     "prompt": "This code fails to compile with E0502. Which exact detail makes it an error, given that non-lexical lifetimes exist?",
@@ -998,6 +1051,7 @@
    {
     "id": "ch04-q17",
     "section": "4.2 References and Borrowing",
+    "anchor": "the-rules-of-references",
     "tag": "Concept",
     "difficulty": 1,
     "prompt": "Which statement correctly summarizes Rust's rules of references?",
@@ -1013,6 +1067,7 @@
    {
     "id": "ch04-q18",
     "section": "4.2 References and Borrowing",
+    "anchor": "dangling-references",
     "tag": "Spot the Bug",
     "difficulty": 2,
     "prompt": "Why does this function fail to compile, and what is the fix?",
@@ -1049,6 +1104,7 @@
    {
     "id": "ch04-q20",
     "section": "4.2 References and Borrowing",
+    "anchor": "mutable-references",
     "tag": "Behavior",
     "difficulty": 2,
     "prompt": "Does this code compile, and why?",
@@ -1065,6 +1121,7 @@
    {
     "id": "ch04-q21",
     "section": "4.2 References and Borrowing",
+    "anchor": "mutable-references",
     "tag": "Misconception",
     "difficulty": 3,
     "prompt": "\"Rust's one-mutable-reference rule must be enforced with runtime locks, which slows programs down.\" What is actually true?",
@@ -1080,6 +1137,7 @@
    {
     "id": "ch04-q22",
     "section": "4.3 The Slice Type",
+    "anchor": "string-slices",
     "tag": "Concept",
     "difficulty": 1,
     "prompt": "What is the type of `s` in `let s = \"Hello, world!\";`, and where does the data live?",
@@ -1095,6 +1153,7 @@
    {
     "id": "ch04-q23",
     "section": "4.3 The Slice Type",
+    "anchor": "string-slices",
     "tag": "Code Output",
     "difficulty": 3,
     "prompt": "Given `fn first_word(s: &str) -> &str` that returns a slice of the input, what happens here?",
@@ -1111,6 +1170,7 @@
    {
     "id": "ch04-q24",
     "section": "4.3 The Slice Type",
+    "anchor": "string-slices",
     "tag": "Concept",
     "difficulty": 1,
     "prompt": "For `let s = String::from(\"hello\");`, which expression is equivalent to `&s[..]`?",
@@ -1142,6 +1202,7 @@
    {
     "id": "ch04-q26",
     "section": "4.3 The Slice Type",
+    "anchor": "string-slices",
     "tag": "Behavior",
     "difficulty": 2,
     "prompt": "Given `fn first_word(s: &str) -> &str` and `let my_string = String::from(\"hello world\");`, which calls compile? (Select all that apply.)",
@@ -1162,6 +1223,7 @@
    {
     "id": "ch04-q27",
     "section": "4.3 The Slice Type",
+    "anchor": "other-slices",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "What does this code print, and what is the type of `slice`?",
@@ -1236,6 +1298,7 @@
    {
     "id": "ch05-q03",
     "section": "5.1 Defining and Instantiating Structs",
+    "anchor": "using-the-field-init-shorthand",
     "tag": "Concept",
     "difficulty": 2,
     "prompt": "Inside `build_user(email: String, username: String)`, when is it valid to write just `email` instead of `email: email` in the `User { ... }` literal?",
@@ -1251,6 +1314,7 @@
    {
     "id": "ch05-q04",
     "section": "5.1 Defining and Instantiating Structs",
+    "anchor": "creating-instances-with-struct-update-syntax",
     "tag": "Code Output",
     "difficulty": 3,
     "prompt": "What happens when you compile and run this program?",
@@ -1267,6 +1331,7 @@
    {
     "id": "ch05-q05",
     "section": "5.1 Defining and Instantiating Structs",
+    "anchor": "creating-instances-with-struct-update-syntax",
     "tag": "Behavior",
     "difficulty": 2,
     "prompt": "Which statements about struct update syntax (`..other`) are true? (Select all that apply.)",
@@ -1287,6 +1352,7 @@
    {
     "id": "ch05-q06",
     "section": "5.1 Defining and Instantiating Structs",
+    "anchor": "creating-different-types-with-tuple-structs",
     "tag": "Misconception",
     "difficulty": 2,
     "prompt": "Given `struct Color(i32, i32, i32);` and `struct Point(i32, i32, i32);`, can a function `fn show(c: Color)` be called with a `Point` value?",
@@ -1302,6 +1368,7 @@
    {
     "id": "ch05-q07",
     "section": "5.1 Defining and Instantiating Structs",
+    "anchor": "defining-unit-like-structs",
     "tag": "Concept",
     "difficulty": 1,
     "prompt": "What is the primary use of a unit-like struct such as `struct AlwaysEqual;`?",
@@ -1317,6 +1384,7 @@
    {
     "id": "ch05-q08",
     "section": "5.1 Defining and Instantiating Structs",
+    "anchor": "ownership-of-struct-data",
     "tag": "Spot the Bug",
     "difficulty": 3,
     "prompt": "This struct definition fails to compile. Why?",
@@ -1333,6 +1401,7 @@
    {
     "id": "ch05-q09",
     "section": "5.2 An Example Program Using Structs",
+    "anchor": "refactoring-with-structs",
     "tag": "Concept",
     "difficulty": 1,
     "prompt": "In the rectangles example, the function is defined as `fn area(rectangle: &Rectangle) -> u32`. Why does it take `&Rectangle` instead of `Rectangle`?",
@@ -1348,6 +1417,7 @@
    {
     "id": "ch05-q10",
     "section": "5.2 An Example Program Using Structs",
+    "anchor": "adding-functionality-with-derived-traits",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "What happens when you compile this program?",
@@ -1364,6 +1434,7 @@
    {
     "id": "ch05-q11",
     "section": "5.2 An Example Program Using Structs",
+    "anchor": "adding-functionality-with-derived-traits",
     "tag": "Concept",
     "difficulty": 1,
     "prompt": "What is the difference between printing a struct with `{:?}` and with `{:#?}`?",
@@ -1379,6 +1450,7 @@
    {
     "id": "ch05-q12",
     "section": "5.2 An Example Program Using Structs",
+    "anchor": "adding-functionality-with-derived-traits",
     "tag": "Behavior",
     "difficulty": 2,
     "prompt": "Which statements about the `dbg!` macro are true? (Select all that apply.)",
@@ -1399,6 +1471,7 @@
    {
     "id": "ch05-q13",
     "section": "5.3 Method Syntax",
+    "anchor": "method-syntax",
     "tag": "Concept",
     "difficulty": 1,
     "prompt": "In a method signature inside `impl Rectangle`, what is `&self` shorthand for?",
@@ -1414,6 +1487,7 @@
    {
     "id": "ch05-q14",
     "section": "5.3 Method Syntax",
+    "anchor": "method-syntax",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "What does this program print?",
@@ -1430,6 +1504,7 @@
    {
     "id": "ch05-q15",
     "section": "5.3 Method Syntax",
+    "anchor": "wheres-the---operator",
     "tag": "Misconception",
     "difficulty": 2,
     "prompt": "A C++ programmer asks where Rust's `->` operator is for calling methods through a reference. What is the correct answer?",
@@ -1481,6 +1556,7 @@
    {
     "id": "ch05-q18",
     "section": "5.3 Method Syntax",
+    "anchor": "method-syntax",
     "tag": "Code Output",
     "difficulty": 3,
     "prompt": "What happens when you compile and run this program?",
@@ -1519,6 +1595,7 @@
    {
     "id": "ch06-q02",
     "section": "6.1 Defining an Enum",
+    "anchor": "enum-values",
     "tag": "Concept",
     "difficulty": 1,
     "prompt": "Given `enum IpAddrKind { V4, V6 }`, how do you create an instance of the `V4` variant?",
@@ -1534,6 +1611,7 @@
    {
     "id": "ch06-q03",
     "section": "6.1 Defining an Enum",
+    "anchor": "enum-values",
     "tag": "Concept",
     "difficulty": 2,
     "prompt": "Which of the following statements about enum variants in Rust are true? (Select all that apply.)",
@@ -1555,6 +1633,7 @@
    {
     "id": "ch06-q04",
     "section": "6.1 Defining an Enum",
+    "anchor": "enum-values",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "What does this program print?",
@@ -1571,6 +1650,7 @@
    {
     "id": "ch06-q05",
     "section": "6.1 Defining an Enum",
+    "anchor": "the-option-enum",
     "tag": "Concept",
     "difficulty": 2,
     "prompt": "Why does Rust use `Option<T>` instead of a null value like many other languages?",
@@ -1586,6 +1666,7 @@
    {
     "id": "ch06-q06",
     "section": "6.1 Defining an Enum",
+    "anchor": "the-option-enum",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "What is the result of running this program?",
@@ -1602,6 +1683,7 @@
    {
     "id": "ch06-q07",
     "section": "6.1 Defining an Enum",
+    "anchor": "the-option-enum",
     "tag": "Spot the Bug",
     "difficulty": 2,
     "prompt": "Why does this program fail to compile?",
@@ -1618,6 +1700,7 @@
    {
     "id": "ch06-q08",
     "section": "6.1 Defining an Enum",
+    "anchor": "the-option-enum",
     "tag": "Misconception",
     "difficulty": 1,
     "prompt": "A colleague says: \"`Some(5)` has type `i32`, since it just wraps the number 5.\" What is the correct picture?",
@@ -1648,6 +1731,7 @@
    {
     "id": "ch06-q10",
     "section": "6.2 The match Control Flow Construct",
+    "anchor": "patterns-that-bind-to-values",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "What does this program print?",
@@ -1664,6 +1748,7 @@
    {
     "id": "ch06-q11",
     "section": "6.2 The match Control Flow Construct",
+    "anchor": "matches-are-exhaustive",
     "tag": "Spot the Bug",
     "difficulty": 2,
     "prompt": "What is wrong with this function?",
@@ -1680,6 +1765,7 @@
    {
     "id": "ch06-q12",
     "section": "6.2 The match Control Flow Construct",
+    "anchor": "the-optiont-match-pattern",
     "tag": "Code Output",
     "difficulty": 1,
     "prompt": "What does this program print?",
@@ -1696,6 +1782,7 @@
    {
     "id": "ch06-q13",
     "section": "6.2 The match Control Flow Construct",
+    "anchor": "catch-all-patterns-and-the-_-placeholder",
     "tag": "Behavior",
     "difficulty": 3,
     "prompt": "Which of the following statements about catch-all patterns in `match` are true? (Select all that apply.)",
@@ -1733,6 +1820,7 @@
    {
     "id": "ch06-q15",
     "section": "6.2 The match Control Flow Construct",
+    "anchor": "catch-all-patterns-and-the-_-placeholder",
     "tag": "Misconception",
     "difficulty": 1,
     "prompt": "In the arm `_ => ()`, a beginner claims `()` is \"an empty function call that does nothing\". What does `()` actually mean here?",
@@ -1802,6 +1890,7 @@
    {
     "id": "ch06-q19",
     "section": "6.3 Concise Control Flow with if let and let else",
+    "anchor": "staying-on-the-happy-path-with-letelse",
     "tag": "Spot the Bug",
     "difficulty": 3,
     "prompt": "What is wrong with this use of `let...else`?",
@@ -1818,6 +1907,7 @@
    {
     "id": "ch06-q20",
     "section": "6.3 Concise Control Flow with if let and let else",
+    "anchor": "staying-on-the-happy-path-with-letelse",
     "tag": "Concept",
     "difficulty": 2,
     "prompt": "What is the main purpose of `let...else`, as in the `describe_state_quarter` example?",
@@ -1891,6 +1981,7 @@
    {
     "id": "ch07-q04",
     "section": "7.2 Defining Modules to Control Scope and Privacy",
+    "anchor": "modules-cheat-sheet",
     "tag": "Concept",
     "difficulty": 1,
     "prompt": "In the crate root you write `mod garden;` with a semicolon instead of a body. Where does the compiler look for the module's code?",
@@ -1906,6 +1997,7 @@
    {
     "id": "ch07-q05",
     "section": "7.2 Defining Modules to Control Scope and Privacy",
+    "anchor": "grouping-related-code-in-modules",
     "tag": "Behavior",
     "difficulty": 2,
     "prompt": "A library crate defines `mod front_of_house` at the top level of `src/lib.rs`. In the module tree, what is the parent of `front_of_house`?",
@@ -1921,6 +2013,7 @@
    {
     "id": "ch07-q06",
     "section": "7.2 Defining Modules to Control Scope and Privacy",
+    "anchor": "modules-cheat-sheet",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "What happens when this program in `src/main.rs` is compiled and run?",
@@ -1952,6 +2045,7 @@
    {
     "id": "ch07-q08",
     "section": "7.3 Paths for Referring to an Item in the Module Tree",
+    "anchor": "exposing-paths-with-the-pub-keyword",
     "tag": "Spot the Bug",
     "difficulty": 2,
     "prompt": "This library crate fails to compile. What is the bug?",
@@ -1968,6 +2062,7 @@
    {
     "id": "ch07-q09",
     "section": "7.3 Paths for Referring to an Item in the Module Tree",
+    "anchor": "starting-relative-paths-with-super",
     "tag": "Code Output",
     "difficulty": 3,
     "prompt": "What is the result of compiling and running this program?",
@@ -1984,6 +2079,7 @@
    {
     "id": "ch07-q10",
     "section": "7.3 Paths for Referring to an Item in the Module Tree",
+    "anchor": "making-structs-and-enums-public",
     "tag": "Misconception",
     "difficulty": 2,
     "prompt": "Inside a module you declare `pub struct Breakfast { toast: String }` and `pub enum Appetizer { Soup, Salad }`. What can code outside the module access?",
@@ -1999,6 +2095,7 @@
    {
     "id": "ch07-q11",
     "section": "7.4 Bringing Paths into Scope with the use Keyword",
+    "anchor": "creating-idiomatic-use-paths",
     "tag": "Concept",
     "difficulty": 2,
     "prompt": "According to the book, what is the idiomatic way to bring the function `add_to_waitlist` (in `crate::front_of_house::hosting`) into scope and call it?",
@@ -2050,6 +2147,7 @@
    {
     "id": "ch07-q14",
     "section": "7.4 Bringing Paths into Scope with the use Keyword",
+    "anchor": "using-nested-paths-to-clean-up-use-lists",
     "tag": "Behavior",
     "difficulty": 1,
     "prompt": "Which single statement brings exactly the same items into scope as the two lines `use std::cmp::Ordering;` and `use std::io;`?",
@@ -2103,6 +2201,7 @@
    {
     "id": "ch08-q01",
     "section": "8.1 Vectors",
+    "anchor": "creating-a-new-vector",
     "tag": "Concept",
     "difficulty": 1,
     "prompt": "Why does `let v: Vec<i32> = Vec::new();` need a type annotation, while `let v = vec![1, 2, 3];` does not?",
@@ -2118,6 +2217,7 @@
    {
     "id": "ch08-q02",
     "section": "8.1 Vectors",
+    "anchor": "reading-elements-of-vectors",
     "tag": "Behavior",
     "difficulty": 1,
     "prompt": "Given `let v = vec![1, 2, 3, 4, 5];`, what is the difference between evaluating `&v[100]` and `v.get(100)`?",
@@ -2133,6 +2233,7 @@
    {
     "id": "ch08-q03",
     "section": "8.1 Vectors",
+    "anchor": "reading-elements-of-vectors",
     "tag": "Spot the Bug",
     "difficulty": 2,
     "prompt": "What happens when you compile and run this program?",
@@ -2149,6 +2250,7 @@
    {
     "id": "ch08-q04",
     "section": "8.1 Vectors",
+    "anchor": "iterating-over-the-values-in-a-vector",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "What does this program print?",
@@ -2165,6 +2267,7 @@
    {
     "id": "ch08-q05",
     "section": "8.1 Vectors",
+    "anchor": "using-an-enum-to-store-multiple-types",
     "tag": "Concept",
     "difficulty": 2,
     "prompt": "A vector can only store elements of a single type. How does the book suggest storing an `i32`, an `f64`, and a `String` in the same vector?",
@@ -2180,6 +2283,7 @@
    {
     "id": "ch08-q06",
     "section": "8.1 Vectors",
+    "anchor": "dropping-a-vector-drops-its-elements",
     "tag": "Behavior",
     "difficulty": 1,
     "prompt": "What happens to a vector's elements when the vector goes out of scope?",
@@ -2195,6 +2299,7 @@
    {
     "id": "ch08-q07",
     "section": "8.1 Vectors",
+    "anchor": "reading-elements-of-vectors",
     "tag": "Code Output",
     "difficulty": 1,
     "prompt": "What does this program print?",
@@ -2231,6 +2336,7 @@
    {
     "id": "ch08-q09",
     "section": "8.2 Strings",
+    "anchor": "defining-strings",
     "tag": "Concept",
     "difficulty": 1,
     "prompt": "What is the difference between `String` and `&str` in Rust?",
@@ -2246,6 +2352,7 @@
    {
     "id": "ch08-q10",
     "section": "8.2 Strings",
+    "anchor": "updating-a-string",
     "tag": "Behavior",
     "difficulty": 2,
     "prompt": "What happens when you compile and run this program?",
@@ -2262,6 +2369,7 @@
    {
     "id": "ch08-q11",
     "section": "8.2 Strings",
+    "anchor": "updating-a-string",
     "tag": "Spot the Bug",
     "difficulty": 3,
     "prompt": "What is wrong with this program?",
@@ -2278,6 +2386,7 @@
    {
     "id": "ch08-q12",
     "section": "8.2 Strings",
+    "anchor": "indexing-into-strings",
     "tag": "Spot the Bug",
     "difficulty": 1,
     "prompt": "What happens when you compile this program?",
@@ -2294,6 +2403,7 @@
    {
     "id": "ch08-q13",
     "section": "8.2 Strings",
+    "anchor": "slicing-strings",
     "tag": "Code Output",
     "difficulty": 3,
     "prompt": "Each character in this Cyrillic string takes 2 bytes in UTF-8. What happens when you run this program?",
@@ -2326,6 +2436,7 @@
    {
     "id": "ch08-q15",
     "section": "8.2 Strings",
+    "anchor": "updating-a-string",
     "tag": "Concept",
     "difficulty": 2,
     "prompt": "Which statements about building and concatenating strings are true? (Select all that apply.)",
@@ -2366,6 +2477,7 @@
    {
     "id": "ch08-q17",
     "section": "8.3 Hash Maps",
+    "anchor": "creating-a-new-hash-map",
     "tag": "Concept",
     "difficulty": 1,
     "prompt": "What must you do before you can use `HashMap` in your code?",
@@ -2381,6 +2493,7 @@
    {
     "id": "ch08-q18",
     "section": "8.3 Hash Maps",
+    "anchor": "accessing-values-in-a-hash-map",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "What does this program print?",
@@ -2397,6 +2510,7 @@
    {
     "id": "ch08-q19",
     "section": "8.3 Hash Maps",
+    "anchor": "accessing-values-in-a-hash-map",
     "tag": "Behavior",
     "difficulty": 1,
     "prompt": "When you iterate over a hash map with `for (key, value) in &scores`, in what order are the pairs visited?",
@@ -2412,6 +2526,7 @@
    {
     "id": "ch08-q20",
     "section": "8.3 Hash Maps",
+    "anchor": "managing-ownership-in-hash-maps",
     "tag": "Spot the Bug",
     "difficulty": 3,
     "prompt": "What happens when you compile this program?",
@@ -2428,6 +2543,7 @@
    {
     "id": "ch08-q21",
     "section": "8.3 Hash Maps",
+    "anchor": "updating-a-hash-map",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "What does this program print?",
@@ -2444,6 +2560,7 @@
    {
     "id": "ch08-q22",
     "section": "8.3 Hash Maps",
+    "anchor": "updating-a-hash-map",
     "tag": "Code Output",
     "difficulty": 3,
     "prompt": "What does this program print?",
@@ -2460,6 +2577,7 @@
    {
     "id": "ch08-q23",
     "section": "8.3 Hash Maps",
+    "anchor": "updating-a-hash-map",
     "tag": "Misconception",
     "difficulty": 2,
     "prompt": "After this code runs, what value is associated with the key `Blue`?",
@@ -2503,6 +2621,7 @@
    {
     "id": "ch09-q01",
     "section": "9.1 Unrecoverable Errors with panic!",
+    "anchor": "unwinding-the-stack-or-aborting-in-response-to-a-panic",
     "tag": "Concept",
     "difficulty": 1,
     "prompt": "By default, what happens when a Rust program calls the `panic!` macro?",
@@ -2518,6 +2637,7 @@
    {
     "id": "ch09-q02",
     "section": "9.1 Unrecoverable Errors with panic!",
+    "anchor": "unwinding-the-stack-or-aborting-in-response-to-a-panic",
     "tag": "Behavior",
     "difficulty": 2,
     "prompt": "What is the effect of adding `panic = 'abort'` under `[profile.release]` in `Cargo.toml`?",
@@ -2600,6 +2720,7 @@
    {
     "id": "ch09-q07",
     "section": "9.2 Recoverable Errors with Result",
+    "anchor": "matching-on-different-errors",
     "tag": "Behavior",
     "difficulty": 2,
     "prompt": "Suppose `hello.txt` does not exist and the current directory is writable. What does this program do?",
@@ -2631,6 +2752,7 @@
    {
     "id": "ch09-q09",
     "section": "9.2 Recoverable Errors with Result",
+    "anchor": "propagating-errors",
     "tag": "Concept",
     "difficulty": 2,
     "prompt": "In this manual error-propagation pattern, what does the arm `Err(e) => return Err(e)` accomplish?",
@@ -2647,6 +2769,7 @@
    {
     "id": "ch09-q10",
     "section": "9.2 Recoverable Errors with Result",
+    "anchor": "propagating-errors",
     "tag": "Behavior",
     "difficulty": 2,
     "prompt": "Which of the following statements about the `?` operator are true? (Select all that apply.)",
@@ -2667,6 +2790,7 @@
    {
     "id": "ch09-q11",
     "section": "9.2 Recoverable Errors with Result",
+    "anchor": "propagating-errors",
     "tag": "Spot the Bug",
     "difficulty": 2,
     "prompt": "This program fails to compile. What is the bug?",
@@ -2683,6 +2807,7 @@
    {
     "id": "ch09-q12",
     "section": "9.2 Recoverable Errors with Result",
+    "anchor": "propagating-errors",
     "tag": "Spot the Bug",
     "difficulty": 3,
     "prompt": "This function fails to compile. Why?",
@@ -2699,6 +2824,7 @@
    {
     "id": "ch09-q13",
     "section": "9.2 Recoverable Errors with Result",
+    "anchor": "propagating-errors",
     "tag": "Code Output",
     "difficulty": 3,
     "prompt": "Assuming `no-such-file.txt` does not exist, what happens when this program runs?",
@@ -2715,6 +2841,7 @@
    {
     "id": "ch09-q14",
     "section": "9.2 Recoverable Errors with Result",
+    "anchor": "propagating-errors",
     "tag": "Code Output",
     "difficulty": 3,
     "prompt": "What does this program print?",
@@ -2766,6 +2893,7 @@
    {
     "id": "ch09-q17",
     "section": "9.3 To panic! or Not to panic!",
+    "anchor": "custom-types-for-validation",
     "tag": "Spot the Bug",
     "difficulty": 2,
     "prompt": "This validation type is meant to guarantee that every `Guess` holds a value between 1 and 100, but it fails to do so. What is the bug?",
@@ -2782,6 +2910,7 @@
    {
     "id": "ch09-q18",
     "section": "9.3 To panic! or Not to panic!",
+    "anchor": "custom-types-for-validation",
     "tag": "Misconception",
     "difficulty": 3,
     "prompt": "A colleague says: \"`Guess::new` panicking on an out-of-range value is bad design — every fallible constructor must return `Result` instead.\" Per the book's guidelines, why is panicking acceptable here?",
@@ -2804,6 +2933,7 @@
    {
     "id": "ch10-q01",
     "section": "10.1 Generic Data Types",
+    "anchor": "in-function-definitions",
     "tag": "Concept",
     "difficulty": 1,
     "prompt": "In the signature `fn largest<T>(list: &[T]) -> &T`, what does the `<T>` after the function name do?",
@@ -2819,6 +2949,7 @@
    {
     "id": "ch10-q02",
     "section": "10.1 Generic Data Types",
+    "anchor": "in-struct-definitions",
     "tag": "Code Output",
     "difficulty": 1,
     "prompt": "What happens when you compile and run this program?",
@@ -2835,6 +2966,7 @@
    {
     "id": "ch10-q03",
     "section": "10.1 Generic Data Types",
+    "anchor": "in-struct-definitions",
     "tag": "Concept",
     "difficulty": 1,
     "prompt": "How can you define a `Point` struct so that `Point { x: 5, y: 4.0 }` compiles?",
@@ -2850,6 +2982,7 @@
    {
     "id": "ch10-q04",
     "section": "10.1 Generic Data Types",
+    "anchor": "in-method-definitions",
     "tag": "Concept",
     "difficulty": 2,
     "prompt": "Why must you write `impl<T> Point<T>` (with `<T>` right after `impl`) when defining methods on the generic struct `Point<T>`?",
@@ -2865,6 +2998,7 @@
    {
     "id": "ch10-q05",
     "section": "10.1 Generic Data Types",
+    "anchor": "in-method-definitions",
     "tag": "Behavior",
     "difficulty": 2,
     "prompt": "What happens when you compile this program?",
@@ -2881,6 +3015,7 @@
    {
     "id": "ch10-q06",
     "section": "10.1 Generic Data Types",
+    "anchor": "performance-of-code-using-generics",
     "tag": "Misconception",
     "difficulty": 1,
     "prompt": "A colleague claims: \"Using generics makes Rust programs slower at runtime than writing duplicate concrete functions.\" Why is this wrong?",
@@ -2896,6 +3031,7 @@
    {
     "id": "ch10-q07",
     "section": "10.1 Generic Data Types",
+    "anchor": "in-function-definitions",
     "tag": "Spot the Bug",
     "difficulty": 2,
     "prompt": "This function fails to compile. What is the bug?",
@@ -2912,6 +3048,7 @@
    {
     "id": "ch10-q08",
     "section": "10.1 Generic Data Types",
+    "anchor": "in-method-definitions",
     "tag": "Code Output",
     "difficulty": 3,
     "prompt": "What does this program print?",
@@ -2948,6 +3085,7 @@
    {
     "id": "ch10-q10",
     "section": "10.2 Traits: Defining Shared Behavior",
+    "anchor": "defining-a-trait",
     "tag": "Concept",
     "difficulty": 1,
     "prompt": "What is a trait in Rust?",
@@ -2963,6 +3101,7 @@
    {
     "id": "ch10-q11",
     "section": "10.2 Traits: Defining Shared Behavior",
+    "anchor": "implementing-a-trait-on-a-type",
     "tag": "Spot the Bug",
     "difficulty": 2,
     "prompt": "In your own crate (which defines neither `Display` nor `Vec`), this code fails to compile. Why?",
@@ -2979,6 +3118,7 @@
    {
     "id": "ch10-q12",
     "section": "10.2 Traits: Defining Shared Behavior",
+    "anchor": "using-default-implementations",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "What does this program print?",
@@ -2995,6 +3135,7 @@
    {
     "id": "ch10-q13",
     "section": "10.2 Traits: Defining Shared Behavior",
+    "anchor": "using-traits-as-parameters",
     "tag": "Concept",
     "difficulty": 1,
     "prompt": "The parameter syntax `pub fn notify(item: &impl Summary)` is syntax sugar for which longer form?",
@@ -3010,6 +3151,7 @@
    {
     "id": "ch10-q14",
     "section": "10.2 Traits: Defining Shared Behavior",
+    "anchor": "using-traits-as-parameters",
     "tag": "Behavior",
     "difficulty": 3,
     "prompt": "What is the key difference between these two signatures?",
@@ -3026,6 +3168,7 @@
    {
     "id": "ch10-q15",
     "section": "10.2 Traits: Defining Shared Behavior",
+    "anchor": "using-traits-as-parameters",
     "tag": "Concept",
     "difficulty": 2,
     "prompt": "Which of these are valid ways to require that a parameter's type implements BOTH `Summary` and `Display`? (Select all that apply.)",
@@ -3046,6 +3189,7 @@
    {
     "id": "ch10-q16",
     "section": "10.2 Traits: Defining Shared Behavior",
+    "anchor": "returning-types-that-implement-traits",
     "tag": "Spot the Bug",
     "difficulty": 3,
     "prompt": "Assuming both `NewsArticle` and `SocialPost` implement `Summary`, why does this fail to compile?",
@@ -3062,6 +3206,7 @@
    {
     "id": "ch10-q17",
     "section": "10.2 Traits: Defining Shared Behavior",
+    "anchor": "using-trait-bounds-to-conditionally-implement-methods",
     "tag": "Behavior",
     "difficulty": 2,
     "prompt": "Given the definitions below, what happens if you call `pair.cmp_display()` where `pair` is a `Pair<Vec<i32>>` (and `Vec<i32>` does not implement `Display`)?",
@@ -3078,6 +3223,7 @@
    {
     "id": "ch10-q18",
     "section": "10.2 Traits: Defining Shared Behavior",
+    "anchor": "using-trait-bounds-to-conditionally-implement-methods",
     "tag": "Concept",
     "difficulty": 3,
     "prompt": "Why can you call `3.to_string()` even though the integer types never explicitly implement `ToString`?",
@@ -3113,6 +3259,7 @@
    {
     "id": "ch10-q20",
     "section": "10.3 Validating References with Lifetimes",
+    "anchor": "dangling-references",
     "tag": "Code Output",
     "difficulty": 1,
     "prompt": "What happens when you compile this program?",
@@ -3129,6 +3276,7 @@
    {
     "id": "ch10-q21",
     "section": "10.3 Validating References with Lifetimes",
+    "anchor": "generic-lifetimes-in-functions",
     "tag": "Spot the Bug",
     "difficulty": 2,
     "prompt": "This function fails with \"missing lifetime specifier\". Why can't the compiler accept it as written?",
@@ -3145,6 +3293,7 @@
    {
     "id": "ch10-q22",
     "section": "10.3 Validating References with Lifetimes",
+    "anchor": "in-function-signatures",
     "tag": "Concept",
     "difficulty": 2,
     "prompt": "In `fn longest<'a>(x: &'a str, y: &'a str) -> &'a str`, what does the lifetime `'a` actually mean for callers?",
@@ -3160,6 +3309,7 @@
    {
     "id": "ch10-q23",
     "section": "10.3 Validating References with Lifetimes",
+    "anchor": "in-function-signatures",
     "tag": "Code Output",
     "difficulty": 3,
     "prompt": "What happens when you compile this program?",
@@ -3176,6 +3326,7 @@
    {
     "id": "ch10-q24",
     "section": "10.3 Validating References with Lifetimes",
+    "anchor": "lifetime-elision",
     "tag": "Behavior",
     "difficulty": 3,
     "prompt": "The function `fn first_word(s: &str) -> &str` compiles without any lifetime annotations, while `fn longest(x: &str, y: &str) -> &str` does not. Which elision rule explains why `first_word` is accepted?",
@@ -3191,6 +3342,7 @@
    {
     "id": "ch10-q25",
     "section": "10.3 Validating References with Lifetimes",
+    "anchor": "relationships",
     "tag": "Spot the Bug",
     "difficulty": 3,
     "prompt": "This implementation of `longest` fails to compile. What is the fundamental problem?",
@@ -3207,6 +3359,7 @@
    {
     "id": "ch10-q26",
     "section": "10.3 Validating References with Lifetimes",
+    "anchor": "in-struct-definitions",
     "tag": "Concept",
     "difficulty": 2,
     "prompt": "Why does this struct definition require the lifetime parameter `'a`?",
@@ -3223,6 +3376,7 @@
    {
     "id": "ch10-q27",
     "section": "10.3 Validating References with Lifetimes",
+    "anchor": "lifetime-elision",
     "tag": "Concept",
     "difficulty": 3,
     "prompt": "Which of the following statements about lifetimes and the elision rules are TRUE? (Select all that apply.)",
@@ -3243,6 +3397,7 @@
    {
     "id": "ch10-q28",
     "section": "10.3 Validating References with Lifetimes",
+    "anchor": "generic-type-parameters-trait-bounds-and-lifetimes",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "What does this program (combining generics, trait bounds, and lifetimes) print?",
@@ -3266,6 +3421,7 @@
    {
     "id": "ch11-q01",
     "section": "11.1 How to Write Tests",
+    "anchor": "structuring-test-functions",
     "tag": "Concept",
     "difficulty": 1,
     "prompt": "How does the Rust test runner know which functions in a crate are tests?",
@@ -3281,6 +3437,7 @@
    {
     "id": "ch11-q02",
     "section": "11.1 How to Write Tests",
+    "anchor": "testing-equality-with-assert_eq-and-assert_ne",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "What happens when this test runs under `cargo test`?",
@@ -3297,6 +3454,7 @@
    {
     "id": "ch11-q03",
     "section": "11.1 How to Write Tests",
+    "anchor": "testing-equality-with-assert_eq-and-assert_ne",
     "tag": "Misconception",
     "difficulty": 1,
     "prompt": "A teammate insists that `assert_eq!` must be called as `assert_eq!(expected, actual)` or the comparison will be wrong. What is the actual convention in Rust?",
@@ -3312,6 +3470,7 @@
    {
     "id": "ch11-q04",
     "section": "11.1 How to Write Tests",
+    "anchor": "adding-custom-failure-messages",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "When this test runs, what does the failure output contain?",
@@ -3328,6 +3487,7 @@
    {
     "id": "ch11-q05",
     "section": "11.1 How to Write Tests",
+    "anchor": "checking-for-panics-with-should_panic",
     "tag": "Code Output",
     "difficulty": 3,
     "prompt": "The two panic messages in `Guess::new` were accidentally swapped. What is the result of running this test?",
@@ -3344,6 +3504,7 @@
    {
     "id": "ch11-q06",
     "section": "11.1 How to Write Tests",
+    "anchor": "using-resultt-e-in-tests",
     "tag": "Spot the Bug",
     "difficulty": 3,
     "prompt": "This test is rejected by the compiler. Why?",
@@ -3360,6 +3521,7 @@
    {
     "id": "ch11-q07",
     "section": "11.1 How to Write Tests",
+    "anchor": "using-resultt-e-in-tests",
     "tag": "Concept",
     "difficulty": 2,
     "prompt": "Which of the following are true about test functions that return `Result<(), String>`? (Select all that apply.)",
@@ -3380,6 +3542,7 @@
    {
     "id": "ch11-q08",
     "section": "11.1 How to Write Tests",
+    "anchor": "testing-equality-with-assert_eq-and-assert_ne",
     "tag": "Spot the Bug",
     "difficulty": 2,
     "prompt": "This test module fails to compile. What is the fix?",
@@ -3411,6 +3574,7 @@
    {
     "id": "ch11-q10",
     "section": "11.2 Controlling How Tests Are Run",
+    "anchor": "running-tests-in-parallel-or-consecutively",
     "tag": "Spot the Bug",
     "difficulty": 2,
     "prompt": "These two tests each pass alone but fail intermittently when running `cargo test`. What is the root cause?",
@@ -3427,6 +3591,7 @@
    {
     "id": "ch11-q11",
     "section": "11.2 Controlling How Tests Are Run",
+    "anchor": "showing-function-output",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "Running `cargo test` (with no extra flags) on this code, which `println!` output appears in the terminal?",
@@ -3443,6 +3608,7 @@
    {
     "id": "ch11-q12",
     "section": "11.2 Controlling How Tests Are Run",
+    "anchor": "running-a-subset-of-tests-by-name",
     "tag": "Behavior",
     "difficulty": 1,
     "prompt": "A crate has tests named `add_two_and_two`, `add_three_and_two`, and `one_hundred`. What does `cargo test add` do?",
@@ -3458,6 +3624,7 @@
    {
     "id": "ch11-q13",
     "section": "11.2 Controlling How Tests Are Run",
+    "anchor": "ignoring-tests-unless-specifically-requested",
     "tag": "Behavior",
     "difficulty": 2,
     "prompt": "Which statements about `#[ignore]` are true? (Select all that apply.)",
@@ -3478,6 +3645,7 @@
    {
     "id": "ch11-q14",
     "section": "11.3 Test Organization",
+    "anchor": "unit-tests",
     "tag": "Concept",
     "difficulty": 1,
     "prompt": "Why are unit test modules in `src/` conventionally annotated with `#[cfg(test)]`?",
@@ -3493,6 +3661,7 @@
    {
     "id": "ch11-q15",
     "section": "11.3 Test Organization",
+    "anchor": "unit-tests",
     "tag": "Misconception",
     "difficulty": 2,
     "prompt": "A colleague claims that private functions in Rust can never be unit tested. Is that correct?",
@@ -3508,6 +3677,7 @@
    {
     "id": "ch11-q16",
     "section": "11.3 Test Organization",
+    "anchor": "integration-tests",
     "tag": "Concept",
     "difficulty": 3,
     "prompt": "Which statements about integration tests in the `tests/` directory are true? (Select all that apply.)",
@@ -3528,6 +3698,7 @@
    {
     "id": "ch11-q17",
     "section": "11.3 Test Organization",
+    "anchor": "integration-tests",
     "tag": "Spot the Bug",
     "difficulty": 2,
     "prompt": "A shared helper was placed in `tests/common.rs`. The tests compile and pass, but `cargo test` output now shows an unwanted section `Running tests/common.rs` with `running 0 tests`. What is the idiomatic fix?",
@@ -3544,6 +3715,7 @@
    {
     "id": "ch11-q18",
     "section": "11.3 Test Organization",
+    "anchor": "integration-tests",
     "tag": "Concept",
     "difficulty": 3,
     "prompt": "A project contains only `src/main.rs`. An integration test `tests/cli.rs` with `use myapp::run;` fails to compile because the crate cannot be found. Why, and what is the standard remedy?",
@@ -3566,6 +3738,7 @@
    {
     "id": "ch12-q01",
     "section": "12.1 Accepting Command Line Arguments",
+    "anchor": "the-args-function-and-invalid-unicode",
     "tag": "Concept",
     "difficulty": 1,
     "prompt": "What happens if a program iterates over `std::env::args()` and one of the command-line arguments contains invalid Unicode?",
@@ -3581,6 +3754,7 @@
    {
     "id": "ch12-q02",
     "section": "12.1 Accepting Command Line Arguments",
+    "anchor": "reading-the-argument-values",
     "tag": "Code Output",
     "difficulty": 1,
     "prompt": "This program is compiled to the binary `minigrep` and run with `cargo run -- needle haystack`. What does it print?",
@@ -3613,6 +3787,7 @@
    {
     "id": "ch12-q04",
     "section": "12.3 Improving Error Handling and Modularity",
+    "anchor": "separating-concerns-in-binary-projects",
     "tag": "Concept",
     "difficulty": 2,
     "prompt": "After the chapter's separation-of-concerns refactor splits the program into `main.rs` and `lib.rs`, which responsibilities remain in the `main` function? Select all that apply.",
@@ -3633,6 +3808,7 @@
    {
     "id": "ch12-q05",
     "section": "12.3 Improving Error Handling and Modularity",
+    "anchor": "fixing-the-error-handling",
     "tag": "Behavior",
     "difficulty": 2,
     "prompt": "Given this `main` and a `Config::build` that returns `Err(\"not enough arguments\")` when `args.len() < 3`, what happens when the user runs `cargo run` with no extra arguments?",
@@ -3649,6 +3825,7 @@
    {
     "id": "ch12-q06",
     "section": "12.3 Improving Error Handling and Modularity",
+    "anchor": "fixing-the-error-handling",
     "tag": "Concept",
     "difficulty": 1,
     "prompt": "In `Config::build(&args).unwrap_or_else(|err| { ... })`, what does `unwrap_or_else` do when `Config::build` returns `Ok(config)`?",
@@ -3664,6 +3841,7 @@
    {
     "id": "ch12-q07",
     "section": "12.3 Improving Error Handling and Modularity",
+    "anchor": "extracting-logic-from-main",
     "tag": "Concept",
     "difficulty": 2,
     "prompt": "Why does the chapter give `run` the return type `Result<(), Box<dyn Error>>` rather than a concrete error type like `std::io::Error`?",
@@ -3679,6 +3857,7 @@
    {
     "id": "ch12-q08",
     "section": "12.3 Improving Error Handling and Modularity",
+    "anchor": "extracting-logic-from-main",
     "tag": "Spot the Bug",
     "difficulty": 2,
     "prompt": "This refactored `run` function does not compile. What is the problem?",
@@ -3695,6 +3874,7 @@
    {
     "id": "ch12-q09",
     "section": "12.3 Improving Error Handling and Modularity",
+    "anchor": "extracting-logic-from-main",
     "tag": "Misconception",
     "difficulty": 1,
     "prompt": "A learner asks: \"Why does `main` use `if let Err(e) = run(config)` instead of `unwrap_or_else`, like it does for `Config::build`?\" What is the book's reasoning?",
@@ -3725,6 +3905,7 @@
    {
     "id": "ch12-q11",
     "section": "12.4 Testing the Library's Functionality",
+    "anchor": "writing-a-failing-test",
     "tag": "Spot the Bug",
     "difficulty": 3,
     "prompt": "This first attempt at `search` fails to compile. Why?",
@@ -3741,6 +3922,7 @@
    {
     "id": "ch12-q12",
     "section": "12.4 Testing the Library's Functionality",
+    "anchor": "writing-code-to-pass-the-test",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "Using the book's final `search` implementation (case-sensitive, matching lines that contain the query), what does this print?",
@@ -3757,6 +3939,7 @@
    {
     "id": "ch12-q13",
     "section": "12.4 Testing the Library's Functionality",
+    "anchor": "writing-a-failing-test",
     "tag": "Misconception",
     "difficulty": 3,
     "prompt": "A colleague looks at `pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str>` and claims: \"The lifetime `'a` means `query` and `contents` must live equally long.\" Which statement is correct?",
@@ -3772,6 +3955,7 @@
    {
     "id": "ch12-q14",
     "section": "12.5 Working with Environment Variables",
+    "anchor": "implementing-the-search_case_insensitive-function",
     "tag": "Behavior",
     "difficulty": 3,
     "prompt": "`Config::build` sets `let ignore_case = env::var(\"IGNORE_CASE\").is_ok();`. A user runs the program with the environment variable set to `IGNORE_CASE=0`, intending to disable case-insensitive search. What actually happens?",
@@ -3787,6 +3971,7 @@
    {
     "id": "ch12-q15",
     "section": "12.5 Working with Environment Variables",
+    "anchor": "implementing-the-search_case_insensitive-function",
     "tag": "Code Output",
     "difficulty": 3,
     "prompt": "Using the book's `search_case_insensitive` (which lowercases the query and each line for comparison), what does this print?",
@@ -3803,6 +3988,7 @@
    {
     "id": "ch12-q16",
     "section": "12.6 Writing Error Messages to Standard Error Instead of Standard Output",
+    "anchor": "printing-errors-to-standard-error",
     "tag": "Behavior",
     "difficulty": 2,
     "prompt": "After the final refactor, error messages are printed with `eprintln!` and `main` calls `process::exit(1)` on failure. The user runs `cargo run > output.txt` with no arguments, triggering the `not enough arguments` error. Which statements are true? Select all that apply.",
@@ -3830,6 +4016,7 @@
    {
     "id": "ch13-q01",
     "section": "13.1 Closures",
+    "anchor": "capturing-the-environment",
     "tag": "Concept",
     "difficulty": 1,
     "prompt": "What is the key capability that closures have but plain `fn` functions do not?",
@@ -3845,6 +4032,7 @@
    {
     "id": "ch13-q02",
     "section": "13.1 Closures",
+    "anchor": "inferring-and-annotating-closure-types",
     "tag": "Spot the Bug",
     "difficulty": 2,
     "prompt": "This code fails to compile. Why?",
@@ -3861,6 +4049,7 @@
    {
     "id": "ch13-q03",
     "section": "13.1 Closures",
+    "anchor": "capturing-references-or-moving-ownership",
     "tag": "Concept",
     "difficulty": 1,
     "prompt": "How does the closure `only_borrows` capture `list`?",
@@ -3877,6 +4066,7 @@
    {
     "id": "ch13-q04",
     "section": "13.1 Closures",
+    "anchor": "capturing-references-or-moving-ownership",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "What does this program print?",
@@ -3893,6 +4083,7 @@
    {
     "id": "ch13-q05",
     "section": "13.1 Closures",
+    "anchor": "capturing-references-or-moving-ownership",
     "tag": "Concept",
     "difficulty": 2,
     "prompt": "Why is the `move` keyword required in this code?",
@@ -3909,6 +4100,7 @@
    {
     "id": "ch13-q06",
     "section": "13.1 Closures",
+    "anchor": "moving-captured-values-out-of-closures",
     "tag": "Concept",
     "difficulty": 3,
     "prompt": "Which of the following statements about the `Fn`, `FnMut`, and `FnOnce` traits are TRUE? (Select all that apply.)",
@@ -3930,6 +4122,7 @@
    {
     "id": "ch13-q07",
     "section": "13.1 Closures",
+    "anchor": "moving-captured-values-out-of-closures",
     "tag": "Behavior",
     "difficulty": 2,
     "prompt": "The standard library defines `Option::unwrap_or_else` with the bound `F: FnOnce() -> T`. Why is `FnOnce` the right choice?",
@@ -3945,6 +4138,7 @@
    {
     "id": "ch13-q08",
     "section": "13.1 Closures",
+    "anchor": "moving-captured-values-out-of-closures",
     "tag": "Spot the Bug",
     "difficulty": 3,
     "prompt": "This code fails to compile. What is the actual problem?",
@@ -3961,6 +4155,7 @@
    {
     "id": "ch13-q09",
     "section": "13.1 Closures",
+    "anchor": "capturing-references-or-moving-ownership",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "What does this program print?",
@@ -3977,6 +4172,7 @@
    {
     "id": "ch13-q10",
     "section": "13.1 Closures",
+    "anchor": "moving-captured-values-out-of-closures",
     "tag": "Misconception",
     "difficulty": 2,
     "prompt": "A colleague claims: \"If you write `move` in front of a closure, it becomes `FnOnce`-only, so you can't call it twice.\" Which statement is correct?",
@@ -3992,6 +4188,7 @@
    {
     "id": "ch13-q11",
     "section": "13.1 Closures",
+    "anchor": "moving-captured-values-out-of-closures",
     "tag": "Code Output",
     "difficulty": 3,
     "prompt": "What is the result of compiling and running this program?",
@@ -4008,6 +4205,7 @@
    {
     "id": "ch13-q12",
     "section": "13.2 Processing a Series of Items with Iterators",
+    "anchor": "methods-that-produce-other-iterators",
     "tag": "Spot the Bug",
     "difficulty": 1,
     "prompt": "This code compiles with a warning and has no visible effect. What went wrong?",
@@ -4024,6 +4222,7 @@
    {
     "id": "ch13-q13",
     "section": "13.2 Processing a Series of Items with Iterators",
+    "anchor": "the-iterator-trait-and-the-next-method",
     "tag": "Concept",
     "difficulty": 1,
     "prompt": "For a `Vec<String>` named `v`, which method creates an iterator that yields owned `String` values, consuming the vector?",
@@ -4039,6 +4238,7 @@
    {
     "id": "ch13-q14",
     "section": "13.2 Processing a Series of Items with Iterators",
+    "anchor": "the-iterator-trait-and-the-next-method",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "What does this program print?",
@@ -4055,6 +4255,7 @@
    {
     "id": "ch13-q15",
     "section": "13.2 Processing a Series of Items with Iterators",
+    "anchor": "the-iterator-trait-and-the-next-method",
     "tag": "Spot the Bug",
     "difficulty": 2,
     "prompt": "This code fails to compile. Why?",
@@ -4071,6 +4272,7 @@
    {
     "id": "ch13-q16",
     "section": "13.2 Processing a Series of Items with Iterators",
+    "anchor": "closures-that-capture-their-environment",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "What does this program print?",
@@ -4087,6 +4289,7 @@
    {
     "id": "ch13-q17",
     "section": "13.2 Processing a Series of Items with Iterators",
+    "anchor": "methods-that-consume-the-iterator",
     "tag": "Concept",
     "difficulty": 2,
     "prompt": "Which of these iterator methods are consuming adapters, i.e. they call `next` repeatedly and use up the iterator? (Select all that apply.)",
@@ -4107,6 +4310,7 @@
    {
     "id": "ch13-q18",
     "section": "13.2 Processing a Series of Items with Iterators",
+    "anchor": "the-iterator-trait-and-the-next-method",
     "tag": "Concept",
     "difficulty": 1,
     "prompt": "To implement the `Iterator` trait for your own type, what is the minimum you must provide?",
@@ -4138,6 +4342,7 @@
    {
     "id": "ch13-q20",
     "section": "13.2 Processing a Series of Items with Iterators",
+    "anchor": "the-iterator-trait-and-the-next-method",
     "tag": "Misconception",
     "difficulty": 3,
     "prompt": "Calling `next()` directly requires a mutable iterator, yet this compiles even though `v1_iter` is not declared `mut`. Why?",
@@ -4154,6 +4359,7 @@
    {
     "id": "ch13-q21",
     "section": "13.3 Improving Our I/O Project",
+    "anchor": "removing-a-clone-using-an-iterator",
     "tag": "Concept",
     "difficulty": 2,
     "prompt": "In the minigrep project, `Config::build` was changed from taking `args: &[String]` to `mut args: impl Iterator<Item = String>`. What is the main benefit?",
@@ -4169,6 +4375,7 @@
    {
     "id": "ch13-q22",
     "section": "13.3 Improving Our I/O Project",
+    "anchor": "clarifying-code-with-iterator-adapters",
     "tag": "Behavior",
     "difficulty": 3,
     "prompt": "The `search` function was rewritten from a `for` loop pushing into a `Vec` to:\n`contents.lines().filter(|line| line.contains(query)).collect()`. Which statements about this version are TRUE? (Select all that apply.)",
@@ -4277,6 +4484,7 @@
    {
     "id": "ch14-q04",
     "section": "14.2 Publishing a Crate to Crates.io",
+    "anchor": "making-useful-documentation-comments",
     "tag": "Concept",
     "difficulty": 1,
     "prompt": "What is the difference between `///` and `//!` documentation comments?",
@@ -4292,6 +4500,7 @@
    {
     "id": "ch14-q05",
     "section": "14.2 Publishing a Crate to Crates.io",
+    "anchor": "making-useful-documentation-comments",
     "tag": "Code Output",
     "difficulty": 3,
     "prompt": "This is the entire `src/lib.rs` of crate `my_crate`. What happens when you run `cargo test`?",
@@ -4308,6 +4517,7 @@
    {
     "id": "ch14-q06",
     "section": "14.2 Publishing a Crate to Crates.io",
+    "anchor": "exporting-a-convenient-public-api",
     "tag": "Concept",
     "difficulty": 2,
     "prompt": "The crate `art` defines `PrimaryColor` in module `kinds` and `mix` in module `utils`. What does adding these lines to the crate root accomplish?",
@@ -4324,6 +4534,7 @@
    {
     "id": "ch14-q07",
     "section": "14.2 Publishing a Crate to Crates.io",
+    "anchor": "adding-metadata-to-a-new-crate",
     "tag": "Spot the Bug",
     "difficulty": 2,
     "prompt": "Running `cargo publish` with this `Cargo.toml` fails with a 400 error from crates.io. Why?",
@@ -4375,6 +4586,7 @@
    {
     "id": "ch14-q10",
     "section": "14.3 Cargo Workspaces",
+    "anchor": "creating-the-second-package-in-the-workspace",
     "tag": "Spot the Bug",
     "difficulty": 2,
     "prompt": "In this workspace, `adder/src/main.rs` calls `add_one::add_one(10)` but the build fails with `can't find crate for add_one`. The workspace `Cargo.toml` lists `members = [\"adder\", \"add_one\"]`. What is missing?",
@@ -4391,6 +4603,7 @@
    {
     "id": "ch14-q11",
     "section": "14.3 Cargo Workspaces",
+    "anchor": "adding-a-test-to-a-workspace",
     "tag": "Behavior",
     "difficulty": 2,
     "prompt": "From the root of a workspace with several members, how do you run only the tests of the `add_one` crate?",
@@ -4463,6 +4676,7 @@
    {
     "id": "ch15-q01",
     "section": "15.1 Using Box<T> to Point to Data on the Heap",
+    "anchor": "enabling-recursive-types-with-boxes",
     "tag": "Concept",
     "difficulty": 1,
     "prompt": "Why does the definition `enum List { Cons(i32, List), Nil }` fail to compile, and how does changing it to `Cons(i32, Box<List>)` fix the problem?",
@@ -4478,6 +4692,7 @@
    {
     "id": "ch15-q02",
     "section": "15.1 Using Box<T> to Point to Data on the Heap",
+    "anchor": "storing-data-on-the-heap",
     "tag": "Code Output",
     "difficulty": 1,
     "prompt": "What does this program print?",
@@ -4509,6 +4724,7 @@
    {
     "id": "ch15-q04",
     "section": "15.1 Using Box<T> to Point to Data on the Heap",
+    "anchor": "enabling-recursive-types-with-boxes",
     "tag": "Spot the Bug",
     "difficulty": 2,
     "prompt": "What is wrong with this code?",
@@ -4546,6 +4762,7 @@
    {
     "id": "ch15-q06",
     "section": "15.2 Treating Smart Pointers Like Regular References with Deref",
+    "anchor": "implementing-the-deref-trait",
     "tag": "Concept",
     "difficulty": 2,
     "prompt": "In an implementation of `Deref`, why is the method signature `fn deref(&self) -> &Self::Target` — returning a reference rather than the inner value itself?",
@@ -4561,6 +4778,7 @@
    {
     "id": "ch15-q07",
     "section": "15.2 Treating Smart Pointers Like Regular References with Deref",
+    "anchor": "using-deref-coercion-in-functions-and-methods",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "What is the result of running this program?",
@@ -4577,6 +4795,7 @@
    {
     "id": "ch15-q08",
     "section": "15.2 Treating Smart Pointers Like Regular References with Deref",
+    "anchor": "handling-deref-coercion-with-mutable-references",
     "tag": "Concept",
     "difficulty": 3,
     "prompt": "Which of the following are deref coercions Rust performs automatically when types don't match at a function or method call? (Select all that apply.)",
@@ -4598,6 +4817,7 @@
    {
     "id": "ch15-q09",
     "section": "15.2 Treating Smart Pointers Like Regular References with Deref",
+    "anchor": "defining-our-own-smart-pointer",
     "tag": "Spot the Bug",
     "difficulty": 2,
     "prompt": "Why does this code fail?",
@@ -4614,6 +4834,7 @@
    {
     "id": "ch15-q10",
     "section": "15.2 Treating Smart Pointers Like Regular References with Deref",
+    "anchor": "using-deref-coercion-in-functions-and-methods",
     "tag": "Behavior",
     "difficulty": 3,
     "prompt": "A function `fn takes(s: &str)` is called as `takes(&b)` where `b: Box<String>`. When and how does the argument become a `&str`?",
@@ -4692,6 +4913,7 @@
    {
     "id": "ch15-q15",
     "section": "15.4 Rc<T>, the Reference Counted Smart Pointer",
+    "anchor": "cloning-to-increase-the-reference-count",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "What does this program print?",
@@ -4724,6 +4946,7 @@
    {
     "id": "ch15-q17",
     "section": "15.4 Rc<T>, the Reference Counted Smart Pointer",
+    "anchor": "sharing-data",
     "tag": "Misconception",
     "difficulty": 1,
     "prompt": "\"`Rc::clone(&a)` performs a deep copy of the data, so it should be avoided in performance-sensitive code.\" What is wrong with this claim?",
@@ -4754,6 +4977,7 @@
    {
     "id": "ch15-q19",
     "section": "15.5 RefCell<T> and the Interior Mutability Pattern",
+    "anchor": "using-interior-mutability",
     "tag": "Code Output",
     "difficulty": 3,
     "prompt": "What is the result of running this program?",
@@ -4770,6 +4994,7 @@
    {
     "id": "ch15-q20",
     "section": "15.5 RefCell<T> and the Interior Mutability Pattern",
+    "anchor": "using-interior-mutability",
     "tag": "Spot the Bug",
     "difficulty": 3,
     "prompt": "This mock object for testing does not compile. The `Messenger` trait is fixed and cannot be changed. What is the problem and the idiomatic fix?",
@@ -4786,6 +5011,7 @@
    {
     "id": "ch15-q21",
     "section": "15.5 RefCell<T> and the Interior Mutability Pattern",
+    "anchor": "allowing-multiple-owners-of-mutable-data",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "What does this program print?",
@@ -4802,6 +5028,7 @@
    {
     "id": "ch15-q22",
     "section": "15.5 RefCell<T> and the Interior Mutability Pattern",
+    "anchor": "enforcing-borrowing-rules-at-runtime",
     "tag": "Concept",
     "difficulty": 3,
     "prompt": "Which statements from the `Box<T>` / `Rc<T>` / `RefCell<T>` comparison are correct? (Select all that apply.)",
@@ -4823,6 +5050,7 @@
    {
     "id": "ch15-q23",
     "section": "15.5 RefCell<T> and the Interior Mutability Pattern",
+    "anchor": "using-interior-mutability",
     "tag": "Behavior",
     "difficulty": 3,
     "prompt": "What happens when this program runs?",
@@ -4839,6 +5067,7 @@
    {
     "id": "ch15-q24",
     "section": "15.6 Reference Cycles Can Leak Memory",
+    "anchor": "creating-a-reference-cycle",
     "tag": "Concept",
     "difficulty": 2,
     "prompt": "Two `Rc` values end up pointing at each other (`a`'s tail refers to `b`, and `b`'s tail is mutated via a `RefCell` to refer back to `a`). What happens when both variables go out of scope?",
@@ -4854,6 +5083,7 @@
    {
     "id": "ch15-q25",
     "section": "15.6 Reference Cycles Can Leak Memory",
+    "anchor": "preventing-reference-cycles-using-weakt",
     "tag": "Code Output",
     "difficulty": 3,
     "prompt": "What does this program print?",
@@ -4870,6 +5100,7 @@
    {
     "id": "ch15-q26",
     "section": "15.6 Reference Cycles Can Leak Memory",
+    "anchor": "preventing-reference-cycles-using-weakt",
     "tag": "Concept",
     "difficulty": 3,
     "prompt": "Which statements about `Weak<T>` are true? (Select all that apply.)",
@@ -4898,6 +5129,7 @@
    {
     "id": "ch16-q01",
     "section": "16.1 Using Threads",
+    "anchor": "creating-a-new-thread-with-spawn",
     "tag": "Concept",
     "difficulty": 1,
     "prompt": "How do you create a new thread in Rust's standard library?",
@@ -4913,6 +5145,7 @@
    {
     "id": "ch16-q02",
     "section": "16.1 Using Threads",
+    "anchor": "creating-a-new-thread-with-spawn",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "What is the most accurate description of this program's output?",
@@ -4929,6 +5162,7 @@
    {
     "id": "ch16-q03",
     "section": "16.1 Using Threads",
+    "anchor": "waiting-for-all-threads-to-finish",
     "tag": "Behavior",
     "difficulty": 1,
     "prompt": "What does calling `join()` on the `JoinHandle` returned by `thread::spawn` do?",
@@ -4944,6 +5178,7 @@
    {
     "id": "ch16-q04",
     "section": "16.1 Using Threads",
+    "anchor": "waiting-for-all-threads-to-finish",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "What does this program print?",
@@ -4960,6 +5195,7 @@
    {
     "id": "ch16-q05",
     "section": "16.1 Using Threads",
+    "anchor": "using-move-closures-with-threads",
     "tag": "Spot the Bug",
     "difficulty": 2,
     "prompt": "Why does this code fail to compile?",
@@ -4976,6 +5212,7 @@
    {
     "id": "ch16-q06",
     "section": "16.1 Using Threads",
+    "anchor": "using-move-closures-with-threads",
     "tag": "Misconception",
     "difficulty": 3,
     "prompt": "Select ALL statements that are true about `move` closures used with `thread::spawn`.",
@@ -5011,6 +5248,7 @@
    {
     "id": "ch16-q08",
     "section": "16.2 Using Message Passing to Transfer Data Between Threads",
+    "anchor": "transferring-ownership-through-channels",
     "tag": "Spot the Bug",
     "difficulty": 2,
     "prompt": "What is wrong with this code?",
@@ -5042,6 +5280,7 @@
    {
     "id": "ch16-q10",
     "section": "16.2 Using Message Passing to Transfer Data Between Threads",
+    "anchor": "sending-multiple-values",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "What does this program do?",
@@ -5058,6 +5297,7 @@
    {
     "id": "ch16-q11",
     "section": "16.2 Using Message Passing to Transfer Data Between Threads",
+    "anchor": "creating-multiple-producers",
     "tag": "Code Output",
     "difficulty": 3,
     "prompt": "Two threads send over the same channel via a cloned transmitter. What is true of the output?",
@@ -5094,6 +5334,7 @@
    {
     "id": "ch16-q13",
     "section": "16.3 Shared-State Concurrency",
+    "anchor": "controlling-access-with-mutexes",
     "tag": "Concept",
     "difficulty": 1,
     "prompt": "What does `Mutex::lock()` return, and when is it an `Err`?",
@@ -5109,6 +5350,7 @@
    {
     "id": "ch16-q14",
     "section": "16.3 Shared-State Concurrency",
+    "anchor": "controlling-access-with-mutexes",
     "tag": "Behavior",
     "difficulty": 2,
     "prompt": "How is a `Mutex` lock released in safe Rust?",
@@ -5124,6 +5366,7 @@
    {
     "id": "ch16-q15",
     "section": "16.3 Shared-State Concurrency",
+    "anchor": "controlling-access-with-mutexes",
     "tag": "Code Output",
     "difficulty": 1,
     "prompt": "What does this single-threaded program print?",
@@ -5140,6 +5383,7 @@
    {
     "id": "ch16-q16",
     "section": "16.3 Shared-State Concurrency",
+    "anchor": "controlling-access-with-mutexes",
     "tag": "Spot the Bug",
     "difficulty": 2,
     "prompt": "Why does this code fail to compile?",
@@ -5156,6 +5400,7 @@
    {
     "id": "ch16-q17",
     "section": "16.3 Shared-State Concurrency",
+    "anchor": "controlling-access-with-mutexes",
     "tag": "Spot the Bug",
     "difficulty": 3,
     "prompt": "To share the counter, a programmer wraps it in `Rc`. What happens?",
@@ -5172,6 +5417,7 @@
    {
     "id": "ch16-q18",
     "section": "16.3 Shared-State Concurrency",
+    "anchor": "controlling-access-with-mutexes",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "What does this program print?",
@@ -5238,6 +5484,7 @@
    {
     "id": "ch16-q22",
     "section": "16.4 Extensible Concurrency with the Send and Sync Traits",
+    "anchor": "implementing-send-and-sync-manually-is-unsafe",
     "tag": "Concept",
     "difficulty": 3,
     "prompt": "How do types come to implement `Send` and `Sync`, and what does implementing them manually involve?",
@@ -5260,6 +5507,7 @@
    {
     "id": "ch17-q01",
     "section": "17.1 Futures and the Async Syntax",
+    "anchor": "defining-the-page_title-function",
     "tag": "Concept",
     "difficulty": 1,
     "prompt": "The book shows that `async fn page_title(url: &str) -> Option<String>` is roughly equivalent to a non-async function. What is that function's return type?",
@@ -5275,6 +5523,7 @@
    {
     "id": "ch17-q02",
     "section": "17.1 Futures and the Async Syntax",
+    "anchor": "defining-the-page_title-function",
     "tag": "Misconception",
     "difficulty": 1,
     "prompt": "Inside an async block you write the following and never use `title_fut` again. What actually happens to the HTTP request?",
@@ -5291,6 +5540,7 @@
    {
     "id": "ch17-q03",
     "section": "17.1 Futures and the Async Syntax",
+    "anchor": "executing-an-async-function-with-a-runtime",
     "tag": "Spot the Bug",
     "difficulty": 1,
     "prompt": "What is wrong with this program?",
@@ -5327,6 +5577,7 @@
    {
     "id": "ch17-q05",
     "section": "17.1 Futures and the Async Syntax",
+    "anchor": "racing-two-urls-against-each-other-concurrently",
     "tag": "Behavior",
     "difficulty": 2,
     "prompt": "In Listing 17-5 the book races two page-title fetches with `trpl::select(title_fut_1, title_fut_2).await`. What does this call return?",
@@ -5342,6 +5593,7 @@
    {
     "id": "ch17-q06",
     "section": "17.2 Applying Concurrency with Async",
+    "anchor": "creating-a-new-task-with-spawn_task",
     "tag": "Code Output",
     "difficulty": 3,
     "prompt": "What does this program print (run inside `trpl::block_on` as the book does)?",
@@ -5358,6 +5610,7 @@
    {
     "id": "ch17-q07",
     "section": "17.2 Applying Concurrency with Async",
+    "anchor": "sending-data-between-two-tasks-using-message-passing",
     "tag": "Spot the Bug",
     "difficulty": 3,
     "prompt": "This message-passing program (Listing 17-11) sends and prints all four messages at 500 ms intervals — but there is still a bug. What is it?",
@@ -5374,6 +5627,7 @@
    {
     "id": "ch17-q08",
     "section": "17.2 Applying Concurrency with Async",
+    "anchor": "creating-a-new-task-with-spawn_task",
     "tag": "Misconception",
     "difficulty": 2,
     "prompt": "You start a long-running counting loop with `trpl::spawn_task(async { ... })` and never use the returned handle. The main async block finishes its own shorter loop first. What happens to the spawned task?",
@@ -5389,6 +5643,7 @@
    {
     "id": "ch17-q09",
     "section": "17.2 Applying Concurrency with Async",
+    "anchor": "sending-data-between-two-tasks-using-message-passing",
     "tag": "Concept",
     "difficulty": 2,
     "prompt": "How does the async channel from `trpl::channel` differ from the synchronous `std::mpsc::channel` used in Chapter 16?",
@@ -5404,6 +5659,7 @@
    {
     "id": "ch17-q10",
     "section": "17.3 Working With Any Number of Futures",
+    "anchor": "yielding-control-to-the-runtime",
     "tag": "Code Output",
     "difficulty": 3,
     "prompt": "`slow` calls `std::thread::sleep` (blocking) and then prints. What output does this produce?",
@@ -5420,6 +5676,7 @@
    {
     "id": "ch17-q11",
     "section": "17.3 Working With Any Number of Futures",
+    "anchor": "yielding-control-to-the-runtime",
     "tag": "Concept",
     "difficulty": 2,
     "prompt": "According to the book, when can the runtime switch from one future to another?",
@@ -5435,6 +5692,7 @@
    {
     "id": "ch17-q12",
     "section": "17.3 Working With Any Number of Futures",
+    "anchor": "building-our-own-async-abstractions",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "Using the book's `timeout` built from `trpl::select` and `trpl::sleep`, what does this program print?",
@@ -5451,6 +5709,7 @@
    {
     "id": "ch17-q13",
     "section": "17.3 Working With Any Number of Futures",
+    "anchor": "building-our-own-async-abstractions",
     "tag": "Behavior",
     "difficulty": 3,
     "prompt": "In the `timeout` implementation, why does the book pass `future_to_try` as the *first* argument to `trpl::select`?",
@@ -5513,6 +5772,7 @@
    {
     "id": "ch17-q17",
     "section": "17.5 A Closer Look at the Traits for Async",
+    "anchor": "the-future-trait",
     "tag": "Concept",
     "difficulty": 2,
     "prompt": "The `Future` trait is defined as `fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output>`. Which statement about `poll` and the `Poll` type is correct?",
@@ -5528,6 +5788,7 @@
    {
     "id": "ch17-q18",
     "section": "17.5 A Closer Look at the Traits for Async",
+    "anchor": "the-pin-type-and-the-unpin-trait",
     "tag": "Spot the Bug",
     "difficulty": 3,
     "prompt": "This attempt to await a runtime-sized collection of futures fails with error E0277: \"`dyn Future<Output = ()>` cannot be unpinned\". What is the problem, and the book's fix?",
@@ -5544,6 +5805,7 @@
    {
     "id": "ch17-q19",
     "section": "17.5 A Closer Look at the Traits for Async",
+    "anchor": "the-pin-type-and-the-unpin-trait",
     "tag": "Concept",
     "difficulty": 3,
     "prompt": "Which of the following statements about `Pin` and `Unpin` are true, as the book presents them? (Select all that apply.)",
@@ -5622,6 +5884,7 @@
    {
     "id": "ch18-q01",
     "section": "18.1 Characteristics of Object-Oriented Languages",
+    "anchor": "objects-contain-data-and-behavior",
     "tag": "Concept",
     "difficulty": 1,
     "prompt": "The book cites the Gang of Four definition: an object packages both data and the procedures that operate on that data. By this definition, why does Rust qualify as object-oriented?",
@@ -5637,6 +5900,7 @@
    {
     "id": "ch18-q02",
     "section": "18.1 Characteristics of Object-Oriented Languages",
+    "anchor": "encapsulation-that-hides-implementation-details",
     "tag": "Spot the Bug",
     "difficulty": 2,
     "prompt": "This code uses the book's `AveragedCollection`. Why does it fail to compile?",
@@ -5653,6 +5917,7 @@
    {
     "id": "ch18-q03",
     "section": "18.1 Characteristics of Object-Oriented Languages",
+    "anchor": "inheritance-as-a-type-system-and-as-code-sharing",
     "tag": "Misconception",
     "difficulty": 1,
     "prompt": "A developer coming from Java asks how to make a `struct` inherit fields and methods from a parent `struct`. What does the book say?",
@@ -5688,6 +5953,7 @@
    {
     "id": "ch18-q05",
     "section": "18.2 Using Trait Objects That Allow for Values of Different Types",
+    "anchor": "defining-a-trait-for-common-behavior",
     "tag": "Concept",
     "difficulty": 1,
     "prompt": "In the type `Box<dyn Draw>`, what does the `dyn Draw` part denote?",
@@ -5703,6 +5969,7 @@
    {
     "id": "ch18-q06",
     "section": "18.2 Using Trait Objects That Allow for Values of Different Types",
+    "anchor": "defining-a-trait-for-common-behavior",
     "tag": "Concept",
     "difficulty": 2,
     "prompt": "The book defines `Screen` with `components: Vec<Box<dyn Draw>>` instead of a generic `Screen<T: Draw>` with `components: Vec<T>`. What is the key capability the trait-object version gains?",
@@ -5718,6 +5985,7 @@
    {
     "id": "ch18-q07",
     "section": "18.2 Using Trait Objects That Allow for Values of Different Types",
+    "anchor": "implementing-the-trait",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "What does this program print?",
@@ -5734,6 +6002,7 @@
    {
     "id": "ch18-q08",
     "section": "18.2 Using Trait Objects That Allow for Values of Different Types",
+    "anchor": "implementing-the-trait",
     "tag": "Spot the Bug",
     "difficulty": 2,
     "prompt": "Using the book's `Screen`, why does this code fail to compile?",
@@ -5750,6 +6019,7 @@
    {
     "id": "ch18-q09",
     "section": "18.2 Using Trait Objects That Allow for Values of Different Types",
+    "anchor": "performing-dynamic-dispatch",
     "tag": "Behavior",
     "difficulty": 2,
     "prompt": "Compare `fn show<T: Draw>(item: &T)` with `fn show(item: &dyn Draw)`. Which statement correctly describes how each call is dispatched?",
@@ -5765,6 +6035,7 @@
    {
     "id": "ch18-q10",
     "section": "18.2 Using Trait Objects That Allow for Values of Different Types",
+    "anchor": "performing-dynamic-dispatch",
     "tag": "Spot the Bug",
     "difficulty": 3,
     "prompt": "This code fails to compile at the function signature. Why?",
@@ -5801,6 +6072,7 @@
    {
     "id": "ch18-q12",
     "section": "18.3 Implementing an Object-Oriented Design Pattern",
+    "anchor": "attempting-traditional-object-oriented-style",
     "tag": "Concept",
     "difficulty": 2,
     "prompt": "In the blog example, `Post` stores `state: Option<Box<dyn State>>`, and `request_review` calls `self.state.take()`. Why is `take` needed?",
@@ -5817,6 +6089,7 @@
    {
     "id": "ch18-q13",
     "section": "18.3 Implementing an Object-Oriented Design Pattern",
+    "anchor": "attempting-traditional-object-oriented-style",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "Using the book's completed state-pattern `Post` (Draft -> PendingReview -> Published), what does this program print?",
@@ -5833,6 +6106,7 @@
    {
     "id": "ch18-q14",
     "section": "18.3 Implementing an Object-Oriented Design Pattern",
+    "anchor": "attempting-traditional-object-oriented-style",
     "tag": "Code Output",
     "difficulty": 1,
     "prompt": "Still using the book's state-pattern `Post`: `approve` on the `Draft` state returns `self` unchanged. What does this print?",
@@ -5864,6 +6138,7 @@
    {
     "id": "ch18-q16",
     "section": "18.3 Implementing an Object-Oriented Design Pattern",
+    "anchor": "encoding-states-and-behavior-as-types",
     "tag": "Misconception",
     "difficulty": 3,
     "prompt": "In the book's alternative that encodes states as separate types (`DraftPost`, `PendingReviewPost`, `Post`), a teammate claims: \"If you forget to call `approve` and try `content()` on a `PendingReviewPost`, the program panics at runtime.\" What actually happens?",
@@ -5908,6 +6183,7 @@
    {
     "id": "ch19-q02",
     "section": "19.1 All the Places Patterns Can Be Used",
+    "anchor": "let-statements",
     "tag": "Misconception",
     "difficulty": 1,
     "prompt": "Consider the statement `let x = 5;`. Which statement about `let` and patterns is true?",
@@ -5923,6 +6199,7 @@
    {
     "id": "ch19-q03",
     "section": "19.1 All the Places Patterns Can Be Used",
+    "anchor": "conditional-if-let-expressions",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "What does this program print?",
@@ -5939,6 +6216,7 @@
    {
     "id": "ch19-q04",
     "section": "19.1 All the Places Patterns Can Be Used",
+    "anchor": "while-let-conditional-loops",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "What does this loop print?",
@@ -5955,6 +6233,7 @@
    {
     "id": "ch19-q05",
     "section": "19.1 All the Places Patterns Can Be Used",
+    "anchor": "for-loops",
     "tag": "Code Output",
     "difficulty": 1,
     "prompt": "What is the first line this program prints?",
@@ -6018,6 +6297,7 @@
    {
     "id": "ch19-q09",
     "section": "19.3 Pattern Syntax",
+    "anchor": "matching-named-variables",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "What does this program print?",
@@ -6034,6 +6314,7 @@
    {
     "id": "ch19-q10",
     "section": "19.3 Pattern Syntax",
+    "anchor": "matching-named-variables",
     "tag": "Misconception",
     "difficulty": 3,
     "prompt": "An outer variable `y` already exists, and a `match` arm uses the pattern `Some(y)`. Which statements are true? Select all that apply.",
@@ -6071,6 +6352,7 @@
    {
     "id": "ch19-q12",
     "section": "19.3 Pattern Syntax",
+    "anchor": "destructuring-to-break-apart-values",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "What does this program print?",
@@ -6087,6 +6369,7 @@
    {
     "id": "ch19-q13",
     "section": "19.3 Pattern Syntax",
+    "anchor": "ignoring-values-in-a-pattern",
     "tag": "Spot the Bug",
     "difficulty": 3,
     "prompt": "What is wrong with this code?",
@@ -6103,6 +6386,7 @@
    {
     "id": "ch19-q14",
     "section": "19.3 Pattern Syntax",
+    "anchor": "ignoring-values-in-a-pattern",
     "tag": "Spot the Bug",
     "difficulty": 3,
     "prompt": "This program fails to compile. Why?",
@@ -6119,6 +6403,7 @@
    {
     "id": "ch19-q15",
     "section": "19.3 Pattern Syntax",
+    "anchor": "adding-conditionals-with-match-guards",
     "tag": "Code Output",
     "difficulty": 3,
     "prompt": "What does this program print?",
@@ -6135,6 +6420,7 @@
    {
     "id": "ch19-q16",
     "section": "19.3 Pattern Syntax",
+    "anchor": "adding-conditionals-with-match-guards",
     "tag": "Concept",
     "difficulty": 2,
     "prompt": "Match guards (an extra `if` condition after a pattern, like `Some(x) if x % 2 == 0`) add expressive power. What is their downside?",
@@ -6150,6 +6436,7 @@
    {
     "id": "ch19-q17",
     "section": "19.3 Pattern Syntax",
+    "anchor": "using--bindings",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "What does this program print?",
@@ -6166,6 +6453,7 @@
    {
     "id": "ch19-q18",
     "section": "19.3 Pattern Syntax",
+    "anchor": "destructuring-to-break-apart-values",
     "tag": "Behavior",
     "difficulty": 3,
     "prompt": "Which statements about destructuring patterns are true? Select all that apply.",
@@ -6194,6 +6482,7 @@
    {
     "id": "ch20-q01",
     "section": "20.1 Unsafe Rust",
+    "anchor": "performing-unsafe-superpowers",
     "tag": "Concept",
     "difficulty": 2,
     "prompt": "Which of the following operations require an `unsafe` block (or an `unsafe fn`)? Select all that apply.",
@@ -6215,6 +6504,7 @@
    {
     "id": "ch20-q02",
     "section": "20.1 Unsafe Rust",
+    "anchor": "performing-unsafe-superpowers",
     "tag": "Misconception",
     "difficulty": 1,
     "prompt": "A colleague claims: \"Inside an `unsafe` block, Rust turns off the borrow checker, so I can create two mutable references to the same value.\" What is true?",
@@ -6230,6 +6520,7 @@
    {
     "id": "ch20-q03",
     "section": "20.1 Unsafe Rust",
+    "anchor": "dereferencing-a-raw-pointer",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "What is the result of compiling and running this program?",
@@ -6246,6 +6537,7 @@
    {
     "id": "ch20-q04",
     "section": "20.1 Unsafe Rust",
+    "anchor": "calling-an-unsafe-function-or-method",
     "tag": "Spot the Bug",
     "difficulty": 2,
     "prompt": "Why does this program fail to compile?",
@@ -6262,6 +6554,7 @@
    {
     "id": "ch20-q05",
     "section": "20.1 Unsafe Rust",
+    "anchor": "creating-a-safe-abstraction-over-unsafe-code",
     "tag": "Behavior",
     "difficulty": 3,
     "prompt": "The standard library's `split_at_mut` returns two mutable slices into one slice. Its implementation uses raw pointers and `slice::from_raw_parts_mut` inside `unsafe`, yet the function itself is safe to call. Why is this a valid \"safe abstraction\"?",
@@ -6278,6 +6571,7 @@
    {
     "id": "ch20-q06",
     "section": "20.1 Unsafe Rust",
+    "anchor": "using-extern-functions-to-call-external-code",
     "tag": "Concept",
     "difficulty": 2,
     "prompt": "Consider this foreign function declaration. Which statement is true?",
@@ -6294,6 +6588,7 @@
    {
     "id": "ch20-q07",
     "section": "20.2 Advanced Traits",
+    "anchor": "defining-traits-with-associated-types",
     "tag": "Concept",
     "difficulty": 2,
     "prompt": "`Iterator` is defined with an associated type (`type Item;`) instead of a generic parameter (`trait Iterator<T>`). What key difference motivates that choice?",
@@ -6309,6 +6604,7 @@
    {
     "id": "ch20-q08",
     "section": "20.2 Advanced Traits",
+    "anchor": "using-default-generic-parameters-and-operator-overloading",
     "tag": "Code Output",
     "difficulty": 3,
     "prompt": "What does this program print?",
@@ -6325,6 +6621,7 @@
    {
     "id": "ch20-q09",
     "section": "20.2 Advanced Traits",
+    "anchor": "disambiguating-between-identically-named-methods",
     "tag": "Code Output",
     "difficulty": 2,
     "prompt": "What does this program print?",
@@ -6341,6 +6638,7 @@
    {
     "id": "ch20-q10",
     "section": "20.2 Advanced Traits",
+    "anchor": "disambiguating-between-identically-named-methods",
     "tag": "Spot the Bug",
     "difficulty": 3,
     "prompt": "This program fails to compile at the `println!` line. What is wrong, and what is the fix?",
@@ -6357,6 +6655,7 @@
    {
     "id": "ch20-q11",
     "section": "20.2 Advanced Traits",
+    "anchor": "using-supertraits",
     "tag": "Spot the Bug",
     "difficulty": 2,
     "prompt": "Why does this code fail to compile?",
@@ -6373,6 +6672,7 @@
    {
     "id": "ch20-q12",
     "section": "20.2 Advanced Traits",
+    "anchor": "implementing-external-traits-with-the-newtype-pattern",
     "tag": "Concept",
     "difficulty": 2,
     "prompt": "You want `Display` output for `Vec<String>`, but both `Display` and `Vec<String>` are defined outside your crate, so the orphan rule blocks `impl Display for Vec<String>`. How does the newtype pattern solve this?",
@@ -6389,6 +6689,7 @@
    {
     "id": "ch20-q13",
     "section": "20.3 Advanced Types",
+    "anchor": "type-synonyms-and-type-aliases",
     "tag": "Misconception",
     "difficulty": 1,
     "prompt": "Given `type Kilometers = i32;`, a developer assumes the compiler will now reject `fn add_miles(m: i32)` being called with a `Kilometers` value, catching unit mix-ups. What is true?",
@@ -6404,6 +6705,7 @@
    {
     "id": "ch20-q14",
     "section": "20.3 Advanced Types",
+    "anchor": "type-synonyms-and-type-aliases",
     "tag": "Code Output",
     "difficulty": 1,
     "prompt": "What does this program print?",
@@ -6441,6 +6743,7 @@
    {
     "id": "ch20-q16",
     "section": "20.3 Advanced Types",
+    "anchor": "dynamically-sized-types-and-the-sized-trait",
     "tag": "Spot the Bug",
     "difficulty": 2,
     "prompt": "Why does this code fail to compile?",
@@ -6457,6 +6760,7 @@
    {
     "id": "ch20-q17",
     "section": "20.4 Advanced Functions & Closures",
+    "anchor": "function-pointers",
     "tag": "Concept",
     "difficulty": 2,
     "prompt": "Given `fn do_twice(f: fn(i32) -> i32, arg: i32) -> i32` and `fn add_one(x: i32) -> i32 { x + 1 }`, which statement about the function pointer type `fn` is true?",
@@ -6472,6 +6776,7 @@
    {
     "id": "ch20-q18",
     "section": "20.4 Advanced Functions & Closures",
+    "anchor": "returning-closures",
     "tag": "Spot the Bug",
     "difficulty": 3,
     "prompt": "This function fails to compile. What is the problem?",
@@ -6488,6 +6793,7 @@
    {
     "id": "ch20-q19",
     "section": "20.5 Macros",
+    "anchor": "declarative-macros-for-general-metaprogramming",
     "tag": "Code Output",
     "difficulty": 3,
     "prompt": "What does this program print?",
@@ -6504,6 +6810,7 @@
    {
     "id": "ch20-q20",
     "section": "20.5 Macros",
+    "anchor": "the-difference-between-macros-and-functions",
     "tag": "Concept",
     "difficulty": 2,
     "prompt": "Which of the following are real differences between macros and functions in Rust? Select all that apply.",
@@ -6525,6 +6832,7 @@
    {
     "id": "ch20-q21",
     "section": "20.5 Macros",
+    "anchor": "procedural-macros-for-generating-code-from-attributes",
     "tag": "Concept",
     "difficulty": 1,
     "prompt": "What are the three kinds of procedural macros in Rust?",
@@ -6540,6 +6848,7 @@
    {
     "id": "ch20-q22",
     "section": "20.5 Macros",
+    "anchor": "custom-derive-macros",
     "tag": "Behavior",
     "difficulty": 3,
     "prompt": "A crate defines a custom derive macro as shown. What happens when a user writes `#[derive(HelloMacro)] struct Pancakes;`?",

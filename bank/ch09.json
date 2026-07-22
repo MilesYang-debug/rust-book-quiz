@@ -6,6 +6,7 @@
   {
    "id": "ch09-q01",
    "section": "9.1 Unrecoverable Errors with panic!",
+   "anchor": "unwinding-the-stack-or-aborting-in-response-to-a-panic",
    "tag": "Concept",
    "difficulty": 1,
    "prompt": "By default, what happens when a Rust program calls the `panic!` macro?",
@@ -21,6 +22,7 @@
   {
    "id": "ch09-q02",
    "section": "9.1 Unrecoverable Errors with panic!",
+   "anchor": "unwinding-the-stack-or-aborting-in-response-to-a-panic",
    "tag": "Behavior",
    "difficulty": 2,
    "prompt": "What is the effect of adding `panic = 'abort'` under `[profile.release]` in `Cargo.toml`?",
@@ -103,6 +105,7 @@
   {
    "id": "ch09-q07",
    "section": "9.2 Recoverable Errors with Result",
+   "anchor": "matching-on-different-errors",
    "tag": "Behavior",
    "difficulty": 2,
    "prompt": "Suppose `hello.txt` does not exist and the current directory is writable. What does this program do?",
@@ -134,6 +137,7 @@
   {
    "id": "ch09-q09",
    "section": "9.2 Recoverable Errors with Result",
+   "anchor": "propagating-errors",
    "tag": "Concept",
    "difficulty": 2,
    "prompt": "In this manual error-propagation pattern, what does the arm `Err(e) => return Err(e)` accomplish?",
@@ -150,6 +154,7 @@
   {
    "id": "ch09-q10",
    "section": "9.2 Recoverable Errors with Result",
+   "anchor": "propagating-errors",
    "tag": "Behavior",
    "difficulty": 2,
    "prompt": "Which of the following statements about the `?` operator are true? (Select all that apply.)",
@@ -170,6 +175,7 @@
   {
    "id": "ch09-q11",
    "section": "9.2 Recoverable Errors with Result",
+   "anchor": "propagating-errors",
    "tag": "Spot the Bug",
    "difficulty": 2,
    "prompt": "This program fails to compile. What is the bug?",
@@ -186,6 +192,7 @@
   {
    "id": "ch09-q12",
    "section": "9.2 Recoverable Errors with Result",
+   "anchor": "propagating-errors",
    "tag": "Spot the Bug",
    "difficulty": 3,
    "prompt": "This function fails to compile. Why?",
@@ -202,6 +209,7 @@
   {
    "id": "ch09-q13",
    "section": "9.2 Recoverable Errors with Result",
+   "anchor": "propagating-errors",
    "tag": "Code Output",
    "difficulty": 3,
    "prompt": "Assuming `no-such-file.txt` does not exist, what happens when this program runs?",
@@ -218,6 +226,7 @@
   {
    "id": "ch09-q14",
    "section": "9.2 Recoverable Errors with Result",
+   "anchor": "propagating-errors",
    "tag": "Code Output",
    "difficulty": 3,
    "prompt": "What does this program print?",
@@ -269,6 +278,7 @@
   {
    "id": "ch09-q17",
    "section": "9.3 To panic! or Not to panic!",
+   "anchor": "custom-types-for-validation",
    "tag": "Spot the Bug",
    "difficulty": 2,
    "prompt": "This validation type is meant to guarantee that every `Guess` holds a value between 1 and 100, but it fails to do so. What is the bug?",
@@ -285,6 +295,7 @@
   {
    "id": "ch09-q18",
    "section": "9.3 To panic! or Not to panic!",
+   "anchor": "custom-types-for-validation",
    "tag": "Misconception",
    "difficulty": 3,
    "prompt": "A colleague says: \"`Guess::new` panicking on an out-of-range value is bad design — every fallible constructor must return `Result` instead.\" Per the book's guidelines, why is panicking acceptable here?",

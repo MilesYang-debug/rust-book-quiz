@@ -6,6 +6,7 @@
     {
       "id": "ch15-q01",
       "section": "15.1 Using Box<T> to Point to Data on the Heap",
+      "anchor": "enabling-recursive-types-with-boxes",
       "tag": "Concept",
       "difficulty": 1,
       "prompt": "Why does the definition `enum List { Cons(i32, List), Nil }` fail to compile, and how does changing it to `Cons(i32, Box<List>)` fix the problem?",
@@ -21,6 +22,7 @@
     {
       "id": "ch15-q02",
       "section": "15.1 Using Box<T> to Point to Data on the Heap",
+      "anchor": "storing-data-on-the-heap",
       "tag": "Code Output",
       "difficulty": 1,
       "prompt": "What does this program print?",
@@ -52,6 +54,7 @@
     {
       "id": "ch15-q04",
       "section": "15.1 Using Box<T> to Point to Data on the Heap",
+      "anchor": "enabling-recursive-types-with-boxes",
       "tag": "Spot the Bug",
       "difficulty": 2,
       "prompt": "What is wrong with this code?",
@@ -84,6 +87,7 @@
     {
       "id": "ch15-q06",
       "section": "15.2 Treating Smart Pointers Like Regular References with Deref",
+      "anchor": "implementing-the-deref-trait",
       "tag": "Concept",
       "difficulty": 2,
       "prompt": "In an implementation of `Deref`, why is the method signature `fn deref(&self) -> &Self::Target` — returning a reference rather than the inner value itself?",
@@ -99,6 +103,7 @@
     {
       "id": "ch15-q07",
       "section": "15.2 Treating Smart Pointers Like Regular References with Deref",
+      "anchor": "using-deref-coercion-in-functions-and-methods",
       "tag": "Code Output",
       "difficulty": 2,
       "prompt": "What is the result of running this program?",
@@ -115,6 +120,7 @@
     {
       "id": "ch15-q08",
       "section": "15.2 Treating Smart Pointers Like Regular References with Deref",
+      "anchor": "handling-deref-coercion-with-mutable-references",
       "tag": "Concept",
       "difficulty": 3,
       "prompt": "Which of the following are deref coercions Rust performs automatically when types don't match at a function or method call? (Select all that apply.)",
@@ -131,6 +137,7 @@
     {
       "id": "ch15-q09",
       "section": "15.2 Treating Smart Pointers Like Regular References with Deref",
+      "anchor": "defining-our-own-smart-pointer",
       "tag": "Spot the Bug",
       "difficulty": 2,
       "prompt": "Why does this code fail?",
@@ -147,6 +154,7 @@
     {
       "id": "ch15-q10",
       "section": "15.2 Treating Smart Pointers Like Regular References with Deref",
+      "anchor": "using-deref-coercion-in-functions-and-methods",
       "tag": "Behavior",
       "difficulty": 3,
       "prompt": "A function `fn takes(s: &str)` is called as `takes(&b)` where `b: Box<String>`. When and how does the argument become a `&str`?",
@@ -225,6 +233,7 @@
     {
       "id": "ch15-q15",
       "section": "15.4 Rc<T>, the Reference Counted Smart Pointer",
+      "anchor": "cloning-to-increase-the-reference-count",
       "tag": "Code Output",
       "difficulty": 2,
       "prompt": "What does this program print?",
@@ -257,6 +266,7 @@
     {
       "id": "ch15-q17",
       "section": "15.4 Rc<T>, the Reference Counted Smart Pointer",
+      "anchor": "sharing-data",
       "tag": "Misconception",
       "difficulty": 1,
       "prompt": "\"`Rc::clone(&a)` performs a deep copy of the data, so it should be avoided in performance-sensitive code.\" What is wrong with this claim?",
@@ -287,6 +297,7 @@
     {
       "id": "ch15-q19",
       "section": "15.5 RefCell<T> and the Interior Mutability Pattern",
+      "anchor": "using-interior-mutability",
       "tag": "Code Output",
       "difficulty": 3,
       "prompt": "What is the result of running this program?",
@@ -303,6 +314,7 @@
     {
       "id": "ch15-q20",
       "section": "15.5 RefCell<T> and the Interior Mutability Pattern",
+      "anchor": "using-interior-mutability",
       "tag": "Spot the Bug",
       "difficulty": 3,
       "prompt": "This mock object for testing does not compile. The `Messenger` trait is fixed and cannot be changed. What is the problem and the idiomatic fix?",
@@ -319,6 +331,7 @@
     {
       "id": "ch15-q21",
       "section": "15.5 RefCell<T> and the Interior Mutability Pattern",
+      "anchor": "allowing-multiple-owners-of-mutable-data",
       "tag": "Code Output",
       "difficulty": 2,
       "prompt": "What does this program print?",
@@ -335,6 +348,7 @@
     {
       "id": "ch15-q22",
       "section": "15.5 RefCell<T> and the Interior Mutability Pattern",
+      "anchor": "enforcing-borrowing-rules-at-runtime",
       "tag": "Concept",
       "difficulty": 3,
       "prompt": "Which statements from the `Box<T>` / `Rc<T>` / `RefCell<T>` comparison are correct? (Select all that apply.)",
@@ -351,6 +365,7 @@
     {
       "id": "ch15-q23",
       "section": "15.5 RefCell<T> and the Interior Mutability Pattern",
+      "anchor": "using-interior-mutability",
       "tag": "Behavior",
       "difficulty": 3,
       "prompt": "What happens when this program runs?",
@@ -367,6 +382,7 @@
     {
       "id": "ch15-q24",
       "section": "15.6 Reference Cycles Can Leak Memory",
+      "anchor": "creating-a-reference-cycle",
       "tag": "Concept",
       "difficulty": 2,
       "prompt": "Two `Rc` values end up pointing at each other (`a`'s tail refers to `b`, and `b`'s tail is mutated via a `RefCell` to refer back to `a`). What happens when both variables go out of scope?",
@@ -382,6 +398,7 @@
     {
       "id": "ch15-q25",
       "section": "15.6 Reference Cycles Can Leak Memory",
+      "anchor": "preventing-reference-cycles-using-weakt",
       "tag": "Code Output",
       "difficulty": 3,
       "prompt": "What does this program print?",
@@ -398,6 +415,7 @@
     {
       "id": "ch15-q26",
       "section": "15.6 Reference Cycles Can Leak Memory",
+      "anchor": "preventing-reference-cycles-using-weakt",
       "tag": "Concept",
       "difficulty": 3,
       "prompt": "Which statements about `Weak<T>` are true? (Select all that apply.)",

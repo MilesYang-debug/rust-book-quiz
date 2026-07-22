@@ -6,6 +6,7 @@
   {
    "id": "ch08-q01",
    "section": "8.1 Vectors",
+   "anchor": "creating-a-new-vector",
    "tag": "Concept",
    "difficulty": 1,
    "prompt": "Why does `let v: Vec<i32> = Vec::new();` need a type annotation, while `let v = vec![1, 2, 3];` does not?",
@@ -21,6 +22,7 @@
   {
    "id": "ch08-q02",
    "section": "8.1 Vectors",
+   "anchor": "reading-elements-of-vectors",
    "tag": "Behavior",
    "difficulty": 1,
    "prompt": "Given `let v = vec![1, 2, 3, 4, 5];`, what is the difference between evaluating `&v[100]` and `v.get(100)`?",
@@ -36,6 +38,7 @@
   {
    "id": "ch08-q03",
    "section": "8.1 Vectors",
+   "anchor": "reading-elements-of-vectors",
    "tag": "Spot the Bug",
    "difficulty": 2,
    "prompt": "What happens when you compile and run this program?",
@@ -52,6 +55,7 @@
   {
    "id": "ch08-q04",
    "section": "8.1 Vectors",
+   "anchor": "iterating-over-the-values-in-a-vector",
    "tag": "Code Output",
    "difficulty": 2,
    "prompt": "What does this program print?",
@@ -68,6 +72,7 @@
   {
    "id": "ch08-q05",
    "section": "8.1 Vectors",
+   "anchor": "using-an-enum-to-store-multiple-types",
    "tag": "Concept",
    "difficulty": 2,
    "prompt": "A vector can only store elements of a single type. How does the book suggest storing an `i32`, an `f64`, and a `String` in the same vector?",
@@ -83,6 +88,7 @@
   {
    "id": "ch08-q06",
    "section": "8.1 Vectors",
+   "anchor": "dropping-a-vector-drops-its-elements",
    "tag": "Behavior",
    "difficulty": 1,
    "prompt": "What happens to a vector's elements when the vector goes out of scope?",
@@ -98,6 +104,7 @@
   {
    "id": "ch08-q07",
    "section": "8.1 Vectors",
+   "anchor": "reading-elements-of-vectors",
    "tag": "Code Output",
    "difficulty": 1,
    "prompt": "What does this program print?",
@@ -134,6 +141,7 @@
   {
    "id": "ch08-q09",
    "section": "8.2 Strings",
+   "anchor": "defining-strings",
    "tag": "Concept",
    "difficulty": 1,
    "prompt": "What is the difference between `String` and `&str` in Rust?",
@@ -149,6 +157,7 @@
   {
    "id": "ch08-q10",
    "section": "8.2 Strings",
+   "anchor": "updating-a-string",
    "tag": "Behavior",
    "difficulty": 2,
    "prompt": "What happens when you compile and run this program?",
@@ -165,6 +174,7 @@
   {
    "id": "ch08-q11",
    "section": "8.2 Strings",
+   "anchor": "updating-a-string",
    "tag": "Spot the Bug",
    "difficulty": 3,
    "prompt": "What is wrong with this program?",
@@ -181,6 +191,7 @@
   {
    "id": "ch08-q12",
    "section": "8.2 Strings",
+   "anchor": "indexing-into-strings",
    "tag": "Spot the Bug",
    "difficulty": 1,
    "prompt": "What happens when you compile this program?",
@@ -197,6 +208,7 @@
   {
    "id": "ch08-q13",
    "section": "8.2 Strings",
+   "anchor": "slicing-strings",
    "tag": "Code Output",
    "difficulty": 3,
    "prompt": "Each character in this Cyrillic string takes 2 bytes in UTF-8. What happens when you run this program?",
@@ -229,6 +241,7 @@
   {
    "id": "ch08-q15",
    "section": "8.2 Strings",
+   "anchor": "updating-a-string",
    "tag": "Concept",
    "difficulty": 2,
    "prompt": "Which statements about building and concatenating strings are true? (Select all that apply.)",
@@ -269,6 +282,7 @@
   {
    "id": "ch08-q17",
    "section": "8.3 Hash Maps",
+   "anchor": "creating-a-new-hash-map",
    "tag": "Concept",
    "difficulty": 1,
    "prompt": "What must you do before you can use `HashMap` in your code?",
@@ -284,6 +298,7 @@
   {
    "id": "ch08-q18",
    "section": "8.3 Hash Maps",
+   "anchor": "accessing-values-in-a-hash-map",
    "tag": "Code Output",
    "difficulty": 2,
    "prompt": "What does this program print?",
@@ -300,6 +315,7 @@
   {
    "id": "ch08-q19",
    "section": "8.3 Hash Maps",
+   "anchor": "accessing-values-in-a-hash-map",
    "tag": "Behavior",
    "difficulty": 1,
    "prompt": "When you iterate over a hash map with `for (key, value) in &scores`, in what order are the pairs visited?",
@@ -315,6 +331,7 @@
   {
    "id": "ch08-q20",
    "section": "8.3 Hash Maps",
+   "anchor": "managing-ownership-in-hash-maps",
    "tag": "Spot the Bug",
    "difficulty": 3,
    "prompt": "What happens when you compile this program?",
@@ -331,6 +348,7 @@
   {
    "id": "ch08-q21",
    "section": "8.3 Hash Maps",
+   "anchor": "updating-a-hash-map",
    "tag": "Code Output",
    "difficulty": 2,
    "prompt": "What does this program print?",
@@ -347,6 +365,7 @@
   {
    "id": "ch08-q22",
    "section": "8.3 Hash Maps",
+   "anchor": "updating-a-hash-map",
    "tag": "Code Output",
    "difficulty": 3,
    "prompt": "What does this program print?",
@@ -363,6 +382,7 @@
   {
    "id": "ch08-q23",
    "section": "8.3 Hash Maps",
+   "anchor": "updating-a-hash-map",
    "tag": "Misconception",
    "difficulty": 2,
    "prompt": "After this code runs, what value is associated with the key `Blue`?",

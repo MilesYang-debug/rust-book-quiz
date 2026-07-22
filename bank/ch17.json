@@ -6,6 +6,7 @@
     {
       "id": "ch17-q01",
       "section": "17.1 Futures and the Async Syntax",
+      "anchor": "defining-the-page_title-function",
       "tag": "Concept",
       "difficulty": 1,
       "prompt": "The book shows that `async fn page_title(url: &str) -> Option<String>` is roughly equivalent to a non-async function. What is that function's return type?",
@@ -21,6 +22,7 @@
     {
       "id": "ch17-q02",
       "section": "17.1 Futures and the Async Syntax",
+      "anchor": "defining-the-page_title-function",
       "tag": "Misconception",
       "difficulty": 1,
       "prompt": "Inside an async block you write the following and never use `title_fut` again. What actually happens to the HTTP request?",
@@ -37,6 +39,7 @@
     {
       "id": "ch17-q03",
       "section": "17.1 Futures and the Async Syntax",
+      "anchor": "executing-an-async-function-with-a-runtime",
       "tag": "Spot the Bug",
       "difficulty": 1,
       "prompt": "What is wrong with this program?",
@@ -69,6 +72,7 @@
     {
       "id": "ch17-q05",
       "section": "17.1 Futures and the Async Syntax",
+      "anchor": "racing-two-urls-against-each-other-concurrently",
       "tag": "Behavior",
       "difficulty": 2,
       "prompt": "In Listing 17-5 the book races two page-title fetches with `trpl::select(title_fut_1, title_fut_2).await`. What does this call return?",
@@ -84,6 +88,7 @@
     {
       "id": "ch17-q06",
       "section": "17.2 Applying Concurrency with Async",
+      "anchor": "creating-a-new-task-with-spawn_task",
       "tag": "Code Output",
       "difficulty": 3,
       "prompt": "What does this program print (run inside `trpl::block_on` as the book does)?",
@@ -100,6 +105,7 @@
     {
       "id": "ch17-q07",
       "section": "17.2 Applying Concurrency with Async",
+      "anchor": "sending-data-between-two-tasks-using-message-passing",
       "tag": "Spot the Bug",
       "difficulty": 3,
       "prompt": "This message-passing program (Listing 17-11) sends and prints all four messages at 500 ms intervals — but there is still a bug. What is it?",
@@ -116,6 +122,7 @@
     {
       "id": "ch17-q08",
       "section": "17.2 Applying Concurrency with Async",
+      "anchor": "creating-a-new-task-with-spawn_task",
       "tag": "Misconception",
       "difficulty": 2,
       "prompt": "You start a long-running counting loop with `trpl::spawn_task(async { ... })` and never use the returned handle. The main async block finishes its own shorter loop first. What happens to the spawned task?",
@@ -131,6 +138,7 @@
     {
       "id": "ch17-q09",
       "section": "17.2 Applying Concurrency with Async",
+      "anchor": "sending-data-between-two-tasks-using-message-passing",
       "tag": "Concept",
       "difficulty": 2,
       "prompt": "How does the async channel from `trpl::channel` differ from the synchronous `std::mpsc::channel` used in Chapter 16?",
@@ -146,6 +154,7 @@
     {
       "id": "ch17-q10",
       "section": "17.3 Working With Any Number of Futures",
+      "anchor": "yielding-control-to-the-runtime",
       "tag": "Code Output",
       "difficulty": 3,
       "prompt": "`slow` calls `std::thread::sleep` (blocking) and then prints. What output does this produce?",
@@ -162,6 +171,7 @@
     {
       "id": "ch17-q11",
       "section": "17.3 Working With Any Number of Futures",
+      "anchor": "yielding-control-to-the-runtime",
       "tag": "Concept",
       "difficulty": 2,
       "prompt": "According to the book, when can the runtime switch from one future to another?",
@@ -177,6 +187,7 @@
     {
       "id": "ch17-q12",
       "section": "17.3 Working With Any Number of Futures",
+      "anchor": "building-our-own-async-abstractions",
       "tag": "Code Output",
       "difficulty": 2,
       "prompt": "Using the book's `timeout` built from `trpl::select` and `trpl::sleep`, what does this program print?",
@@ -193,6 +204,7 @@
     {
       "id": "ch17-q13",
       "section": "17.3 Working With Any Number of Futures",
+      "anchor": "building-our-own-async-abstractions",
       "tag": "Behavior",
       "difficulty": 3,
       "prompt": "In the `timeout` implementation, why does the book pass `future_to_try` as the *first* argument to `trpl::select`?",
@@ -255,6 +267,7 @@
     {
       "id": "ch17-q17",
       "section": "17.5 A Closer Look at the Traits for Async",
+      "anchor": "the-future-trait",
       "tag": "Concept",
       "difficulty": 2,
       "prompt": "The `Future` trait is defined as `fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output>`. Which statement about `poll` and the `Poll` type is correct?",
@@ -270,6 +283,7 @@
     {
       "id": "ch17-q18",
       "section": "17.5 A Closer Look at the Traits for Async",
+      "anchor": "the-pin-type-and-the-unpin-trait",
       "tag": "Spot the Bug",
       "difficulty": 3,
       "prompt": "This attempt to await a runtime-sized collection of futures fails with error E0277: \"`dyn Future<Output = ()>` cannot be unpinned\". What is the problem, and the book's fix?",
@@ -286,6 +300,7 @@
     {
       "id": "ch17-q19",
       "section": "17.5 A Closer Look at the Traits for Async",
+      "anchor": "the-pin-type-and-the-unpin-trait",
       "tag": "Concept",
       "difficulty": 3,
       "prompt": "Which of the following statements about `Pin` and `Unpin` are true, as the book presents them? (Select all that apply.)",

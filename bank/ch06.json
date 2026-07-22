@@ -21,6 +21,7 @@
   {
    "id": "ch06-q02",
    "section": "6.1 Defining an Enum",
+   "anchor": "enum-values",
    "tag": "Concept",
    "difficulty": 1,
    "prompt": "Given `enum IpAddrKind { V4, V6 }`, how do you create an instance of the `V4` variant?",
@@ -36,6 +37,7 @@
   {
    "id": "ch06-q03",
    "section": "6.1 Defining an Enum",
+   "anchor": "enum-values",
    "tag": "Concept",
    "difficulty": 2,
    "prompt": "Which of the following statements about enum variants in Rust are true? (Select all that apply.)",
@@ -57,6 +59,7 @@
   {
    "id": "ch06-q04",
    "section": "6.1 Defining an Enum",
+   "anchor": "enum-values",
    "tag": "Code Output",
    "difficulty": 2,
    "prompt": "What does this program print?",
@@ -73,6 +76,7 @@
   {
    "id": "ch06-q05",
    "section": "6.1 Defining an Enum",
+   "anchor": "the-option-enum",
    "tag": "Concept",
    "difficulty": 2,
    "prompt": "Why does Rust use `Option<T>` instead of a null value like many other languages?",
@@ -88,6 +92,7 @@
   {
    "id": "ch06-q06",
    "section": "6.1 Defining an Enum",
+   "anchor": "the-option-enum",
    "tag": "Code Output",
    "difficulty": 2,
    "prompt": "What is the result of running this program?",
@@ -104,6 +109,7 @@
   {
    "id": "ch06-q07",
    "section": "6.1 Defining an Enum",
+   "anchor": "the-option-enum",
    "tag": "Spot the Bug",
    "difficulty": 2,
    "prompt": "Why does this program fail to compile?",
@@ -120,6 +126,7 @@
   {
    "id": "ch06-q08",
    "section": "6.1 Defining an Enum",
+   "anchor": "the-option-enum",
    "tag": "Misconception",
    "difficulty": 1,
    "prompt": "A colleague says: \"`Some(5)` has type `i32`, since it just wraps the number 5.\" What is the correct picture?",
@@ -150,6 +157,7 @@
   {
    "id": "ch06-q10",
    "section": "6.2 The match Control Flow Construct",
+   "anchor": "patterns-that-bind-to-values",
    "tag": "Code Output",
    "difficulty": 2,
    "prompt": "What does this program print?",
@@ -166,6 +174,7 @@
   {
    "id": "ch06-q11",
    "section": "6.2 The match Control Flow Construct",
+   "anchor": "matches-are-exhaustive",
    "tag": "Spot the Bug",
    "difficulty": 2,
    "prompt": "What is wrong with this function?",
@@ -182,6 +191,7 @@
   {
    "id": "ch06-q12",
    "section": "6.2 The match Control Flow Construct",
+   "anchor": "the-optiont-match-pattern",
    "tag": "Code Output",
    "difficulty": 1,
    "prompt": "What does this program print?",
@@ -198,6 +208,7 @@
   {
    "id": "ch06-q13",
    "section": "6.2 The match Control Flow Construct",
+   "anchor": "catch-all-patterns-and-the-_-placeholder",
    "tag": "Behavior",
    "difficulty": 3,
    "prompt": "Which of the following statements about catch-all patterns in `match` are true? (Select all that apply.)",
@@ -235,6 +246,7 @@
   {
    "id": "ch06-q15",
    "section": "6.2 The match Control Flow Construct",
+   "anchor": "catch-all-patterns-and-the-_-placeholder",
    "tag": "Misconception",
    "difficulty": 1,
    "prompt": "In the arm `_ => ()`, a beginner claims `()` is \"an empty function call that does nothing\". What does `()` actually mean here?",
@@ -304,6 +316,7 @@
   {
    "id": "ch06-q19",
    "section": "6.3 Concise Control Flow with if let and let else",
+   "anchor": "staying-on-the-happy-path-with-letelse",
    "tag": "Spot the Bug",
    "difficulty": 3,
    "prompt": "What is wrong with this use of `let...else`?",
@@ -320,6 +333,7 @@
   {
    "id": "ch06-q20",
    "section": "6.3 Concise Control Flow with if let and let else",
+   "anchor": "staying-on-the-happy-path-with-letelse",
    "tag": "Concept",
    "difficulty": 2,
    "prompt": "What is the main purpose of `let...else`, as in the `describe_state_quarter` example?",

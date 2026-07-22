@@ -19,7 +19,7 @@
 //! `#[test]` snippets are compiled with `rustc --test` and the harness is
 //! executed, so "the test fails/passes" claims are verified for real.
 //! Snippets are tried with `--edition 2021` first, re-tried with 2024 on
-//! mismatch (the Book targets 2024; the app crate uses 2021).
+//! mismatch (questions may quote code from either edition of the Book).
 //!
 //! Usage: `cargo run -p quiz-bank --bin code_check`
 //! Exit code is non-zero only on MISMATCH, so CI can gate on it.

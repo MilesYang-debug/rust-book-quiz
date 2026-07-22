@@ -6,6 +6,7 @@
     {
       "id": "ch11-q01",
       "section": "11.1 How to Write Tests",
+      "anchor": "structuring-test-functions",
       "tag": "Concept",
       "difficulty": 1,
       "prompt": "How does the Rust test runner know which functions in a crate are tests?",
@@ -21,6 +22,7 @@
     {
       "id": "ch11-q02",
       "section": "11.1 How to Write Tests",
+      "anchor": "testing-equality-with-assert_eq-and-assert_ne",
       "tag": "Code Output",
       "difficulty": 2,
       "prompt": "What happens when this test runs under `cargo test`?",
@@ -37,6 +39,7 @@
     {
       "id": "ch11-q03",
       "section": "11.1 How to Write Tests",
+      "anchor": "testing-equality-with-assert_eq-and-assert_ne",
       "tag": "Misconception",
       "difficulty": 1,
       "prompt": "A teammate insists that `assert_eq!` must be called as `assert_eq!(expected, actual)` or the comparison will be wrong. What is the actual convention in Rust?",
@@ -52,6 +55,7 @@
     {
       "id": "ch11-q04",
       "section": "11.1 How to Write Tests",
+      "anchor": "adding-custom-failure-messages",
       "tag": "Code Output",
       "difficulty": 2,
       "prompt": "When this test runs, what does the failure output contain?",
@@ -68,6 +72,7 @@
     {
       "id": "ch11-q05",
       "section": "11.1 How to Write Tests",
+      "anchor": "checking-for-panics-with-should_panic",
       "tag": "Code Output",
       "difficulty": 3,
       "prompt": "The two panic messages in `Guess::new` were accidentally swapped. What is the result of running this test?",
@@ -84,6 +89,7 @@
     {
       "id": "ch11-q06",
       "section": "11.1 How to Write Tests",
+      "anchor": "using-resultt-e-in-tests",
       "tag": "Spot the Bug",
       "difficulty": 3,
       "prompt": "This test is rejected by the compiler. Why?",
@@ -100,6 +106,7 @@
     {
       "id": "ch11-q07",
       "section": "11.1 How to Write Tests",
+      "anchor": "using-resultt-e-in-tests",
       "tag": "Concept",
       "difficulty": 2,
       "prompt": "Which of the following are true about test functions that return `Result<(), String>`? (Select all that apply.)",
@@ -116,6 +123,7 @@
     {
       "id": "ch11-q08",
       "section": "11.1 How to Write Tests",
+      "anchor": "testing-equality-with-assert_eq-and-assert_ne",
       "tag": "Spot the Bug",
       "difficulty": 2,
       "prompt": "This test module fails to compile. What is the fix?",
@@ -147,6 +155,7 @@
     {
       "id": "ch11-q10",
       "section": "11.2 Controlling How Tests Are Run",
+      "anchor": "running-tests-in-parallel-or-consecutively",
       "tag": "Spot the Bug",
       "difficulty": 2,
       "prompt": "These two tests each pass alone but fail intermittently when running `cargo test`. What is the root cause?",
@@ -163,6 +172,7 @@
     {
       "id": "ch11-q11",
       "section": "11.2 Controlling How Tests Are Run",
+      "anchor": "showing-function-output",
       "tag": "Code Output",
       "difficulty": 2,
       "prompt": "Running `cargo test` (with no extra flags) on this code, which `println!` output appears in the terminal?",
@@ -179,6 +189,7 @@
     {
       "id": "ch11-q12",
       "section": "11.2 Controlling How Tests Are Run",
+      "anchor": "running-a-subset-of-tests-by-name",
       "tag": "Behavior",
       "difficulty": 1,
       "prompt": "A crate has tests named `add_two_and_two`, `add_three_and_two`, and `one_hundred`. What does `cargo test add` do?",
@@ -194,6 +205,7 @@
     {
       "id": "ch11-q13",
       "section": "11.2 Controlling How Tests Are Run",
+      "anchor": "ignoring-tests-unless-specifically-requested",
       "tag": "Behavior",
       "difficulty": 2,
       "prompt": "Which statements about `#[ignore]` are true? (Select all that apply.)",
@@ -210,6 +222,7 @@
     {
       "id": "ch11-q14",
       "section": "11.3 Test Organization",
+      "anchor": "unit-tests",
       "tag": "Concept",
       "difficulty": 1,
       "prompt": "Why are unit test modules in `src/` conventionally annotated with `#[cfg(test)]`?",
@@ -225,6 +238,7 @@
     {
       "id": "ch11-q15",
       "section": "11.3 Test Organization",
+      "anchor": "unit-tests",
       "tag": "Misconception",
       "difficulty": 2,
       "prompt": "A colleague claims that private functions in Rust can never be unit tested. Is that correct?",
@@ -240,6 +254,7 @@
     {
       "id": "ch11-q16",
       "section": "11.3 Test Organization",
+      "anchor": "integration-tests",
       "tag": "Concept",
       "difficulty": 3,
       "prompt": "Which statements about integration tests in the `tests/` directory are true? (Select all that apply.)",
@@ -256,6 +271,7 @@
     {
       "id": "ch11-q17",
       "section": "11.3 Test Organization",
+      "anchor": "integration-tests",
       "tag": "Spot the Bug",
       "difficulty": 2,
       "prompt": "A shared helper was placed in `tests/common.rs`. The tests compile and pass, but `cargo test` output now shows an unwanted section `Running tests/common.rs` with `running 0 tests`. What is the idiomatic fix?",
@@ -272,6 +288,7 @@
     {
       "id": "ch11-q18",
       "section": "11.3 Test Organization",
+      "anchor": "integration-tests",
       "tag": "Concept",
       "difficulty": 3,
       "prompt": "A project contains only `src/main.rs`. An integration test `tests/cli.rs` with `use myapp::run;` fails to compile because the crate cannot be found. Why, and what is the standard remedy?",

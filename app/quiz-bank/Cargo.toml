@@ -1,7 +1,7 @@
 [package]
 name = "quiz-bank"
-version = "0.1.0"
-edition = "2021"
+version = "1.0.0"
+edition = "2024"
 # Two binaries live here (validate, code_check); keep the historical
 # `cargo run -p quiz-bank` invocation pointing at the validator.
 default-run = "validate"
@@ -10,3 +10,14 @@ default-run = "validate"
 serde = { version = "1", features = ["derive"] }
 # preserve_order keeps question fields in authored order when regenerating the snapshot
 serde_json = { version = "1", features = ["preserve_order"] }
+# HTTP client for link_check only — feature-gated so the wasm front end
+# (which depends on this crate as a lib) never pulls it in.
+ureq = { version = "2", optional = true }
+
+[features]
+net = ["dep:ureq"]
+
+[[bin]]
+name = "link_check"
+required-features = ["net"]
+

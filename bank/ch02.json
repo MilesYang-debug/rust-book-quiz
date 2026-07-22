@@ -6,6 +6,7 @@
   {
    "id": "ch02-q01",
    "section": "Guessing Game Tutorial",
+   "anchor": "storing-values-with-variables",
    "tag": "Concept",
    "difficulty": 1,
    "prompt": "In `let mut guess = String::new();`, why is the `mut` keyword required?",
@@ -21,6 +22,7 @@
   {
    "id": "ch02-q02",
    "section": "Guessing Game Tutorial",
+   "anchor": "storing-values-with-variables",
    "tag": "Concept",
    "difficulty": 1,
    "prompt": "What does the `::` syntax in `String::new()` indicate?",
@@ -36,6 +38,7 @@
   {
    "id": "ch02-q03",
    "section": "Guessing Game Tutorial",
+   "anchor": "receiving-user-input",
    "tag": "Behavior",
    "difficulty": 2,
    "prompt": "Which of the following statements about `io::stdin().read_line(&mut guess)` are true? (Select all that apply.)",
@@ -56,6 +59,7 @@
   {
    "id": "ch02-q04",
    "section": "Guessing Game Tutorial",
+   "anchor": "receiving-user-input",
    "tag": "Spot the Bug",
    "difficulty": 2,
    "prompt": "This code fails to compile. Why?",
@@ -72,6 +76,7 @@
   {
    "id": "ch02-q05",
    "section": "Guessing Game Tutorial",
+   "anchor": "handling-potential-failure-with-result",
    "tag": "Behavior",
    "difficulty": 1,
    "prompt": "What does calling `.expect(\"Failed to read line\")` on a `Result` value do?",
@@ -87,6 +92,7 @@
   {
    "id": "ch02-q06",
    "section": "Guessing Game Tutorial",
+   "anchor": "increasing-functionality-with-a-crate",
    "tag": "Concept",
    "difficulty": 2,
    "prompt": "Which of the following statements about Cargo dependencies and `Cargo.lock` are true? (Select all that apply.)",
@@ -107,6 +113,7 @@
   {
    "id": "ch02-q07",
    "section": "Guessing Game Tutorial",
+   "anchor": "generating-a-random-number",
    "tag": "Behavior",
    "difficulty": 2,
    "prompt": "In the guessing game, what range of numbers can `rand::thread_rng().gen_range(1..=100)` produce?",
@@ -122,6 +129,7 @@
   {
    "id": "ch02-q08",
    "section": "Guessing Game Tutorial",
+   "anchor": "comparing-the-guess-to-the-secret-number",
    "tag": "Code Output",
    "difficulty": 2,
    "prompt": "What does this program print?",
@@ -138,6 +146,7 @@
   {
    "id": "ch02-q09",
    "section": "Guessing Game Tutorial",
+   "anchor": "comparing-the-guess-to-the-secret-number",
    "tag": "Code Output",
    "difficulty": 3,
    "prompt": "What does this program print?",
@@ -154,6 +163,7 @@
   {
    "id": "ch02-q10",
    "section": "Guessing Game Tutorial",
+   "anchor": "comparing-the-guess-to-the-secret-number",
    "tag": "Spot the Bug",
    "difficulty": 3,
    "prompt": "This code fails to compile. Why?",
@@ -170,6 +180,7 @@
   {
    "id": "ch02-q11",
    "section": "Guessing Game Tutorial",
+   "anchor": "handling-invalid-input",
    "tag": "Code Output",
    "difficulty": 3,
    "prompt": "What happens when this program runs?",
@@ -186,6 +197,7 @@
   {
    "id": "ch02-q12",
    "section": "Guessing Game Tutorial",
+   "anchor": "comparing-the-guess-to-the-secret-number",
    "tag": "Misconception",
    "difficulty": 1,
    "prompt": "A learner says: \"To convert `guess` from a `String` to a `u32`, we must mark it `mut`, because its type is changing.\" What is wrong with this claim?",

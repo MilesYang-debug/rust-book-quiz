@@ -6,7 +6,7 @@
 
 **A quiz app for *The Rust Programming Language* (the official Rust Book)**
 
-One Rust codebase, four targets: Windows / Linux desktop · Android · web browser
+One Rust codebase, five targets: Windows / macOS / Linux desktop · Android · web browser
 No JS framework · no backend · works offline
 
 [![Rust](https://img.shields.io/badge/Rust-100%25-f74c00?logo=rust&logoColor=white)](https://www.rust-lang.org/)
@@ -49,11 +49,12 @@ Quizzing is *testing*, writing code is *training* — treat this as the checkpoi
 |---|---|---|
 | **Online** | [Open in your browser](https://MilesYang-debug.github.io/rust-book-quiz/) | Works immediately; progress is stored in your browser |
 | **Windows** | Download `RustBookQuiz.exe` from [Releases](../../releases) | Double-click to run (~6MB, uses the system WebView2) |
+| **macOS** | Download `RustBookQuiz.dmg` from [Releases](../../releases) | Universal (Intel + Apple Silicon). Unsigned: on first launch, right-click the app → "Open" |
 | **Linux (Debian/Ubuntu)** | Download `RustBookQuiz_amd64.deb` from [Releases](../../releases) | `sudo apt install ./RustBookQuiz_amd64.deb` |
 | **Linux (any distro)** | Download `RustBookQuiz_x86_64.AppImage` from [Releases](../../releases) | `chmod +x`, then run |
 | **Linux (bare binary)** | Download `RustBookQuiz-linux` from [Releases](../../releases) | Requires `libwebkit2gtk-4.1`; `chmod +x`, then run |
 | **Android** | Download `RustBookQuiz.apk` from [Releases](../../releases) | Install on your phone (~12MB, arm64, allow "unknown sources") |
-| **Self-hosted web** | Download `RustBookQuiz-web.zip` from [Releases](../../releases) | Unzip onto any static file server, see [4. Web](#4-web) |
+| **Self-hosted web** | Download `RustBookQuiz-web.zip` from [Releases](../../releases) | Unzip onto any static file server, see [5. Web](#5-web) |
 
 All artifacts are built automatically by [GitHub Actions](#automated-builds-and-releases-github-actions); if you'd rather build them yourself, see the [manual build guide](#manual-build-guide) at the end.
 
@@ -87,6 +88,14 @@ One JSON file per chapter, containing a single Chapter object:
 - `tag`: Concept | Behavior | Code Output | Spot the Bug | Misconception
 - `difficulty`: 1 easy / 2 medium / 3 hard
 - Multiple choice: `"answer": ["A","C"]`, with 5 options A–E
+- `section`: must be `"N.M Title"` matching The Book's table of contents — the
+  validator checks it, and the app derives each question's "Read in The Book"
+  link from it (mapping table: `app/quiz-bank/src/book_toc.rs`)
+- `anchor` (optional): the URL fragment after `#` on that section's page
+  (e.g. `"installing-rustup-on-linux-or-macos"`) — makes the source link jump
+  to the exact heading instead of the top of the page
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for question quality guidelines and the full PR checklist.
 
 ### Workflow for adding questions
 
@@ -110,6 +119,8 @@ cargo check --target wasm32-unknown-unknown        # front-end type check (run i
 cd src-tauri && cargo check                        # shell type check
 cargo run -p quiz-bank                             # bank validation (inside app/; --sync regenerates the snapshot)
 cargo test -p quiz-bank                            # same validation as a test (CI gate)
+cargo run -p quiz-bank --bin code_check            # verify code-snippet behavior claims with real rustc
+cargo run -p quiz-bank --features net --bin link_check   # verify The Book links/anchors (CI runs it weekly)
 ```
 
 > Prerequisites: stable Rust toolchain + the `wasm32-unknown-unknown` target + trunk — see [Manual build guide · Common setup](#common-setup-once-for-every-platform). That's all day-to-day development needs; **no Node.js required**.
@@ -154,7 +165,7 @@ flowchart LR
 |---|---|
 | [`bank/`](bank/) | Question bank source data `chNN.json`, one file per chapter (**single source of truth**) |
 | [`.github/workflows/`](.github/workflows/) | CI: `release.yml` (four-platform artifacts) · `deploy-pages.yml` (online version) · `validate.yml` (bank gate) |
-| [`app/quiz-bank/`](app/quiz-bank/) | Bank schema types + validator (`cargo run -p quiz-bank`) |
+| [`app/quiz-bank/`](app/quiz-bank/) | Bank schema types + tooling: validator (`cargo run -p quiz-bank`), `code_check` (verifies snippet behavior with real `rustc`), `link_check` (verifies The Book links/anchors, needs `--features net`) |
 | [`app/index.html`](app/index.html) | trunk build entry (declares font/icon asset copies) |
 | [`app/style.css`](app/style.css) | Dark tech theme + light theme + mobile media queries |
 | [`app/fonts/`](app/fonts/) · [`ferris.png`](app/ferris.png) | Embedded assets (OFL fonts / hand-drawn Ferris) |
@@ -165,20 +176,21 @@ flowchart LR
 | [`app/src/views.rs`](app/src/views.rs) | Sidebar / Home / Exam / Wrong / Quiz components |
 | [`app/src-tauri/src/lib.rs`](app/src-tauri/src/lib.rs) | Tauri shell entry + all commands (mobile entry point lives here) |
 | [`app/src-tauri/src/main.rs`](app/src-tauri/src/main.rs) | Desktop entry (calls `lib::run`) |
-| [`app/src-tauri/tauri.conf.json`](app/src-tauri/tauri.conf.json) | Window config + bundling config (deb / AppImage) |
+| [`app/src-tauri/tauri.conf.json`](app/src-tauri/tauri.conf.json) | Window config + bundling config (deb / AppImage / dmg) |
 | [`app/src-tauri/capabilities/`](app/src-tauri/capabilities/) | Window drag permission |
 | [`app/src-tauri/icons/`](app/src-tauri/icons/) | `icon.ico` (Windows) / `icon.png` (mobile + Linux bundling) |
 | [`app/src-tauri/gen/android/`](app/src-tauri/gen/android/) | Android project (committed — no need to re-init) |
 
 ## Automated Builds and Releases (GitHub Actions)
 
-Day-to-day development does **not** require setting up all four platform toolchains locally — CI does it all:
+Day-to-day development does **not** require setting up all five platform toolchains locally — CI does it all:
 
 | Workflow | Trigger | Output |
 |---|---|---|
-| [release.yml](.github/workflows/release.yml) | Push a `v*` tag | exe / deb / AppImage / Linux bare binary / apk / web zip, attached to Releases automatically |
+| [release.yml](.github/workflows/release.yml) | Push a `v*` tag | exe / deb / AppImage / Linux bare binary / macOS dmg / apk / web zip, attached to Releases automatically |
 | [deploy-pages.yml](.github/workflows/deploy-pages.yml) | Push to main (changes under app/) | Online version auto-deployed to GitHub Pages |
 | [validate.yml](.github/workflows/validate.yml) | push / PR touching bank/ or the validator | Validates the bank + checks the embedded snapshot is in sync (fails if `--sync` was forgotten) |
+| [link-check.yml](.github/workflows/link-check.yml) | Weekly schedule + manual | Fetches every The Book page the bank references and verifies pages and per-question anchors still exist (the book gets restructured occasionally) |
 
 Shipping a release is just:
 
@@ -199,7 +211,7 @@ One-time setup (once after creating the repo): **Settings → Pages → Source �
 
 ## Common setup (once, for every platform)
 
-**Step 1**: Install the Rust toolchain (stable). Follow <https://rustup.rs/>, then verify:
+**Step 1**: Install the Rust toolchain (stable, 1.85+ — the crates use edition 2024). Follow <https://rustup.rs/>, then verify:
 
 ```bash
 rustc --version        # ✅ prints something like rustc 1.8x.0
@@ -283,11 +295,36 @@ cargo tauri build --bundles deb appimage    # npm variant: tauri build --bundles
 > ⚠️ Running only `cargo build --release` gives you **just the bare binary — no deb**. deb/AppImage require
 > `cargo tauri build` (bundling is already enabled in the `bundle` section of `tauri.conf.json`).
 
-## 3. Android
+## 3. macOS desktop (dmg)
+
+Prerequisite: complete [Common setup](#common-setup-once-for-every-platform); the steps below must run **on macOS**. No extra system dependencies — the WebView (WKWebView) ships with the OS.
+
+**Step 1**: Install the Tauri CLI (same two options as Linux above).
+
+**Step 2** (only for a universal binary): add both Apple targets:
+
+```bash
+rustup target add aarch64-apple-darwin x86_64-apple-darwin
+```
+
+**Step 3**: Build and bundle:
+
+```bash
+cd app
+cargo tauri build --bundles dmg                                     # current arch only
+cargo tauri build --target universal-apple-darwin --bundles dmg     # Intel + Apple Silicon (what CI ships)
+# ✅ artifact: src-tauri/target/release/bundle/dmg/*.dmg
+#    (universal: src-tauri/target/universal-apple-darwin/release/bundle/dmg/*.dmg)
+```
+
+> ⚠️ The dmg is not signed or notarized. Gatekeeper blocks a plain double-click on first launch —
+> right-click the app → "Open" instead (or clear the quarantine flag: `xattr -cr /Applications/RustBookQuiz.app`).
+
+## 4. Android
 
 Prerequisite: complete [Common setup](#common-setup-once-for-every-platform). The environment setup has many steps, but each is one-time.
 
-### 3.1 One-time environment setup
+### 4.1 One-time environment setup
 
 **Step 1**: Install JDK 17 (any distribution, e.g. [Temurin](https://adoptium.net/)), then verify:
 
@@ -334,7 +371,7 @@ export ANDROID_HOME=<sdk dir>
 export NDK_HOME=$ANDROID_HOME/ndk/27.1.12297006
 ```
 
-### 3.2 Building the APK
+### 4.2 Building the APK
 
 ```bash
 cd app && trunk build --release     # front-end assets (embedded into the APK)
@@ -347,7 +384,7 @@ cargo tauri android build --apk --target aarch64
 > - On Linux/macOS, if you get gradlew Permission denied: `chmod +x gen/android/gradlew`
 > - ⚠️ Don't use `--debug`: the debug build carries unstripped symbols (~238MB) vs ~12MB for release
 
-### 3.3 Signing (a release APK must be signed to install)
+### 4.3 Signing (a release APK must be signed to install)
 
 ```bash
 # Use the debug keystore (auto-generated by gradle at ~/.android/debug.keystore on first build) — fine for personal use
@@ -363,14 +400,14 @@ $ANDROID_HOME/build-tools/36.0.0/apksigner verify RustBookQuiz.apk   # ✅ no er
 
 Transfer the APK to your phone and install (allow "unknown sources"). The phone uses the embedded bank; the UI switches to the mobile layout automatically (☰ drawer sidebar, system status bar, single-column touch layout).
 
-### 3.4 Mobile notes when changing the shell code
+### 4.4 Mobile notes when changing the shell code
 
 - The entry point is in `lib.rs`: `#[cfg_attr(mobile, tauri::mobile_entry_point)] pub fn run()`; `main.rs` is just a thin desktop wrapper
 - Window APIs (minimize/maximize, etc.) must be gated with `#[cfg(desktop)]` — they don't exist on the Android target, otherwise you get E0599
 - External links go through `tauri-plugin-opener` (works on desktop and Android alike); the command lives in `open_url` in `lib.rs`
 - Mobile requires `icons/icon.png` (desktop uses .ico, mobile uses .png)
 
-## 4. Web
+## 5. Web
 
 The front end is a plain static WASM app: the `app/dist/` produced in [Common setup step 4](#common-setup-once-for-every-platform) is the entire deployable — **no backend, no database**; anything that serves static files works.
 

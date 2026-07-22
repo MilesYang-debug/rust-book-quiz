@@ -15,6 +15,8 @@ use std::collections::{BTreeMap, HashSet};
 use std::fs;
 use std::path::{Path, PathBuf};
 
+pub mod book_toc;
+
 #[derive(Debug, Clone, PartialEq, Deserialize)]
 pub struct Chapter {
     pub chapter: u32,
@@ -33,6 +35,10 @@ pub struct Question {
     pub prompt: String,
     #[serde(default)]
     pub code: Option<String>,
+    /// Optional fragment after `#` in the section page's URL, pointing at the
+    /// exact heading the question comes from (e.g. "installing-rustup-on-linux-or-macos").
+    #[serde(default)]
+    pub anchor: Option<String>,
     /// BTreeMap keeps option letters in A..E order.
     pub options: BTreeMap<String, String>,
     pub answer: Answer,
@@ -157,6 +163,23 @@ pub fn validate_dir(dir: &Path) -> Report {
             }
             if q.section.trim().is_empty() {
                 err("empty section".into());
+            } else if book_toc::book_url(ch.chapter, &q.section).is_none() {
+                err(format!(
+                    "section \"{}\" does not map to a page of The Book \
+                     (typo, wrong chapter number, or book_toc.rs needs updating)",
+                    q.section
+                ));
+            }
+            if let Some(a) = &q.anchor {
+                let ok = !a.is_empty()
+                    && a.bytes()
+                        .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == b'-' || c == b'_');
+                if !ok {
+                    err(format!(
+                        "anchor \"{a}\" must be the lowercase fragment after '#' \
+                         in the page URL (no '#', no spaces, no uppercase)"
+                    ));
+                }
             }
             if !TAGS.contains(&q.tag.as_str()) {
                 err(format!("bad tag \"{}\"", q.tag));
